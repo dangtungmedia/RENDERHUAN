@@ -38,8 +38,7 @@ load_dotenv()
 
 SECRET_KEY="ugz6iXZ.fM8+9sS}uleGtIb,wuQN^1J%EvnMBeW5#+CYX_ej&%"
 # SERVER='http://daphne:5505'
-SERVER='https://autospamnews.com'
-
+SERVER=os.environ.get('SERVER')
 
 def delete_directory(video_id):
     directory_path = f'media/{video_id}'
