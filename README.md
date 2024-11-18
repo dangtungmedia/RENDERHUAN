@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 $ virtualenv env
 $ source env/bin/activate
 $ pip3 install -r requirements.txt
@@ -26,3 +27,6 @@ LJi35iwxrADd2J
 https://www.youtube.com/watch?v=Z6gOGWSmjvU&pp=ygUGY2h1IGR1
 
 yt-dlp -v "https://www.youtube.com/watch?v=Z6gOGWSmjvU&pp=ygUGY2h1IGR1"
+=======
+# RENDERHUAN
+>>>>>>> 40e09a8fd040d12febc76deac38929eef11121ac
