@@ -7,6 +7,8 @@ services:
     volumes:
       - .:/app
     command: sh /app/download.sh
+    networks:
+      - app_network
     healthcheck:
       test: ["CMD", "test", "-f", "/app/video_screen/ready.txt"]
       interval: 1m30s
@@ -18,14 +20,25 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A celeryworker worker -l INFO --hostname=test@%h --concurrency=1 -Q render_video_reupload  
+    command: python start_celery.py
     volumes:
       - .:/app
-  # voicevox:
-  #   container_name: voicevox
-  #   image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
-  #   ports:
-  #     - "127.0.0.1:50021:50021"
-  #   restart: always 
-  #   volumes:
-  #     - .:/app
+    networks:
+      - app_network
+
+  voicevox:
+    container_name: voicevox
+    image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+    ports:
+      - "127.0.0.1:50021:50021"
+    restart: always 
+    volumes:
+      - .:/app
+    networks:
+      - app_network
+networks:
+  app_network:
+    driver: bridge
+
+
+      

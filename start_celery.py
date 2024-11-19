@@ -16,6 +16,9 @@ def get_public_ip():
 
 if __name__ == "__main__":
     # Lấy địa chỉ IP public
-    public_ip = get_public_ip()
+    ip_address = get_public_ip()
     
-    print(f"Public IP: {public_ip}")
+    # Chạy Celery worker với 2 worker và queue render_video
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}/ReupLoad --concurrency=1 -Q render_video_reupload")
+    
+    
