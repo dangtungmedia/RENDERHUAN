@@ -2,7 +2,7 @@
 
 if [ ! -d /app/video_screen ]; then
     echo 'Thư mục chưa tồn tại, tiến hành tải và giải nén.'
-    wget -O /app/video_screen.rar 'https://autospamnews.com/download_file_screen/' &&
+    wget -O /app/video_screen.rar 'https://hrmedia89.com/download_file_screen/' &&
     mkdir -p /app/video_screen &&
     unrar x /app/video_screen.rar /app/video_screen
 
