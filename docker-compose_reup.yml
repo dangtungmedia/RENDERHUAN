@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  video_screen:
+    build:
+      context: .
+    container_name: video_screen
+    volumes:
+      - .:/app
+    command: sh /app/download.sh
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/video_screen/ready.txt"]
+      interval: 1m30s
+      timeout: 20s
+      retries: 5
+
+  celery:
+    container_name: celery
+    restart: always
+    build:
+      context: .
+    command: python start_celery_content.py
+    volumes:
+      - .:/app
+    networks:
+      - app_network
+
+  voicevox:
+    container_name: voicevox
+    image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+    ports:
+      - "127.0.0.1:50021:50021"
+    restart: always 
+    volumes:
+      - .:/app
+    networks:
+      - app_network
+networks:
+  app_network:
+    driver: bridge
+
+
+      

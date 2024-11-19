@@ -19,6 +19,6 @@ if __name__ == "__main__":
     ip_address = get_public_ip()
     
     # Chạy Celery worker với 2 worker và queue render_video
-    os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}/ReupLoad --concurrency=1 -Q render_video_reupload")
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}-Content --concurrency=3 -Q render_video_content")
     
     
