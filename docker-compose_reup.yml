@@ -20,7 +20,7 @@ services:
     restart: always
     build:
       context: .
-    command: python start_celery_content.py
+    command: python start_celery_reup.py
     volumes:
       - .:/app
     networks:
