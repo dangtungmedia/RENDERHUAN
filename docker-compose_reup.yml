@@ -23,6 +23,7 @@ services:
     command: python start_celery_reup.py
     volumes:
       - .:/app
+      - ./voicevox_engine:/opt/voicevox_engine
     networks:
       - app_network
     environment:
