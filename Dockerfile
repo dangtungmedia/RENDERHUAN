@@ -5,8 +5,6 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV TZ=Asia/Ho_Chi_Minh
 
-
-
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update && apt-get install -y \
@@ -16,13 +14,22 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Optional: Add fonts if necessary
 COPY fonts/* /usr/share/fonts/truetype/custom/
 
 # Install dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-# RUN python -m nltk.downloader punkt
-# RUN python -m nltk.downloader stopwords
+
+# Set working directory
 WORKDIR /app
+
+# Copy application code
 COPY . .
+
+# Prepare /opt/voicevox_engine with write permissions
+RUN mkdir -p /opt/voicevox_engine && chmod -R 777 /opt/voicevox_engine
+
+# Expose ports if necessary
+EXPOSE 50021
