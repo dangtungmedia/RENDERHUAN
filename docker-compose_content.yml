@@ -25,7 +25,8 @@ services:
       - .:/app
     networks:
       - app_network
-
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
   voicevox:
     container_name: voicevox
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest

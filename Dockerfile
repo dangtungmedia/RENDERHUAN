@@ -27,5 +27,3 @@ WORKDIR /app
 
 # Copy application code
 COPY . .
-
-RUN mkdir -p /opt/voicevox_engine && chmod -R 777 /opt/voicevox_engine
