@@ -30,6 +30,3 @@ COPY . .
 
 # Prepare /opt/voicevox_engine with write permissions
 RUN mkdir -p /opt/voicevox_engine && chmod -R 777 /opt/voicevox_engine
-
-# Expose ports if necessary
-EXPOSE 50021
