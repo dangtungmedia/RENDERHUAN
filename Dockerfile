@@ -24,3 +24,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Set working directory
 WORKDIR /app
+
+# Copy application code
+COPY . .
