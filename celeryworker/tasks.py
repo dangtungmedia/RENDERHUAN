@@ -208,8 +208,10 @@ def convert_video(input_path, output_path, target_resolution="1280x720", target_
     try:
         subprocess.run(ffmpeg_command, check=True)
         print(f"Video đã được chuyển đổi và lưu tại {output_path}")
+        return True
     except subprocess.CalledProcessError as e:
         print(f"Lỗi khi chuyển đổi video: {e}")
+        return False
 
 def convert_video_backrought_reup(data,task_id, worker_id, success):
     video_id = data.get('video_id')
@@ -221,33 +223,51 @@ def convert_video_backrought_reup(data,task_id, worker_id, success):
     conver_count = 0  # Biến đếm số lượng video đã chuyển đổi thành công
     total_videos = len(success)  # Tổng số video cần chuyển đổi
 
-    for video in success:
-        file_name = get_filename_from_url(video)
-        video_path = f'media/{video_id}/video_backrought/{file_name}'
-        output_path = f'media/{video_id}/video/{file_name}.mp4'
-
-        # Kiểm tra nếu tệp video không tồn tại thì báo lỗi ngay
-        if not os.path.exists(video_path):
-            update_status_video(f"Render Lỗi: Tệp video {video_path} không tồn tại", video_id, task_id, worker_id)
-            print(f"Lỗi: Tệp video {video_path} không tồn tại")
-            return False  # Ngừng tiếp tục và trả về lỗi
-
-        try:
-            # Chuyển đổi video
-            convert_video(video_path, output_path)
-            conver_count += 1
-            percent_complete = (conver_count / total_videos) * 100  # Tính phần trăm hoàn thành
-            update_status_video(
-                f"Đang Render: đang chuyển đổi định dạng video {conver_count}/{total_videos} - {percent_complete:.2f}%",
-                video_id, task_id, worker_id
-            )
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = []
+        future_to_url = {}  # Khởi tạo từ điển để theo dõi các URL tương ứng với các tác vụ
         
-        except Exception as e:
-            # Nếu có lỗi xảy ra, dừng toàn bộ và báo lỗi
-            update_status_video(f"Render Lỗi : {str(e)}", video_id, task_id, worker_id)
-            print(f"Lỗi trong quá trình chuyển đổi video {video}: {str(e)}")
-            return False  # Ngừng tiếp tục và trả về lỗi
-
+        for video in success:
+            file_name = get_filename_from_url(video)
+            video_path = f'media/{video_id}/video_backrought/{file_name}'
+            output_path = f'media/{video_id}/video/{file_name}.mp4'
+            
+            future = executor.submit(convert_video, video_path, output_path)
+            futures.append(future)
+            future_to_url[future] = video  # Lưu trữ URL tương ứng với mỗi tác vụ
+            
+        for future in as_completed(futures):
+            try:
+                # Kiểm tra kết quả của từng tương lai
+                video = future_to_url[future]  # Lấy URL từ từ điển
+                if future.result():
+                    conver_count += 1
+                    percent_complete = (conver_count / total_videos) * 100  # Sửa lại tính phần trăm từ total_videos
+                    update_status_video(
+                        f"Đang Render: Chuyển đổi video thành công ({conver_count}/{total_videos}) - {percent_complete:.2f}%",
+                        video_id, task_id, worker_id
+                    )
+                else:
+                    # Hủy tất cả các tác vụ còn lại khi gặp lỗi chuyển đổi
+                    update_status_video(
+                        f"Render Lỗi: Không thể chuyển đổi video - {video}",
+                        video_id, task_id, worker_id
+                    )
+                    for pending in futures:
+                        pending.cancel()
+                    return False  # Trả về False nếu có lỗi chuyển đổi
+            except Exception as e:
+                print(f"Lỗi khi chuyển đổi video {video}: {e}")
+                update_status_video(
+                    f"Render Lỗi: Lỗi không xác định - {e} - {video}",
+                    video_id, task_id, worker_id
+                )
+                # Hủy tất cả các tác vụ còn lại và ngừng tiến trình
+                for pending in futures:
+                    pending.cancel()
+                return False
+          
+          
     # Nếu tất cả video được chuyển đổi thành công
     update_status_video("Đang Render: Đang xuất video hoàn thành", video_id, task_id, worker_id)
     
@@ -343,8 +363,6 @@ def convert_video_backrought_reup(data,task_id, worker_id, success):
     
     
 def cread_test_reup(data, task_id, worker_id):
-    
-    
     # Lấy ID video và đường dẫn tới video
     video_id = data.get('video_id')
     video_path = f'media/{video_id}/cache.mp4'
@@ -365,7 +383,7 @@ def cread_test_reup(data, task_id, worker_id):
     downloaded_images = 0
     
     # Tạo một ThreadPoolExecutor để tải video song song
-    with ThreadPoolExecutor(max_workers=15) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
         future_to_url = {}  # Khởi tạo từ điển để theo dõi các URL tương ứng với các tác vụ
         
