@@ -1828,6 +1828,12 @@ def download_image(data, task_id, worker_id):
     # Tải và kiểm tra nội dung văn bản
     text_entries = json.loads(text)
     for iteam in text_entries:
+        if iteam.get('url_video') =="":
+            update_status_video(
+                        f"Render Lỗi : iteam hình ảnh lỗi vui lòng xử lý lại",
+                        video_id, task_id, worker_id
+                    )
+            return False
         images.append(iteam.get('url_video'))
             
     print(f"Số lượng hình ảnh cần tải: {len(images)}")
