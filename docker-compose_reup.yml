@@ -24,10 +24,13 @@ services:
     volumes:
       - .:/app
       - ./voicevox_engine:/opt/voicevox_engine
+      - /etc/localtime:/etc/localtime:ro  # Gắn mount thời gian của hệ thống vào container
+      - /etc/timezone:/etc/timezone:ro    # Gắn mount múi giờ của hệ thống vào container
     networks:
       - app_network
     environment:
       - TZ=Asia/Ho_Chi_Minh
+
 
 networks:
   app_network:
