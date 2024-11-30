@@ -33,7 +33,7 @@ services:
     restart: always 
     volumes:
       - .:/app
-      - ./presets.yaml:/opt/voicevox_engine/presets.yaml
+      # - ./presets.yaml:/opt/voicevox_engine/presets.yaml
 networks:
   app_network:
     driver: bridge

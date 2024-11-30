@@ -1,20 +1,5 @@
 version: '3.8'
 services:
-  video_screen:
-    build:
-      context: .
-    container_name: video_screen
-    volumes:
-      - .:/app
-    command: sh /app/download.sh
-    networks:
-      - app_network
-    healthcheck:
-      test: ["CMD", "test", "-f", "/app/video_screen/ready.txt"]
-      interval: 1m30s
-      timeout: 20s
-      retries: 5
-
   celery:
     container_name: celery
     restart: always
