@@ -1490,6 +1490,9 @@ def process_voice_entry(data, text_entry, video_id, task_id, worker_id, language
         
     elif language == 'SUPER VOICE':
         success = get_voice_super_voice(data, text_entry['text'], file_name)
+        
+    elif language == 'Japanese ondoku3':
+        success = get_voice_ondoku3(data, text_entry['text'], file_name)
     
     # Trả về False nếu tải không thành công, dừng toàn bộ
     if not success:
@@ -1782,6 +1785,70 @@ def get_voice_chat_ai_human(data, text, file_name):
         print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
         return False
     return True
+
+
+def get_voice_ondoku3(data, text, file_name):
+    
+    
+    directory = os.path.dirname(file_name)
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+    
+    
+    url = f"https://ondoku3.com/en/text_to_speech/"
+    data = json.loads(data.get("style"))
+    headers = {  
+            "referer": "https://ondoku3.com/en/text_to_speech/",
+            "x-csrftoken": "PE5podrc4l812OtM9HlfsxAONQudZOLkGD7MABvA2LWtSw4y2iw6HFh83NVJBACs",
+            "cookie": "_gid=GA1.2.1148716843.1732981575; user=4528422; csrftoken=19cxmyey8AYC0SLW3Ll1piRuq7BGMW1i; sessionid=obz5r6tbjtjwswh6b5x4lzc2iiihcgi4; django_language=en; _gat_gtag_UA_111769414_6=1; _ga=GA1.1.31832820.1732272096; _ga_0MMKHHJ235=GS1.1.1733029892.5.1.1733036426.0.0.0"
+            
+        }
+    data['text'] = text
+    
+    
+    while not success and attempt < 10:
+        try:
+            # Gửi yêu cầu đến API để lấy URL tệp âm thanh
+            response = requests.post(url, data=data, headers=headers)
+            response.raise_for_status()  # Kiểm tra mã trạng thái HTTP
+            
+            response_json = response.json()
+            tts_path = response_json.get('url')
+            if not tts_path:
+                raise ValueError("Không nhận được đường dẫn tệp âm thanh từ API.")
+
+            # Tải xuống tệp âm thanh từ URL trả về
+            response_synthesis = requests.get(tts_path)
+            response_synthesis.raise_for_status()  # Kiểm tra mã trạng thái HTTP
+
+            # Lưu tệp âm thanh
+            with open(file_name, 'wb') as f:
+                f.write(response_synthesis.content)
+            
+            # Kiểm tra độ dài tệp âm thanh
+            duration = get_audio_duration(file_name)
+            if duration > 0:
+                success = True
+                print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+            else:
+                if os.path.exists(file_name):
+                    os.remove(file_name)  # Xóa tệp nếu không hợp lệ
+                print(f"Lỗi: Tệp âm thanh {file_name} không hợp lệ.")
+        
+        except requests.RequestException as e:
+            print(f"Lỗi mạng khi gọi API AI Human Studio: {e}. Thử lại...")
+        except Exception as e:
+            print(f"Lỗi không xác định: {e}. Thử lại...")
+
+        attempt += 1
+        if not success:
+            time.sleep(1)  # Đợi 1 giây trước khi thử lại
+
+    if not success:
+        print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
+        return False
+    return True
+
       
 def get_filename_from_url(url):
     parsed_url = urllib.parse.urlparse(url)
