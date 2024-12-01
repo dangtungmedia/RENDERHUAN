@@ -879,7 +879,7 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
         scale_factor = 1  # Giữ nguyên tốc độ video nếu video dài hơn hoặc bằng audio
     
     base_video = get_random_video_from_directory(overlay_video_dir)
-    is_overlay_video = random.choice([True, False])
+    is_overlay_video = random.choice([False])
     
     if is_overlay_video:
         cmd = [
@@ -1115,7 +1115,7 @@ def get_random_video_from_directory(directory_path):
     return os.path.join(directory_path, random.choice(video_files))
 
 def image_to_video_zoom_out(input_image, output_video, duration, scale_width, scale_height, overlay_video):
-    is_overlay_video = random.choice([True, False])
+    is_overlay_video = random.choice([False])
     base_video = get_random_video_from_directory(overlay_video)
     time_video = format_time(duration)
     if is_overlay_video:
@@ -1162,7 +1162,7 @@ def image_to_video_zoom_out(input_image, output_video, duration, scale_width, sc
         print(f"lỗi chạy FFMPEG {e}")
 
 def image_to_video_zoom_in(input_image, output_video, duration, scale_width, scale_height, overlay_video):
-    is_overlay_video = random.choice([True, False])
+    is_overlay_video = random.choice([False])
     base_video = get_random_video_from_directory(overlay_video)
     time_video = format_time(duration)
     if is_overlay_video:
@@ -1793,8 +1793,6 @@ def get_voice_ondoku3(data, text, file_name):
     directory = os.path.dirname(file_name)
     if not os.path.exists(directory):
         os.makedirs(directory, exist_ok=True)
-    
-    
     url = f"https://ondoku3.com/en/text_to_speech/"
     data = json.loads(data.get("style"))
     headers = {  
@@ -1805,7 +1803,8 @@ def get_voice_ondoku3(data, text, file_name):
         }
     data['text'] = text
     
-    
+    success = False
+    attempt = 0
     while not success and attempt < 10:
         try:
             # Gửi yêu cầu đến API để lấy URL tệp âm thanh
@@ -1814,6 +1813,9 @@ def get_voice_ondoku3(data, text, file_name):
             
             response_json = response.json()
             tts_path = response_json.get('url')
+            print(tts_path)
+            print(response_json)
+            print("=========================================")
             if not tts_path:
                 raise ValueError("Không nhận được đường dẫn tệp âm thanh từ API.")
 
