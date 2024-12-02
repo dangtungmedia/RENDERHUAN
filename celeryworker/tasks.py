@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 from dotenv import load_dotenv
 
-from random_video_effect  import random_video_effect
+from .random_video_effect  import random_video_effect_cython
 
 # Nạp biến môi trường từ file .env
 load_dotenv()
@@ -1052,8 +1052,8 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
             cut_and_scale_video_random(path_file, out_file, duration, 1920, 1080, 'video_screen')
         elif file_type == "image":
             
-            cache_file = out_file = f'media/{video_id}/video/chace_{text_entry["id"]}.mp4'
-            success = random_video_effect(path_file, cache_file, duration,24,1920, 1080)
+            cache_file = f'media/{video_id}/video/chace_{text_entry["id"]}.mp4'
+            success = random_video_effect_cython(path_file, cache_file, duration,24,1920, 1080)
             if not success:
                 update_status_video(
                         f"Render Lỗi : Không thể xử lý video render {text_entry['id']}", video_id, task_id, worker_id)
@@ -1521,24 +1521,19 @@ def get_voice_japanese(data, text, file_name):
     while not success and attempt < 10:
         try:
             # Tạo audio query với VoiceVox
-            url_query = f"http://voicevox:50021/audio_query?speaker={voice_id}"
-            response_query = requests.post(url_query, params={'text': text})
-            response_query.raise_for_status()  # Kiểm tra mã trạng thái HTTP
+            response_query = requests.post(
+                            f'http://voicevox:50021/audio_query?speaker={voice_id}',  # API để tạo audio_query
+                            params={'text': text}  # Gửi văn bản cần chuyển thành giọng nói
+                        )
+                                    
             
-            # Lấy JSON từ phản hồi và điều chỉnh tốc độ
-            query_json = response_query.json()
-            query_json["speedScale"] = 1.0  # Điều chỉnh tốc độ
-
+            
             # Yêu cầu tạo âm thanh
             url_synthesis = f"http://voicevox:50021/synthesis?speaker={voice_id}"
-            headers = {"Content-Type": "application/json"}
-            response_synthesis = requests.post(url_synthesis, headers=headers, json=query_json)
-            response_synthesis.raise_for_status()  # Kiểm tra mã trạng thái HTTP
-
+            response_synthesis = requests.post(url_synthesis,data=json.dumps(response_query.json()))
             # Ghi nội dung phản hồi vào tệp
             with open(file_name, 'wb') as f:
                 f.write(response_synthesis.content)
-
             # Kiểm tra độ dài tệp âm thanh
             duration = get_audio_duration(file_name)
             if duration > 0:  # Đảm bảo rằng âm thanh có độ dài hợp lý
@@ -1722,8 +1717,6 @@ def get_voice_chat_ai_human(data, text, file_name):
 
 
 def get_voice_ondoku3(data, text, file_name):
-    
-    
     directory = os.path.dirname(file_name)
     if not os.path.exists(directory):
         os.makedirs(directory, exist_ok=True)
