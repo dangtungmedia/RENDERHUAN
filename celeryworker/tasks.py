@@ -1834,7 +1834,7 @@ def download_image(data, task_id, worker_id):
 
     downloaded_images = 0  # Số hình ảnh đã tải xuống thành công
 
-    with ThreadPoolExecutor(max_workers=15) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         future_to_url = {
             executor.submit(download_single_image, image, local_directory): image
             for image in images
