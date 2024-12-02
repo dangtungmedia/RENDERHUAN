@@ -879,7 +879,7 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
     else:
         scale_factor = 1  # Giữ nguyên tốc độ video nếu video dài hơn hoặc bằng audio
     
-    base_video = get_random_video_from_directory(overlay_video_dir)
+    # base_video = get_random_video_from_directory(overlay_video_dir)
     is_overlay_video = random.choice([False])
     
     if is_overlay_video:
@@ -1060,7 +1060,7 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
                 return False
             else:
                 random_choice = random.choice([False])
-                base_video = get_random_video_from_directory('video_screen')
+                # base_video = get_random_video_from_directory('video_screen')
                 if random_choice:
                     cmd = [  
                             "ffmpeg",  
