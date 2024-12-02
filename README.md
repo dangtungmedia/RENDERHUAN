@@ -2,7 +2,7 @@ $ virtualenv env
 $ source env/bin/activate
 $ pip3 install -r requirements.txt
 
-.\env\Scripts\activate
+.venv\Scripts\activate
 
 $pip freeze > requirements.txt
 

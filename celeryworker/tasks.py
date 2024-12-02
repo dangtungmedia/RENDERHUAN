@@ -32,6 +32,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 from dotenv import load_dotenv
 
+from random_video_effect  import random_video_effect
+
 # Nạp biến môi trường từ file .env
 load_dotenv()
 
@@ -451,7 +453,6 @@ def select_videos_by_total_duration(file_path, min_duration):
         data.remove(video)
     
     return selected_urls
-
 
 class UploadProgress:
     def __init__(self, data, task_id, worker_id):
@@ -883,27 +884,28 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
     
     if is_overlay_video:
         cmd = [
-            "ffmpeg",
-            "-i", input_video,
-            "-ss", start_time_str,  # Thời gian bắt đầu cắt của video đầu vào
-            "-t", str(duration),     # Thời gian video cần cắt
-            "-i", base_video,
-            "-ss", start_time_str,  # Thời gian bắt đầu cắt của video overlay
-            "-t", str(duration),    # Thời gian video cần cắt
-            "-filter_complex", f"[0:v]scale={scale_width}:{scale_height},setpts={scale_factor}*PTS[bg];"
-                            f"[1:v]scale={scale_width}:{scale_height},setpts={scale_factor}*PTS[overlay_scaled];"
-                            f"[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",  # overlay video
-            "-map", "[outv]",
-            "-r", "24",             # Tốc độ khung hình đầu ra
-            "-c:v", "libx264",      # Codec video
-            "-crf", "18",           # Chất lượng video
-            "-preset", "medium",    # Tốc độ mã hóa
-            "-pix_fmt", "yuv420p",  # Đảm bảo tương thích với đầu ra
-            "-vsync", "2",          # Đồng bộ hóa video
-            "-loglevel", "debug",   # Đặt mức log level để ghi chi tiết
-            "-y",                   # Ghi đè file đầu ra nếu đã tồn tại
-            output_video
-        ]
+                "ffmpeg",
+                "-i", input_video,  # Video nền
+                "-ss", start_time_str,
+                "-t", str(duration),
+                "-i", base_video,  # Video overlay
+                "-ss", start_time_str,
+                "-t", str(duration),
+                "-filter_complex", 
+                "[0:v]fps=24,scale={scale_width}:{scale_height},minterpolate=fps=24[bg];"
+                "[1:v]fps=24,scale={scale_width}:{scale_height},minterpolate=fps=24[overlay_scaled];"
+                "[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",  # overlay video
+                "-map", "[outv]",
+                "-r", "24",             # Tốc độ khung hình đầu ra
+                "-c:v", "libx264",      # Codec video
+                "-crf", "18",           # Chất lượng video
+                "-preset", "medium",    # Tốc độ mã hóa
+                "-pix_fmt", "yuv420p",  # Đảm bảo tương thích với đầu ra
+                "-vsync", "1",          # Đồng bộ hóa video
+                "-loglevel", "debug",   # Đặt mức log level để ghi chi tiết
+                "-y",                   # Ghi đè file đầu ra nếu đã tồn tại
+                output_video
+            ]
     else:
         cmd = [
             "ffmpeg",
@@ -916,7 +918,7 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
             "-crf", "18",            # Chất lượng video
             "-preset", "medium",     # Tốc độ mã hóa
             "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
-            "-vsync", "2",           # Đồng bộ hóa video
+            "-vsync", "1",           # Đồng bộ hóa video
             "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
             "-y",                    # Ghi đè file đầu ra nếu đã tồn tại
             output_video
@@ -1049,13 +1051,39 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         if file_type == "video":
             cut_and_scale_video_random(path_file, out_file, duration, 1920, 1080, 'video_screen')
         elif file_type == "image":
-            random_choice = random.choice([True, False])
-            if random_choice:
-                image_to_video_zoom_in(path_file, out_file, duration, 1920, 1080, 'video_screen')
+            
+            cache_file = out_file = f'media/{video_id}/video/chace_{text_entry["id"]}.mp4'
+            success = random_video_effect(path_file, cache_file, duration,24,1920, 1080)
+            if not success:
+                update_status_video(
+                        f"Render Lỗi : Không thể xử lý video render {text_entry['id']}", video_id, task_id, worker_id)
+                return False
             else:
-                image_to_video_zoom_out(path_file, out_file, duration, 1920, 1080, 'video_screen')
+                random_choice = random.choice([False])
+                base_video = get_random_video_from_directory('video_screen')
+                if random_choice:
+                    cmd = [  
+                            "ffmpeg",  
+                            "-i", cache_file,  
+                            "-i", base_video,  
+                            "-filter_complex", "[0:v]fps=24,scale=1280:720,minterpolate=fps=24[bg];"  
+                                            "[1:v]fps=24,scale=1280:720,minterpolate=fps=24[overlay_scaled];"  
+                                            "[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",  
+                            "-map", "[outv]",  
+                            "-r", "24",  
+                            "-c:v", "libx264",  
+                            "-crf", "18",  
+                            "-preset", "medium",  
+                            "-pix_fmt", "yuv420p",  
+                            "-vsync", "1",  
+                            "-loglevel", "debug",  
+                            "-y", out_file  
+                        ]  
+                    subprocess.run(cmd, check=True)    
+                else:
+                    os.rename(cache_file, out_file)
         return True
-    except :
+    except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return False
 
@@ -1113,100 +1141,6 @@ def create_video_lines(data, task_id, worker_id):
 def get_random_video_from_directory(directory_path):
     video_files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
     return os.path.join(directory_path, random.choice(video_files))
-
-def image_to_video_zoom_out(input_image, output_video, duration, scale_width, scale_height, overlay_video):
-    is_overlay_video = random.choice([False])
-    base_video = get_random_video_from_directory(overlay_video)
-    time_video = format_time(duration)
-    if is_overlay_video:
-        ffmpeg_command = [
-            'ffmpeg',
-            '-loop', '1',
-            '-framerate','24',
-            '-i', input_image,
-            '-i', base_video,
-            '-filter_complex',
-            f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24[bg];[1:v]scale={scale_width}:{scale_height}[overlay_scaled];[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
-            '-map', '[outv]',
-            '-t', time_video,
-            "-r", "24",
-            "-c:v", "libx264",
-            "-crf", "18",
-            "-preset", "medium",
-            "-loglevel", "debug",  # Thêm tùy chọn loglevel
-            "-y",
-            output_video
-        ]
-
-    else:
-        ffmpeg_command = [
-        'ffmpeg',
-        '-loop', '1',
-        '-framerate','24',
-        '-i', input_image,
-        '-vf',
-        f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
-        '-t', time_video,
-        "-r", "24",
-        "-c:v", "libx264",
-        "-crf", "18",
-        "-preset", "medium",
-        "-loglevel", "debug",  # Thêm tùy chọn loglevel
-        "-y",
-        output_video
-    ]
-    try:
-        # Chạy lệnh FFmpeg
-        subprocess.run(ffmpeg_command, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"lỗi chạy FFMPEG {e}")
-
-def image_to_video_zoom_in(input_image, output_video, duration, scale_width, scale_height, overlay_video):
-    is_overlay_video = random.choice([False])
-    base_video = get_random_video_from_directory(overlay_video)
-    time_video = format_time(duration)
-    if is_overlay_video:
-        ffmpeg_command = [
-            'ffmpeg',
-            '-loop', '1',
-            '-framerate','24',
-            '-i', input_image,
-            '-i', base_video,
-            '-filter_complex',
-            f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24[bg];[1:v]scale={scale_width}:{scale_height}[overlay_scaled];[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
-            '-map', '[outv]',
-            '-t', time_video,
-            "-r", "24",
-            "-c:v", "libx264",
-            "-crf", "18",
-            "-preset", "medium",
-            "-loglevel", "debug",  # Thêm tùy chọn loglevel
-            "-y",
-            output_video
-        ]
-
-    else:
-        ffmpeg_command = [
-        'ffmpeg',
-        '-loop', '1',
-        '-framerate','24',
-        '-i', input_image,
-        '-vf',
-        f"format=yuv420p,scale=8000:-1,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
-        '-t', time_video,
-        "-r", "24",
-        "-c:v", "libx264",
-        "-crf", "18",
-        "-preset", "medium",
-        "-loglevel", "debug",  # Thêm tùy chọn loglevel
-        "-y",
-        output_video
-    ]
-    try:
-        # Chạy lệnh FFmpeg
-        subprocess.run(ffmpeg_command, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"lỗi chạy FFMPEG {e}")
 
 def get_voice_super_voice(data, text, file_name):     
     success = False

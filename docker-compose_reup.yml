@@ -10,7 +10,6 @@ services:
       - .:/app
     networks:
       - app_network
-
 networks:
   app_network:
     driver: bridge
