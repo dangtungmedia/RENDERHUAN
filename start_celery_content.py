@@ -28,8 +28,8 @@ if __name__ == "__main__":
     if ip_address:
         # Lấy số lượng lõi CPU vật lý
         physical_cores, logical_cores = get_cpu_cores()
-
+        
         # Chạy Celery worker với số lượng worker là physical_cores - 1 (bớt 1 để tránh overload)
-        os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}-Reup --concurrency={physical_cores - 1} -Q render_video_reupload")
+        os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}-Reup --concurrency={physical_cores - 1} -Q render_video_content")
     else:
         print("Không thể lấy địa chỉ IP public.")
