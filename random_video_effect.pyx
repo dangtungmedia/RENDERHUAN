@@ -1,30 +1,42 @@
 import cv2
 cimport cv2
 import random
-from libc.stdlib cimport malloc, free
+import numpy as np  # Import numpy
 
 def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):
-    cdef object image = cv2.imread(image_path)
+    # Đọc ảnh
+    image = cv2.imread(image_path)
     
     if image is None:
         raise ValueError(f"Không thể đọc hình ảnh từ {image_path}. Vui lòng kiểm tra lại đường dẫn.")
     
-    cdef int orig_height = image.shape[0], orig_width = image.shape[1]
+    orig_height, orig_width = image.shape[:2]
     
-    if orig_width < orig_height:
-        scale_factor = target_width / orig_width
-    else:
-        scale_factor = target_height / orig_height
+    print(f"Kích thước ảnh gốc: {orig_width}x{orig_height}")
     
-    cdef int new_width = int(orig_width * scale_factor)
-    cdef int new_height = int(orig_height * scale_factor)
+    # Tính tỷ lệ phóng to sao cho một trong các cạnh bằng target_width hoặc target_height
+    scale_w = target_width / orig_width
+    scale_h = target_height / orig_height
     
-    cdef object resized_image = cv2.resize(image, (new_width, new_height))
+    # Chọn tỷ lệ phóng to lớn nhất để phóng to ảnh mà không bị thiếu
+    scale_factor = max(scale_w, scale_h)
     
-    cdef int start_x = (new_width - target_width) // 2
-    cdef int start_y = (new_height - target_height) // 2
+    # Tính kích thước mới sau khi phóng to
+    new_width = int(orig_width * scale_factor)
+    new_height = int(orig_height * scale_factor)
     
-    cdef object cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
+    print(f"Tỷ lệ phóng to: {scale_factor}")
+    print(f"Kích thước mới sau khi phóng to: {new_width}x{new_height}")
+    
+    # Thay đổi kích thước ảnh
+    resized_image = cv2.resize(image, (new_width, new_height))
+    
+    # Cắt căn giữa nếu ảnh sau khi phóng to vượt quá kích thước mục tiêu
+    start_x = (new_width - target_width) // 2
+    start_y = (new_height - target_height) // 2
+    
+    # Cắt ảnh để có kích thước target_width x target_height
+    cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
     
     return cropped_image
 
@@ -114,7 +126,6 @@ def create_parallax_left_video(image_path: str, output_path: str, duration: floa
     
     # Giải phóng video writer và đóng cửa sổ OpenCV
     out.release()
-    cv2.destroyAllWindows()
 
 
 def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
@@ -179,7 +190,6 @@ def create_parallax_right_video(image_path: str, output_path: str, duration: flo
     
     # Giải phóng video writer và đóng cửa sổ OpenCV
     out.release()
-    cv2.destroyAllWindows()
 
 
 def create_scrolling_image_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
@@ -554,14 +564,15 @@ def random_video_effect_cython(image_path: str, output_path: str, duration: floa
         create_parallax_left_video,
         create_parallax_right_video
     ]
-    
     try:
         # Chọn ngẫu nhiên một hàm từ danh sách
         selected_function = random.choice(functions)
-    
         # Gọi hàm được chọn ngẫu nhiên với các tham số đã định nghĩa
         selected_function(image_path, output_path, duration, fps, width, height)
         return True
     except Exception as e:
         print(f"Error occurred while executing the selected function: {e}")
+        with open("error_log.txt", "a") as f:
+            f.write(f"Error occurred for image: {image_path}\n")
+            f.write(f"Error message: {e}\n\n")
         return False

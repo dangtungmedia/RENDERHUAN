@@ -3,7 +3,6 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
-        "depends": [],
         "name": "random_video_effect",
         "sources": [
             "random_video_effect.pyx"
@@ -1232,8 +1231,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #define __PYX_HAVE__random_video_effect
 #define __PYX_HAVE_API__random_video_effect
 /* Early includes */
-#include <string.h>
-#include <stdlib.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -1900,6 +1897,54 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
+/* SliceObject.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
+        PyObject* obj, Py_ssize_t cstart, Py_ssize_t cstop,
+        PyObject** py_start, PyObject** py_stop, PyObject** py_slice,
+        int has_cstart, int has_cstop, int wraparound);
+
+/* RaiseTooManyValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
+
+/* RaiseNeedMoreValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
+
+/* IterFinish.proto */
+static CYTHON_INLINE int __Pyx_IterFinish(void);
+
+/* UnpackItemEndCheck.proto */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
+
+/* PyObjectFormatSimple.proto */
+#if CYTHON_COMPILING_IN_PYPY
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#elif PY_MAJOR_VERSION < 3
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyString_CheckExact(s)) ? PyUnicode_FromEncodedObject(s, NULL, "strict") :\
+        PyObject_Format(s, f))
+#elif CYTHON_USE_TYPE_SLOTS
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyLong_CheckExact(s)) ? PyLong_Type.tp_repr(s) :\
+        likely(PyFloat_CheckExact(s)) ? PyFloat_Type.tp_repr(s) :\
+        PyObject_Format(s, f))
+#else
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#endif
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_FloorDivideObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_FloorDivideObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceFloorDivide(op1, op2) : PyNumber_FloorDivide(op1, op2))
+#endif
+
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
     (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
@@ -1922,38 +1967,12 @@ static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
                                                      int is_list, int wraparound, int boundscheck);
 
-/* PyIntBinop.proto */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_FloorDivideObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
-#else
-#define __Pyx_PyInt_FloorDivideObjC(op1, op2, intval, inplace, zerodivision_check)\
-    (inplace ? PyNumber_InPlaceFloorDivide(op1, op2) : PyNumber_FloorDivide(op1, op2))
-#endif
-
 /* ObjectGetItem.proto */
 #if CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject *key);
 #else
 #define __Pyx_PyObject_GetItem(obj, key)  PyObject_GetItem(obj, key)
 #endif
-
-/* SliceObject.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
-        PyObject* obj, Py_ssize_t cstart, Py_ssize_t cstop,
-        PyObject** py_start, PyObject** py_stop, PyObject** py_slice,
-        int has_cstart, int has_cstop, int wraparound);
-
-/* RaiseTooManyValuesToUnpack.proto */
-static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
-
-/* RaiseNeedMoreValuesToUnpack.proto */
-static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
-
-/* IterFinish.proto */
-static CYTHON_INLINE int __Pyx_IterFinish(void);
-
-/* UnpackItemEndCheck.proto */
-static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
 
 /* RaiseUnexpectedTypeError.proto */
 static int __Pyx_RaiseUnexpectedTypeError(const char *expected, PyObject *obj);
@@ -1966,6 +1985,16 @@ static CYTHON_INLINE PyObject* __Pyx_PyUnicode_Unicode(PyObject *obj);
 static CYTHON_INLINE PyObject* __Pyx_PyInt_FromDouble(double value);
 #else
 #define __Pyx_PyInt_FromDouble(value) PyLong_FromDouble(value)
+#endif
+
+/* PyObjectLookupSpecial.proto */
+#if CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_LookupSpecialNoError(obj, attr_name)  __Pyx__PyObject_LookupSpecial(obj, attr_name, 0)
+#define __Pyx_PyObject_LookupSpecial(obj, attr_name)  __Pyx__PyObject_LookupSpecial(obj, attr_name, 1)
+static CYTHON_INLINE PyObject* __Pyx__PyObject_LookupSpecial(PyObject* obj, PyObject* attr_name, int with_error);
+#else
+#define __Pyx_PyObject_LookupSpecialNoError(o,n) __Pyx_PyObject_GetAttrStrNoError(o,n)
+#define __Pyx_PyObject_LookupSpecial(o,n) __Pyx_PyObject_GetAttrStr(o,n)
 #endif
 
 /* GetTopmostException.proto */
@@ -1990,28 +2019,6 @@ static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject 
 static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
 #else
 static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
-#endif
-
-/* PyObjectFormatSimple.proto */
-#if CYTHON_COMPILING_IN_PYPY
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        PyObject_Format(s, f))
-#elif PY_MAJOR_VERSION < 3
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        likely(PyString_CheckExact(s)) ? PyUnicode_FromEncodedObject(s, NULL, "strict") :\
-        PyObject_Format(s, f))
-#elif CYTHON_USE_TYPE_SLOTS
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        likely(PyLong_CheckExact(s)) ? PyLong_Type.tp_repr(s) :\
-        likely(PyFloat_CheckExact(s)) ? PyFloat_Type.tp_repr(s) :\
-        PyObject_Format(s, f))
-#else
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        PyObject_Format(s, f))
 #endif
 
 /* SwapException.proto */
@@ -2265,10 +2272,6 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 /* Module declarations from "cv2" */
 
-/* Module declarations from "libc.string" */
-
-/* Module declarations from "libc.stdlib" */
-
 /* Module declarations from "random_video_effect" */
 /* #### Code section: typeinfo ### */
 /* #### Code section: before_global_var ### */
@@ -2279,12 +2282,20 @@ int __pyx_module_is_main_random_video_effect = 0;
 /* Implementation of "random_video_effect" */
 /* #### Code section: global_var ### */
 static PyObject *__pyx_builtin_ValueError;
-static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_print;
+static PyObject *__pyx_builtin_range;
+static PyObject *__pyx_builtin_open;
 /* #### Code section: string_decls ### */
+static const char __pyx_k_a[] = "a";
 static const char __pyx_k_e[] = "e";
-static const char __pyx_k__3[] = "*";
-static const char __pyx_k__23[] = "?";
+static const char __pyx_k_f[] = "f";
+static const char __pyx_k_x[] = "x";
+static const char __pyx_k__4[] = "\n";
+static const char __pyx_k__7[] = "\n\n";
+static const char __pyx_k__8[] = "*";
+static const char __pyx_k_np[] = "np";
+static const char __pyx_k_FPS[] = ", FPS: ";
+static const char __pyx_k__28[] = "?";
 static const char __pyx_k_cv2[] = "cv2";
 static const char __pyx_k_fps[] = "fps";
 static const char __pyx_k_int[] = "int";
@@ -2292,20 +2303,26 @@ static const char __pyx_k_out[] = "out";
 static const char __pyx_k_str[] = "str";
 static const char __pyx_k_None[] = "None";
 static const char __pyx_k_copy[] = "copy";
+static const char __pyx_k_exit[] = "__exit__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mp4v[] = "mp4v";
 static const char __pyx_k_name[] = "__name__";
+static const char __pyx_k_open[] = "open";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_Width[] = ", Width: ";
+static const char __pyx_k_enter[] = "__enter__";
 static const char __pyx_k_float[] = "float";
 static const char __pyx_k_frame[] = "frame";
 static const char __pyx_k_image[] = "image";
+static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_print[] = "print";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_value[] = "value";
 static const char __pyx_k_width[] = "width";
 static const char __pyx_k_write[] = "write";
+static const char __pyx_k_Height[] = ", Height: ";
 static const char __pyx_k_choice[] = "choice";
 static const char __pyx_k_fourcc[] = "fourcc";
 static const char __pyx_k_height[] = "height";
@@ -2318,6 +2335,8 @@ static const char __pyx_k_down_up[] = "down_up";
 static const char __pyx_k_image_1[] = "image_1";
 static const char __pyx_k_image_2[] = "image_2";
 static const char __pyx_k_release[] = "release";
+static const char __pyx_k_scale_h[] = "scale_h";
+static const char __pyx_k_scale_w[] = "scale_w";
 static const char __pyx_k_start_x[] = "start_x";
 static const char __pyx_k_start_y[] = "start_y";
 static const char __pyx_k_total_1[] = "total_1";
@@ -2325,6 +2344,7 @@ static const char __pyx_k_total_2[] = "total_2";
 static const char __pyx_k_up_down[] = "up_down";
 static const char __pyx_k_width_1[] = "width_1";
 static const char __pyx_k_width_2[] = "width_2";
+static const char __pyx_k_Duration[] = "Duration: ";
 static const char __pyx_k_duration[] = "duration";
 static const char __pyx_k_height_1[] = "height_1";
 static const char __pyx_k_height_2[] = "height_2";
@@ -2347,11 +2367,13 @@ static const char __pyx_k_right_left[] = "right_left";
 static const char __pyx_k_start_x_bg[] = "start_x_bg";
 static const char __pyx_k_start_y_bg[] = "start_y_bg";
 static const char __pyx_k_total_move[] = "total_move";
+static const char __pyx_k_T_l_phng_to[] = "T\341\273\267 l\341\273\207 ph\303\263ng to: ";
 static const char __pyx_k_VideoWriter[] = "VideoWriter";
 static const char __pyx_k_orig_height[] = "orig_height";
 static const char __pyx_k_output_path[] = "output_path";
 static const char __pyx_k_scale_width[] = "scale_width";
 static const char __pyx_k_start_scale[] = "start_scale";
+static const char __pyx_k_success_txt[] = "success.txt";
 static const char __pyx_k_GaussianBlur[] = "GaussianBlur";
 static const char __pyx_k_INTER_LINEAR[] = "INTER_LINEAR";
 static const char __pyx_k_current_x_bg[] = "current_x_bg";
@@ -2363,12 +2385,15 @@ static const char __pyx_k_scale_factor[] = "scale_factor";
 static const char __pyx_k_scale_height[] = "scale_height";
 static const char __pyx_k_target_width[] = "target_width";
 static const char __pyx_k_total_frames[] = "total_frames";
+static const char __pyx_k_Error_message[] = "Error message: ";
+static const char __pyx_k_Kch_thc_nh_gc[] = "K\303\255ch th\306\260\341\273\233c \341\272\243nh g\341\273\221c: ";
 static const char __pyx_k_blur_strength[] = "blur_strength";
 static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_cropped_image[] = "cropped_image";
 static const char __pyx_k_current_scale[] = "current_scale";
 static const char __pyx_k_current_x_img[] = "current_x_img";
 static const char __pyx_k_end_scale_img[] = "end_scale_img";
+static const char __pyx_k_error_log_txt[] = "error_log.txt";
 static const char __pyx_k_image_resized[] = "image_resized";
 static const char __pyx_k_interpolation[] = "interpolation";
 static const char __pyx_k_resized_image[] = "resized_image";
@@ -2384,8 +2409,8 @@ static const char __pyx_k_BORDER_CONSTANT[] = "BORDER_CONSTANT";
 static const char __pyx_k_resize_and_crop[] = "resize_and_crop";
 static const char __pyx_k_start_scale_img[] = "start_scale_img";
 static const char __pyx_k_resize_and_limit[] = "resize_and_limit";
+static const char __pyx_k_Selected_function[] = "Selected function: ";
 static const char __pyx_k_check_image_ratio[] = "check_image_ratio";
-static const char __pyx_k_destroyAllWindows[] = "destroyAllWindows";
 static const char __pyx_k_move_per_frame_bg[] = "move_per_frame_bg";
 static const char __pyx_k_selected_function[] = "selected_function";
 static const char __pyx_k_Khng_th_c_hnh_nh_t[] = "Kh\303\264ng th\341\273\203 \304\221\341\273\215c h\303\254nh \341\272\243nh t\341\273\253 ";
@@ -2404,7 +2429,9 @@ static const char __pyx_k_create_zoom_out_video[] = "create_zoom_out_video";
 static const char __pyx_k_Cannot_read_image_from[] = "Cannot read image from ";
 static const char __pyx_k_Video_c_to_thnh_cng_ti[] = "Video \304\221\303\243 \304\221\306\260\341\273\243c t\341\272\241o th\303\240nh c\303\264ng t\341\272\241i: ";
 static const char __pyx_k_random_video_effect_pyx[] = "random_video_effect.pyx";
+static const char __pyx_k_Error_occurred_for_image[] = "Error occurred for image: ";
 static const char __pyx_k_Vui_lng_kim_tra_li_ng_dn[] = ". Vui l\303\262ng ki\341\273\203m tra l\341\272\241i \304\221\306\260\341\273\235ng d\341\272\253n.";
+static const char __pyx_k_Kch_thc_mi_sau_khi_phng_to[] = "K\303\255ch th\306\260\341\273\233c m\341\273\233i sau khi ph\303\263ng to: ";
 static const char __pyx_k_create_parallax_left_video[] = "create_parallax_left_video";
 static const char __pyx_k_random_video_effect_cython[] = "random_video_effect_cython";
 static const char __pyx_k_create_parallax_right_video[] = "create_parallax_right_video";
@@ -2468,19 +2495,24 @@ typedef struct {
   #endif
   #if CYTHON_USE_MODULE_STATE
   #endif
-  #if CYTHON_USE_MODULE_STATE
-  #endif
-  #if CYTHON_USE_MODULE_STATE
-  #endif
   PyObject *__pyx_n_s_BORDER_CONSTANT;
   PyObject *__pyx_kp_u_Cannot_read_image_from;
+  PyObject *__pyx_kp_u_Duration;
+  PyObject *__pyx_kp_u_Error_message;
+  PyObject *__pyx_kp_u_Error_occurred_for_image;
   PyObject *__pyx_kp_u_Error_occurred_while_executing_t;
+  PyObject *__pyx_kp_u_FPS;
   PyObject *__pyx_n_s_GaussianBlur;
+  PyObject *__pyx_kp_u_Height;
   PyObject *__pyx_n_s_INTER_LINEAR;
+  PyObject *__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to;
+  PyObject *__pyx_kp_u_Kch_thc_nh_gc;
   PyObject *__pyx_kp_u_Khng_th_c_hnh_nh_t;
   PyObject *__pyx_kp_u_None;
   PyObject *__pyx_kp_u_Please_check_the_path;
   PyObject *__pyx_kp_u_Scrolling_direction;
+  PyObject *__pyx_kp_u_Selected_function;
+  PyObject *__pyx_kp_u_T_l_phng_to;
   PyObject *__pyx_n_s_ValueError;
   PyObject *__pyx_n_s_VideoWriter;
   PyObject *__pyx_n_s_VideoWriter_fourcc;
@@ -2488,9 +2520,13 @@ typedef struct {
   PyObject *__pyx_kp_u_Video_created_successfully_at;
   PyObject *__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti;
   PyObject *__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn;
+  PyObject *__pyx_kp_u_Width;
   PyObject *__pyx_kp_u_Zoom_in_video_created_successful;
-  PyObject *__pyx_n_s__23;
-  PyObject *__pyx_n_s__3;
+  PyObject *__pyx_n_s__28;
+  PyObject *__pyx_kp_u__4;
+  PyObject *__pyx_kp_u__7;
+  PyObject *__pyx_n_s__8;
+  PyObject *__pyx_n_u_a;
   PyObject *__pyx_n_s_asyncio_coroutines;
   PyObject *__pyx_n_s_blur_strength;
   PyObject *__pyx_n_s_blurred_background;
@@ -2516,7 +2552,6 @@ typedef struct {
   PyObject *__pyx_n_s_current_x_img;
   PyObject *__pyx_n_s_current_y;
   PyObject *__pyx_n_s_cv2;
-  PyObject *__pyx_n_s_destroyAllWindows;
   PyObject *__pyx_n_s_direction;
   PyObject *__pyx_n_u_down_up;
   PyObject *__pyx_n_s_duration;
@@ -2524,6 +2559,10 @@ typedef struct {
   PyObject *__pyx_n_s_end_scale;
   PyObject *__pyx_n_s_end_scale_bg;
   PyObject *__pyx_n_s_end_scale_img;
+  PyObject *__pyx_n_s_enter;
+  PyObject *__pyx_kp_u_error_log_txt;
+  PyObject *__pyx_n_s_exit;
+  PyObject *__pyx_n_s_f;
   PyObject *__pyx_n_s_float;
   PyObject *__pyx_n_s_fourcc;
   PyObject *__pyx_n_s_fps;
@@ -2554,6 +2593,9 @@ typedef struct {
   PyObject *__pyx_n_s_name;
   PyObject *__pyx_n_s_new_height;
   PyObject *__pyx_n_s_new_width;
+  PyObject *__pyx_n_s_np;
+  PyObject *__pyx_n_s_numpy;
+  PyObject *__pyx_n_s_open;
   PyObject *__pyx_n_s_orig_height;
   PyObject *__pyx_n_s_orig_width;
   PyObject *__pyx_n_s_out;
@@ -2575,8 +2617,10 @@ typedef struct {
   PyObject *__pyx_n_u_right_left;
   PyObject *__pyx_n_s_scale_bg;
   PyObject *__pyx_n_s_scale_factor;
+  PyObject *__pyx_n_s_scale_h;
   PyObject *__pyx_n_s_scale_height;
   PyObject *__pyx_n_s_scale_img;
+  PyObject *__pyx_n_s_scale_w;
   PyObject *__pyx_n_s_scale_width;
   PyObject *__pyx_n_s_selected_function;
   PyObject *__pyx_n_s_shape;
@@ -2591,6 +2635,7 @@ typedef struct {
   PyObject *__pyx_n_s_start_y_bg;
   PyObject *__pyx_n_s_start_y_small;
   PyObject *__pyx_n_s_str;
+  PyObject *__pyx_kp_u_success_txt;
   PyObject *__pyx_n_s_target_height;
   PyObject *__pyx_n_s_target_width;
   PyObject *__pyx_n_s_test;
@@ -2605,6 +2650,7 @@ typedef struct {
   PyObject *__pyx_n_s_width_1;
   PyObject *__pyx_n_s_width_2;
   PyObject *__pyx_n_s_write;
+  PyObject *__pyx_n_u_x;
   PyObject *__pyx_float_0_6;
   PyObject *__pyx_float_1_3;
   PyObject *__pyx_int_0;
@@ -2615,27 +2661,30 @@ typedef struct {
   PyObject *__pyx_int_255;
   PyObject *__pyx_int_1080;
   PyObject *__pyx_int_1920;
-  PyObject *__pyx_tuple_;
-  PyObject *__pyx_slice__2;
-  PyObject *__pyx_tuple__4;
+  PyObject *__pyx_slice_;
+  PyObject *__pyx_tuple__2;
+  PyObject *__pyx_tuple__3;
+  PyObject *__pyx_tuple__5;
   PyObject *__pyx_tuple__6;
-  PyObject *__pyx_tuple__8;
+  PyObject *__pyx_tuple__9;
   PyObject *__pyx_tuple__11;
   PyObject *__pyx_tuple__13;
   PyObject *__pyx_tuple__16;
-  PyObject *__pyx_tuple__19;
+  PyObject *__pyx_tuple__18;
   PyObject *__pyx_tuple__21;
-  PyObject *__pyx_codeobj__5;
-  PyObject *__pyx_codeobj__7;
-  PyObject *__pyx_codeobj__9;
+  PyObject *__pyx_tuple__24;
+  PyObject *__pyx_tuple__26;
   PyObject *__pyx_codeobj__10;
   PyObject *__pyx_codeobj__12;
   PyObject *__pyx_codeobj__14;
   PyObject *__pyx_codeobj__15;
   PyObject *__pyx_codeobj__17;
-  PyObject *__pyx_codeobj__18;
+  PyObject *__pyx_codeobj__19;
   PyObject *__pyx_codeobj__20;
   PyObject *__pyx_codeobj__22;
+  PyObject *__pyx_codeobj__23;
+  PyObject *__pyx_codeobj__25;
+  PyObject *__pyx_codeobj__27;
 } __pyx_mstate;
 
 #if CYTHON_USE_MODULE_STATE
@@ -2680,13 +2729,22 @@ static int __pyx_m_clear(PyObject *m) {
   #endif
   Py_CLEAR(clear_module_state->__pyx_n_s_BORDER_CONSTANT);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Cannot_read_image_from);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Duration);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Error_message);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Error_occurred_for_image);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Error_occurred_while_executing_t);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_FPS);
   Py_CLEAR(clear_module_state->__pyx_n_s_GaussianBlur);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Height);
   Py_CLEAR(clear_module_state->__pyx_n_s_INTER_LINEAR);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Kch_thc_nh_gc);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Khng_th_c_hnh_nh_t);
   Py_CLEAR(clear_module_state->__pyx_kp_u_None);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Please_check_the_path);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Scrolling_direction);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Selected_function);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_T_l_phng_to);
   Py_CLEAR(clear_module_state->__pyx_n_s_ValueError);
   Py_CLEAR(clear_module_state->__pyx_n_s_VideoWriter);
   Py_CLEAR(clear_module_state->__pyx_n_s_VideoWriter_fourcc);
@@ -2694,9 +2752,13 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_kp_u_Video_created_successfully_at);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Width);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Zoom_in_video_created_successful);
-  Py_CLEAR(clear_module_state->__pyx_n_s__23);
-  Py_CLEAR(clear_module_state->__pyx_n_s__3);
+  Py_CLEAR(clear_module_state->__pyx_n_s__28);
+  Py_CLEAR(clear_module_state->__pyx_kp_u__4);
+  Py_CLEAR(clear_module_state->__pyx_kp_u__7);
+  Py_CLEAR(clear_module_state->__pyx_n_s__8);
+  Py_CLEAR(clear_module_state->__pyx_n_u_a);
   Py_CLEAR(clear_module_state->__pyx_n_s_asyncio_coroutines);
   Py_CLEAR(clear_module_state->__pyx_n_s_blur_strength);
   Py_CLEAR(clear_module_state->__pyx_n_s_blurred_background);
@@ -2722,7 +2784,6 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_current_x_img);
   Py_CLEAR(clear_module_state->__pyx_n_s_current_y);
   Py_CLEAR(clear_module_state->__pyx_n_s_cv2);
-  Py_CLEAR(clear_module_state->__pyx_n_s_destroyAllWindows);
   Py_CLEAR(clear_module_state->__pyx_n_s_direction);
   Py_CLEAR(clear_module_state->__pyx_n_u_down_up);
   Py_CLEAR(clear_module_state->__pyx_n_s_duration);
@@ -2730,6 +2791,10 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_end_scale);
   Py_CLEAR(clear_module_state->__pyx_n_s_end_scale_bg);
   Py_CLEAR(clear_module_state->__pyx_n_s_end_scale_img);
+  Py_CLEAR(clear_module_state->__pyx_n_s_enter);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_error_log_txt);
+  Py_CLEAR(clear_module_state->__pyx_n_s_exit);
+  Py_CLEAR(clear_module_state->__pyx_n_s_f);
   Py_CLEAR(clear_module_state->__pyx_n_s_float);
   Py_CLEAR(clear_module_state->__pyx_n_s_fourcc);
   Py_CLEAR(clear_module_state->__pyx_n_s_fps);
@@ -2760,6 +2825,9 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_name);
   Py_CLEAR(clear_module_state->__pyx_n_s_new_height);
   Py_CLEAR(clear_module_state->__pyx_n_s_new_width);
+  Py_CLEAR(clear_module_state->__pyx_n_s_np);
+  Py_CLEAR(clear_module_state->__pyx_n_s_numpy);
+  Py_CLEAR(clear_module_state->__pyx_n_s_open);
   Py_CLEAR(clear_module_state->__pyx_n_s_orig_height);
   Py_CLEAR(clear_module_state->__pyx_n_s_orig_width);
   Py_CLEAR(clear_module_state->__pyx_n_s_out);
@@ -2781,8 +2849,10 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_u_right_left);
   Py_CLEAR(clear_module_state->__pyx_n_s_scale_bg);
   Py_CLEAR(clear_module_state->__pyx_n_s_scale_factor);
+  Py_CLEAR(clear_module_state->__pyx_n_s_scale_h);
   Py_CLEAR(clear_module_state->__pyx_n_s_scale_height);
   Py_CLEAR(clear_module_state->__pyx_n_s_scale_img);
+  Py_CLEAR(clear_module_state->__pyx_n_s_scale_w);
   Py_CLEAR(clear_module_state->__pyx_n_s_scale_width);
   Py_CLEAR(clear_module_state->__pyx_n_s_selected_function);
   Py_CLEAR(clear_module_state->__pyx_n_s_shape);
@@ -2797,6 +2867,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_start_y_bg);
   Py_CLEAR(clear_module_state->__pyx_n_s_start_y_small);
   Py_CLEAR(clear_module_state->__pyx_n_s_str);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_success_txt);
   Py_CLEAR(clear_module_state->__pyx_n_s_target_height);
   Py_CLEAR(clear_module_state->__pyx_n_s_target_width);
   Py_CLEAR(clear_module_state->__pyx_n_s_test);
@@ -2811,6 +2882,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_width_1);
   Py_CLEAR(clear_module_state->__pyx_n_s_width_2);
   Py_CLEAR(clear_module_state->__pyx_n_s_write);
+  Py_CLEAR(clear_module_state->__pyx_n_u_x);
   Py_CLEAR(clear_module_state->__pyx_float_0_6);
   Py_CLEAR(clear_module_state->__pyx_float_1_3);
   Py_CLEAR(clear_module_state->__pyx_int_0);
@@ -2821,27 +2893,30 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_int_255);
   Py_CLEAR(clear_module_state->__pyx_int_1080);
   Py_CLEAR(clear_module_state->__pyx_int_1920);
-  Py_CLEAR(clear_module_state->__pyx_tuple_);
-  Py_CLEAR(clear_module_state->__pyx_slice__2);
-  Py_CLEAR(clear_module_state->__pyx_tuple__4);
+  Py_CLEAR(clear_module_state->__pyx_slice_);
+  Py_CLEAR(clear_module_state->__pyx_tuple__2);
+  Py_CLEAR(clear_module_state->__pyx_tuple__3);
+  Py_CLEAR(clear_module_state->__pyx_tuple__5);
   Py_CLEAR(clear_module_state->__pyx_tuple__6);
-  Py_CLEAR(clear_module_state->__pyx_tuple__8);
+  Py_CLEAR(clear_module_state->__pyx_tuple__9);
   Py_CLEAR(clear_module_state->__pyx_tuple__11);
   Py_CLEAR(clear_module_state->__pyx_tuple__13);
   Py_CLEAR(clear_module_state->__pyx_tuple__16);
-  Py_CLEAR(clear_module_state->__pyx_tuple__19);
+  Py_CLEAR(clear_module_state->__pyx_tuple__18);
   Py_CLEAR(clear_module_state->__pyx_tuple__21);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__5);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__7);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__9);
+  Py_CLEAR(clear_module_state->__pyx_tuple__24);
+  Py_CLEAR(clear_module_state->__pyx_tuple__26);
   Py_CLEAR(clear_module_state->__pyx_codeobj__10);
   Py_CLEAR(clear_module_state->__pyx_codeobj__12);
   Py_CLEAR(clear_module_state->__pyx_codeobj__14);
   Py_CLEAR(clear_module_state->__pyx_codeobj__15);
   Py_CLEAR(clear_module_state->__pyx_codeobj__17);
-  Py_CLEAR(clear_module_state->__pyx_codeobj__18);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__19);
   Py_CLEAR(clear_module_state->__pyx_codeobj__20);
   Py_CLEAR(clear_module_state->__pyx_codeobj__22);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__23);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__25);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__27);
   return 0;
 }
 #endif
@@ -2864,13 +2939,22 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   #endif
   Py_VISIT(traverse_module_state->__pyx_n_s_BORDER_CONSTANT);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Cannot_read_image_from);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Duration);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Error_message);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Error_occurred_for_image);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Error_occurred_while_executing_t);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_FPS);
   Py_VISIT(traverse_module_state->__pyx_n_s_GaussianBlur);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Height);
   Py_VISIT(traverse_module_state->__pyx_n_s_INTER_LINEAR);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Kch_thc_nh_gc);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Khng_th_c_hnh_nh_t);
   Py_VISIT(traverse_module_state->__pyx_kp_u_None);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Please_check_the_path);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Scrolling_direction);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Selected_function);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_T_l_phng_to);
   Py_VISIT(traverse_module_state->__pyx_n_s_ValueError);
   Py_VISIT(traverse_module_state->__pyx_n_s_VideoWriter);
   Py_VISIT(traverse_module_state->__pyx_n_s_VideoWriter_fourcc);
@@ -2878,9 +2962,13 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_kp_u_Video_created_successfully_at);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Width);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Zoom_in_video_created_successful);
-  Py_VISIT(traverse_module_state->__pyx_n_s__23);
-  Py_VISIT(traverse_module_state->__pyx_n_s__3);
+  Py_VISIT(traverse_module_state->__pyx_n_s__28);
+  Py_VISIT(traverse_module_state->__pyx_kp_u__4);
+  Py_VISIT(traverse_module_state->__pyx_kp_u__7);
+  Py_VISIT(traverse_module_state->__pyx_n_s__8);
+  Py_VISIT(traverse_module_state->__pyx_n_u_a);
   Py_VISIT(traverse_module_state->__pyx_n_s_asyncio_coroutines);
   Py_VISIT(traverse_module_state->__pyx_n_s_blur_strength);
   Py_VISIT(traverse_module_state->__pyx_n_s_blurred_background);
@@ -2906,7 +2994,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_current_x_img);
   Py_VISIT(traverse_module_state->__pyx_n_s_current_y);
   Py_VISIT(traverse_module_state->__pyx_n_s_cv2);
-  Py_VISIT(traverse_module_state->__pyx_n_s_destroyAllWindows);
   Py_VISIT(traverse_module_state->__pyx_n_s_direction);
   Py_VISIT(traverse_module_state->__pyx_n_u_down_up);
   Py_VISIT(traverse_module_state->__pyx_n_s_duration);
@@ -2914,6 +3001,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_end_scale);
   Py_VISIT(traverse_module_state->__pyx_n_s_end_scale_bg);
   Py_VISIT(traverse_module_state->__pyx_n_s_end_scale_img);
+  Py_VISIT(traverse_module_state->__pyx_n_s_enter);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_error_log_txt);
+  Py_VISIT(traverse_module_state->__pyx_n_s_exit);
+  Py_VISIT(traverse_module_state->__pyx_n_s_f);
   Py_VISIT(traverse_module_state->__pyx_n_s_float);
   Py_VISIT(traverse_module_state->__pyx_n_s_fourcc);
   Py_VISIT(traverse_module_state->__pyx_n_s_fps);
@@ -2944,6 +3035,9 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_name);
   Py_VISIT(traverse_module_state->__pyx_n_s_new_height);
   Py_VISIT(traverse_module_state->__pyx_n_s_new_width);
+  Py_VISIT(traverse_module_state->__pyx_n_s_np);
+  Py_VISIT(traverse_module_state->__pyx_n_s_numpy);
+  Py_VISIT(traverse_module_state->__pyx_n_s_open);
   Py_VISIT(traverse_module_state->__pyx_n_s_orig_height);
   Py_VISIT(traverse_module_state->__pyx_n_s_orig_width);
   Py_VISIT(traverse_module_state->__pyx_n_s_out);
@@ -2965,8 +3059,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_u_right_left);
   Py_VISIT(traverse_module_state->__pyx_n_s_scale_bg);
   Py_VISIT(traverse_module_state->__pyx_n_s_scale_factor);
+  Py_VISIT(traverse_module_state->__pyx_n_s_scale_h);
   Py_VISIT(traverse_module_state->__pyx_n_s_scale_height);
   Py_VISIT(traverse_module_state->__pyx_n_s_scale_img);
+  Py_VISIT(traverse_module_state->__pyx_n_s_scale_w);
   Py_VISIT(traverse_module_state->__pyx_n_s_scale_width);
   Py_VISIT(traverse_module_state->__pyx_n_s_selected_function);
   Py_VISIT(traverse_module_state->__pyx_n_s_shape);
@@ -2981,6 +3077,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_start_y_bg);
   Py_VISIT(traverse_module_state->__pyx_n_s_start_y_small);
   Py_VISIT(traverse_module_state->__pyx_n_s_str);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_success_txt);
   Py_VISIT(traverse_module_state->__pyx_n_s_target_height);
   Py_VISIT(traverse_module_state->__pyx_n_s_target_width);
   Py_VISIT(traverse_module_state->__pyx_n_s_test);
@@ -2995,6 +3092,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_width_1);
   Py_VISIT(traverse_module_state->__pyx_n_s_width_2);
   Py_VISIT(traverse_module_state->__pyx_n_s_write);
+  Py_VISIT(traverse_module_state->__pyx_n_u_x);
   Py_VISIT(traverse_module_state->__pyx_float_0_6);
   Py_VISIT(traverse_module_state->__pyx_float_1_3);
   Py_VISIT(traverse_module_state->__pyx_int_0);
@@ -3005,27 +3103,30 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_int_255);
   Py_VISIT(traverse_module_state->__pyx_int_1080);
   Py_VISIT(traverse_module_state->__pyx_int_1920);
-  Py_VISIT(traverse_module_state->__pyx_tuple_);
-  Py_VISIT(traverse_module_state->__pyx_slice__2);
-  Py_VISIT(traverse_module_state->__pyx_tuple__4);
+  Py_VISIT(traverse_module_state->__pyx_slice_);
+  Py_VISIT(traverse_module_state->__pyx_tuple__2);
+  Py_VISIT(traverse_module_state->__pyx_tuple__3);
+  Py_VISIT(traverse_module_state->__pyx_tuple__5);
   Py_VISIT(traverse_module_state->__pyx_tuple__6);
-  Py_VISIT(traverse_module_state->__pyx_tuple__8);
+  Py_VISIT(traverse_module_state->__pyx_tuple__9);
   Py_VISIT(traverse_module_state->__pyx_tuple__11);
   Py_VISIT(traverse_module_state->__pyx_tuple__13);
   Py_VISIT(traverse_module_state->__pyx_tuple__16);
-  Py_VISIT(traverse_module_state->__pyx_tuple__19);
+  Py_VISIT(traverse_module_state->__pyx_tuple__18);
   Py_VISIT(traverse_module_state->__pyx_tuple__21);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__5);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__7);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__9);
+  Py_VISIT(traverse_module_state->__pyx_tuple__24);
+  Py_VISIT(traverse_module_state->__pyx_tuple__26);
   Py_VISIT(traverse_module_state->__pyx_codeobj__10);
   Py_VISIT(traverse_module_state->__pyx_codeobj__12);
   Py_VISIT(traverse_module_state->__pyx_codeobj__14);
   Py_VISIT(traverse_module_state->__pyx_codeobj__15);
   Py_VISIT(traverse_module_state->__pyx_codeobj__17);
-  Py_VISIT(traverse_module_state->__pyx_codeobj__18);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__19);
   Py_VISIT(traverse_module_state->__pyx_codeobj__20);
   Py_VISIT(traverse_module_state->__pyx_codeobj__22);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__23);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__25);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__27);
   return 0;
 }
 #endif
@@ -3058,19 +3159,24 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #endif
 #if CYTHON_USE_MODULE_STATE
 #endif
-#if CYTHON_USE_MODULE_STATE
-#endif
-#if CYTHON_USE_MODULE_STATE
-#endif
 #define __pyx_n_s_BORDER_CONSTANT __pyx_mstate_global->__pyx_n_s_BORDER_CONSTANT
 #define __pyx_kp_u_Cannot_read_image_from __pyx_mstate_global->__pyx_kp_u_Cannot_read_image_from
+#define __pyx_kp_u_Duration __pyx_mstate_global->__pyx_kp_u_Duration
+#define __pyx_kp_u_Error_message __pyx_mstate_global->__pyx_kp_u_Error_message
+#define __pyx_kp_u_Error_occurred_for_image __pyx_mstate_global->__pyx_kp_u_Error_occurred_for_image
 #define __pyx_kp_u_Error_occurred_while_executing_t __pyx_mstate_global->__pyx_kp_u_Error_occurred_while_executing_t
+#define __pyx_kp_u_FPS __pyx_mstate_global->__pyx_kp_u_FPS
 #define __pyx_n_s_GaussianBlur __pyx_mstate_global->__pyx_n_s_GaussianBlur
+#define __pyx_kp_u_Height __pyx_mstate_global->__pyx_kp_u_Height
 #define __pyx_n_s_INTER_LINEAR __pyx_mstate_global->__pyx_n_s_INTER_LINEAR
+#define __pyx_kp_u_Kch_thc_mi_sau_khi_phng_to __pyx_mstate_global->__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to
+#define __pyx_kp_u_Kch_thc_nh_gc __pyx_mstate_global->__pyx_kp_u_Kch_thc_nh_gc
 #define __pyx_kp_u_Khng_th_c_hnh_nh_t __pyx_mstate_global->__pyx_kp_u_Khng_th_c_hnh_nh_t
 #define __pyx_kp_u_None __pyx_mstate_global->__pyx_kp_u_None
 #define __pyx_kp_u_Please_check_the_path __pyx_mstate_global->__pyx_kp_u_Please_check_the_path
 #define __pyx_kp_u_Scrolling_direction __pyx_mstate_global->__pyx_kp_u_Scrolling_direction
+#define __pyx_kp_u_Selected_function __pyx_mstate_global->__pyx_kp_u_Selected_function
+#define __pyx_kp_u_T_l_phng_to __pyx_mstate_global->__pyx_kp_u_T_l_phng_to
 #define __pyx_n_s_ValueError __pyx_mstate_global->__pyx_n_s_ValueError
 #define __pyx_n_s_VideoWriter __pyx_mstate_global->__pyx_n_s_VideoWriter
 #define __pyx_n_s_VideoWriter_fourcc __pyx_mstate_global->__pyx_n_s_VideoWriter_fourcc
@@ -3078,9 +3184,13 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_kp_u_Video_created_successfully_at __pyx_mstate_global->__pyx_kp_u_Video_created_successfully_at
 #define __pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti __pyx_mstate_global->__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti
 #define __pyx_kp_u_Vui_lng_kim_tra_li_ng_dn __pyx_mstate_global->__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn
+#define __pyx_kp_u_Width __pyx_mstate_global->__pyx_kp_u_Width
 #define __pyx_kp_u_Zoom_in_video_created_successful __pyx_mstate_global->__pyx_kp_u_Zoom_in_video_created_successful
-#define __pyx_n_s__23 __pyx_mstate_global->__pyx_n_s__23
-#define __pyx_n_s__3 __pyx_mstate_global->__pyx_n_s__3
+#define __pyx_n_s__28 __pyx_mstate_global->__pyx_n_s__28
+#define __pyx_kp_u__4 __pyx_mstate_global->__pyx_kp_u__4
+#define __pyx_kp_u__7 __pyx_mstate_global->__pyx_kp_u__7
+#define __pyx_n_s__8 __pyx_mstate_global->__pyx_n_s__8
+#define __pyx_n_u_a __pyx_mstate_global->__pyx_n_u_a
 #define __pyx_n_s_asyncio_coroutines __pyx_mstate_global->__pyx_n_s_asyncio_coroutines
 #define __pyx_n_s_blur_strength __pyx_mstate_global->__pyx_n_s_blur_strength
 #define __pyx_n_s_blurred_background __pyx_mstate_global->__pyx_n_s_blurred_background
@@ -3106,7 +3216,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_current_x_img __pyx_mstate_global->__pyx_n_s_current_x_img
 #define __pyx_n_s_current_y __pyx_mstate_global->__pyx_n_s_current_y
 #define __pyx_n_s_cv2 __pyx_mstate_global->__pyx_n_s_cv2
-#define __pyx_n_s_destroyAllWindows __pyx_mstate_global->__pyx_n_s_destroyAllWindows
 #define __pyx_n_s_direction __pyx_mstate_global->__pyx_n_s_direction
 #define __pyx_n_u_down_up __pyx_mstate_global->__pyx_n_u_down_up
 #define __pyx_n_s_duration __pyx_mstate_global->__pyx_n_s_duration
@@ -3114,6 +3223,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_end_scale __pyx_mstate_global->__pyx_n_s_end_scale
 #define __pyx_n_s_end_scale_bg __pyx_mstate_global->__pyx_n_s_end_scale_bg
 #define __pyx_n_s_end_scale_img __pyx_mstate_global->__pyx_n_s_end_scale_img
+#define __pyx_n_s_enter __pyx_mstate_global->__pyx_n_s_enter
+#define __pyx_kp_u_error_log_txt __pyx_mstate_global->__pyx_kp_u_error_log_txt
+#define __pyx_n_s_exit __pyx_mstate_global->__pyx_n_s_exit
+#define __pyx_n_s_f __pyx_mstate_global->__pyx_n_s_f
 #define __pyx_n_s_float __pyx_mstate_global->__pyx_n_s_float
 #define __pyx_n_s_fourcc __pyx_mstate_global->__pyx_n_s_fourcc
 #define __pyx_n_s_fps __pyx_mstate_global->__pyx_n_s_fps
@@ -3144,6 +3257,9 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_name __pyx_mstate_global->__pyx_n_s_name
 #define __pyx_n_s_new_height __pyx_mstate_global->__pyx_n_s_new_height
 #define __pyx_n_s_new_width __pyx_mstate_global->__pyx_n_s_new_width
+#define __pyx_n_s_np __pyx_mstate_global->__pyx_n_s_np
+#define __pyx_n_s_numpy __pyx_mstate_global->__pyx_n_s_numpy
+#define __pyx_n_s_open __pyx_mstate_global->__pyx_n_s_open
 #define __pyx_n_s_orig_height __pyx_mstate_global->__pyx_n_s_orig_height
 #define __pyx_n_s_orig_width __pyx_mstate_global->__pyx_n_s_orig_width
 #define __pyx_n_s_out __pyx_mstate_global->__pyx_n_s_out
@@ -3165,8 +3281,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_u_right_left __pyx_mstate_global->__pyx_n_u_right_left
 #define __pyx_n_s_scale_bg __pyx_mstate_global->__pyx_n_s_scale_bg
 #define __pyx_n_s_scale_factor __pyx_mstate_global->__pyx_n_s_scale_factor
+#define __pyx_n_s_scale_h __pyx_mstate_global->__pyx_n_s_scale_h
 #define __pyx_n_s_scale_height __pyx_mstate_global->__pyx_n_s_scale_height
 #define __pyx_n_s_scale_img __pyx_mstate_global->__pyx_n_s_scale_img
+#define __pyx_n_s_scale_w __pyx_mstate_global->__pyx_n_s_scale_w
 #define __pyx_n_s_scale_width __pyx_mstate_global->__pyx_n_s_scale_width
 #define __pyx_n_s_selected_function __pyx_mstate_global->__pyx_n_s_selected_function
 #define __pyx_n_s_shape __pyx_mstate_global->__pyx_n_s_shape
@@ -3181,6 +3299,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_start_y_bg __pyx_mstate_global->__pyx_n_s_start_y_bg
 #define __pyx_n_s_start_y_small __pyx_mstate_global->__pyx_n_s_start_y_small
 #define __pyx_n_s_str __pyx_mstate_global->__pyx_n_s_str
+#define __pyx_kp_u_success_txt __pyx_mstate_global->__pyx_kp_u_success_txt
 #define __pyx_n_s_target_height __pyx_mstate_global->__pyx_n_s_target_height
 #define __pyx_n_s_target_width __pyx_mstate_global->__pyx_n_s_target_width
 #define __pyx_n_s_test __pyx_mstate_global->__pyx_n_s_test
@@ -3195,6 +3314,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_width_1 __pyx_mstate_global->__pyx_n_s_width_1
 #define __pyx_n_s_width_2 __pyx_mstate_global->__pyx_n_s_width_2
 #define __pyx_n_s_write __pyx_mstate_global->__pyx_n_s_write
+#define __pyx_n_u_x __pyx_mstate_global->__pyx_n_u_x
 #define __pyx_float_0_6 __pyx_mstate_global->__pyx_float_0_6
 #define __pyx_float_1_3 __pyx_mstate_global->__pyx_float_1_3
 #define __pyx_int_0 __pyx_mstate_global->__pyx_int_0
@@ -3205,35 +3325,38 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_int_255 __pyx_mstate_global->__pyx_int_255
 #define __pyx_int_1080 __pyx_mstate_global->__pyx_int_1080
 #define __pyx_int_1920 __pyx_mstate_global->__pyx_int_1920
-#define __pyx_tuple_ __pyx_mstate_global->__pyx_tuple_
-#define __pyx_slice__2 __pyx_mstate_global->__pyx_slice__2
-#define __pyx_tuple__4 __pyx_mstate_global->__pyx_tuple__4
+#define __pyx_slice_ __pyx_mstate_global->__pyx_slice_
+#define __pyx_tuple__2 __pyx_mstate_global->__pyx_tuple__2
+#define __pyx_tuple__3 __pyx_mstate_global->__pyx_tuple__3
+#define __pyx_tuple__5 __pyx_mstate_global->__pyx_tuple__5
 #define __pyx_tuple__6 __pyx_mstate_global->__pyx_tuple__6
-#define __pyx_tuple__8 __pyx_mstate_global->__pyx_tuple__8
+#define __pyx_tuple__9 __pyx_mstate_global->__pyx_tuple__9
 #define __pyx_tuple__11 __pyx_mstate_global->__pyx_tuple__11
 #define __pyx_tuple__13 __pyx_mstate_global->__pyx_tuple__13
 #define __pyx_tuple__16 __pyx_mstate_global->__pyx_tuple__16
-#define __pyx_tuple__19 __pyx_mstate_global->__pyx_tuple__19
+#define __pyx_tuple__18 __pyx_mstate_global->__pyx_tuple__18
 #define __pyx_tuple__21 __pyx_mstate_global->__pyx_tuple__21
-#define __pyx_codeobj__5 __pyx_mstate_global->__pyx_codeobj__5
-#define __pyx_codeobj__7 __pyx_mstate_global->__pyx_codeobj__7
-#define __pyx_codeobj__9 __pyx_mstate_global->__pyx_codeobj__9
+#define __pyx_tuple__24 __pyx_mstate_global->__pyx_tuple__24
+#define __pyx_tuple__26 __pyx_mstate_global->__pyx_tuple__26
 #define __pyx_codeobj__10 __pyx_mstate_global->__pyx_codeobj__10
 #define __pyx_codeobj__12 __pyx_mstate_global->__pyx_codeobj__12
 #define __pyx_codeobj__14 __pyx_mstate_global->__pyx_codeobj__14
 #define __pyx_codeobj__15 __pyx_mstate_global->__pyx_codeobj__15
 #define __pyx_codeobj__17 __pyx_mstate_global->__pyx_codeobj__17
-#define __pyx_codeobj__18 __pyx_mstate_global->__pyx_codeobj__18
+#define __pyx_codeobj__19 __pyx_mstate_global->__pyx_codeobj__19
 #define __pyx_codeobj__20 __pyx_mstate_global->__pyx_codeobj__20
 #define __pyx_codeobj__22 __pyx_mstate_global->__pyx_codeobj__22
+#define __pyx_codeobj__23 __pyx_mstate_global->__pyx_codeobj__23
+#define __pyx_codeobj__25 __pyx_mstate_global->__pyx_codeobj__25
+#define __pyx_codeobj__27 __pyx_mstate_global->__pyx_codeobj__27
 /* #### Code section: module_code ### */
 
 /* "random_video_effect.pyx":6
- * from libc.stdlib cimport malloc, free
+ * import numpy as np  # Import numpy
  * 
  * def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
- *     cdef object image = cv2.imread(image_path)
- * 
+ *     # c nh
+ *     image = cv2.imread(image_path)
  */
 
 static PyObject *__pyx_pf_19random_video_effect_22__defaults__(CYTHON_UNUSED PyObject *__pyx_self) {
@@ -3413,16 +3536,18 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 }
 
 static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_image_path, PyObject *__pyx_v_target_width, PyObject *__pyx_v_target_height) {
-  PyObject *__pyx_v_image = 0;
-  int __pyx_v_orig_height;
-  int __pyx_v_orig_width;
+  PyObject *__pyx_v_image = NULL;
+  PyObject *__pyx_v_orig_height = NULL;
+  PyObject *__pyx_v_orig_width = NULL;
+  PyObject *__pyx_v_scale_w = NULL;
+  PyObject *__pyx_v_scale_h = NULL;
   PyObject *__pyx_v_scale_factor = NULL;
-  int __pyx_v_new_width;
-  int __pyx_v_new_height;
-  PyObject *__pyx_v_resized_image = 0;
-  int __pyx_v_start_x;
-  int __pyx_v_start_y;
-  PyObject *__pyx_v_cropped_image = 0;
+  PyObject *__pyx_v_new_width = NULL;
+  PyObject *__pyx_v_new_height = NULL;
+  PyObject *__pyx_v_resized_image = NULL;
+  PyObject *__pyx_v_start_x = NULL;
+  PyObject *__pyx_v_start_y = NULL;
+  PyObject *__pyx_v_cropped_image = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3432,24 +3557,23 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
   int __pyx_t_5;
   Py_ssize_t __pyx_t_6;
   Py_UCS4 __pyx_t_7;
-  int __pyx_t_8;
-  PyObject *__pyx_t_9 = NULL;
-  PyObject *__pyx_t_10 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  PyObject *(*__pyx_t_9)(PyObject *);
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("resize_and_crop", 1);
 
-  /* "random_video_effect.pyx":7
- * 
+  /* "random_video_effect.pyx":8
  * def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):
- *     cdef object image = cv2.imread(image_path)             # <<<<<<<<<<<<<<
+ *     # c nh
+ *     image = cv2.imread(image_path)             # <<<<<<<<<<<<<<
  * 
  *     if image is None:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_imread); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_imread); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -3470,15 +3594,15 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_image_path};
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_v_image = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":9
- *     cdef object image = cv2.imread(image_path)
+  /* "random_video_effect.pyx":10
+ *     image = cv2.imread(image_path)
  * 
  *     if image is None:             # <<<<<<<<<<<<<<
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")
@@ -3487,14 +3611,14 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
   __pyx_t_5 = (__pyx_v_image == Py_None);
   if (unlikely(__pyx_t_5)) {
 
-    /* "random_video_effect.pyx":10
+    /* "random_video_effect.pyx":11
  * 
  *     if image is None:
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")             # <<<<<<<<<<<<<<
  * 
- *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]
+ *     orig_height, orig_width = image.shape[:2]
  */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = 0;
     __pyx_t_7 = 127;
@@ -3513,18 +3637,18 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
     __pyx_t_6 += 34;
     __Pyx_GIVEREF(__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
     PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
-    __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 11, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 10, __pyx_L1_error)
+    __PYX_ERR(0, 11, __pyx_L1_error)
 
-    /* "random_video_effect.pyx":9
- *     cdef object image = cv2.imread(image_path)
+    /* "random_video_effect.pyx":10
+ *     image = cv2.imread(image_path)
  * 
  *     if image is None:             # <<<<<<<<<<<<<<
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")
@@ -3532,153 +3656,281 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
  */
   }
 
-  /* "random_video_effect.pyx":12
+  /* "random_video_effect.pyx":13
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")
  * 
- *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]             # <<<<<<<<<<<<<<
+ *     orig_height, orig_width = image.shape[:2]             # <<<<<<<<<<<<<<
  * 
- *     if orig_width < orig_height:
+ *     print(f"Kch thc nh gc: {orig_width}x{orig_height}")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 12, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_v_orig_height = __pyx_t_8;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 12, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 12, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_orig_width = __pyx_t_8;
-
-  /* "random_video_effect.pyx":14
- *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]
- * 
- *     if orig_width < orig_height:             # <<<<<<<<<<<<<<
- *         scale_factor = target_width / orig_width
- *     else:
- */
-  __pyx_t_5 = (__pyx_v_orig_width < __pyx_v_orig_height);
-  if (__pyx_t_5) {
-
-    /* "random_video_effect.pyx":15
- * 
- *     if orig_width < orig_height:
- *         scale_factor = target_width / orig_width             # <<<<<<<<<<<<<<
- *     else:
- *         scale_factor = target_height / orig_height
- */
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_orig_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
+    PyObject* sequence = __pyx_t_3;
+    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+    if (unlikely(size != 2)) {
+      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 13, __pyx_L1_error)
+    }
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
+      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
+    } else {
+      __pyx_t_1 = PyList_GET_ITEM(sequence, 0); 
+      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
+    }
+    __Pyx_INCREF(__pyx_t_1);
+    __Pyx_INCREF(__pyx_t_2);
+    #else
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_target_width, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_v_scale_factor = __pyx_t_3;
-    __pyx_t_3 = 0;
-
-    /* "random_video_effect.pyx":14
- *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]
- * 
- *     if orig_width < orig_height:             # <<<<<<<<<<<<<<
- *         scale_factor = target_width / orig_width
- *     else:
- */
-    goto __pyx_L4;
-  }
-
-  /* "random_video_effect.pyx":17
- *         scale_factor = target_width / orig_width
- *     else:
- *         scale_factor = target_height / orig_height             # <<<<<<<<<<<<<<
- * 
- *     cdef int new_width = int(orig_width * scale_factor)
- */
-  /*else*/ {
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_orig_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 17, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_target_height, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_v_scale_factor = __pyx_t_1;
-    __pyx_t_1 = 0;
+  } else {
+    Py_ssize_t index = -1;
+    __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 13, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_9 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_8);
+    index = 0; __pyx_t_1 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_1)) goto __pyx_L4_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_1);
+    index = 1; __pyx_t_2 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_2)) goto __pyx_L4_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_2);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+    __pyx_t_9 = NULL;
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    goto __pyx_L5_unpacking_done;
+    __pyx_L4_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __pyx_t_9 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 13, __pyx_L1_error)
+    __pyx_L5_unpacking_done:;
   }
-  __pyx_L4:;
+  __pyx_v_orig_height = __pyx_t_1;
+  __pyx_t_1 = 0;
+  __pyx_v_orig_width = __pyx_t_2;
+  __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":19
- *         scale_factor = target_height / orig_height
+  /* "random_video_effect.pyx":15
+ *     orig_height, orig_width = image.shape[:2]
  * 
- *     cdef int new_width = int(orig_width * scale_factor)             # <<<<<<<<<<<<<<
- *     cdef int new_height = int(orig_height * scale_factor)
+ *     print(f"Kch thc nh gc: {orig_width}x{orig_height}")             # <<<<<<<<<<<<<<
  * 
+ *     # Tnh t l phng to sao cho mt trong cc cnh bng target_width hoc target_height
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_orig_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_v_scale_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 19, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_new_width = __pyx_t_8;
-
-  /* "random_video_effect.pyx":20
- * 
- *     cdef int new_width = int(orig_width * scale_factor)
- *     cdef int new_height = int(orig_height * scale_factor)             # <<<<<<<<<<<<<<
- * 
- *     cdef object resized_image = cv2.resize(image, (new_width, new_height))
- */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_orig_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_v_scale_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_new_height = __pyx_t_8;
-
-  /* "random_video_effect.pyx":22
- *     cdef int new_height = int(orig_height * scale_factor)
- * 
- *     cdef object resized_image = cv2.resize(image, (new_width, new_height))             # <<<<<<<<<<<<<<
- * 
- *     cdef int start_x = (new_width - target_width) // 2
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_6 = 0;
+  __pyx_t_7 = 127;
+  __Pyx_INCREF(__pyx_kp_u_Kch_thc_nh_gc);
+  __pyx_t_7 = (65535 > __pyx_t_7) ? 65535 : __pyx_t_7;
+  __pyx_t_6 += 20;
+  __Pyx_GIVEREF(__pyx_kp_u_Kch_thc_nh_gc);
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_Kch_thc_nh_gc);
+  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_orig_width, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_7;
+  __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __Pyx_INCREF(__pyx_n_u_x);
+  __pyx_t_6 += 1;
+  __Pyx_GIVEREF(__pyx_n_u_x);
+  PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_n_u_x);
+  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_orig_height, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_7;
+  __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_3, 4, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_9);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_t_9)) __PYX_ERR(0, 22, __pyx_L1_error);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "random_video_effect.pyx":18
+ * 
+ *     # Tnh t l phng to sao cho mt trong cc cnh bng target_width hoc target_height
+ *     scale_w = target_width / orig_width             # <<<<<<<<<<<<<<
+ *     scale_h = target_height / orig_height
+ * 
+ */
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_target_width, __pyx_v_orig_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_v_scale_w = __pyx_t_3;
   __pyx_t_3 = 0;
-  __pyx_t_9 = 0;
-  __pyx_t_9 = NULL;
+
+  /* "random_video_effect.pyx":19
+ *     # Tnh t l phng to sao cho mt trong cc cnh bng target_width hoc target_height
+ *     scale_w = target_width / orig_width
+ *     scale_h = target_height / orig_height             # <<<<<<<<<<<<<<
+ * 
+ *     # Chn t l phng to ln nht  phng to nh m khng b thiu
+ */
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_target_height, __pyx_v_orig_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_v_scale_h = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "random_video_effect.pyx":22
+ * 
+ *     # Chn t l phng to ln nht  phng to nh m khng b thiu
+ *     scale_factor = max(scale_w, scale_h)             # <<<<<<<<<<<<<<
+ * 
+ *     # Tnh kch thc mi sau khi phng to
+ */
+  __Pyx_INCREF(__pyx_v_scale_h);
+  __pyx_t_3 = __pyx_v_scale_h;
+  __Pyx_INCREF(__pyx_v_scale_w);
+  __pyx_t_2 = __pyx_v_scale_w;
+  __pyx_t_8 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  if (__pyx_t_5) {
+    __Pyx_INCREF(__pyx_t_3);
+    __pyx_t_1 = __pyx_t_3;
+  } else {
+    __Pyx_INCREF(__pyx_t_2);
+    __pyx_t_1 = __pyx_t_2;
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __pyx_t_1;
+  __Pyx_INCREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_scale_factor = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "random_video_effect.pyx":25
+ * 
+ *     # Tnh kch thc mi sau khi phng to
+ *     new_width = int(orig_width * scale_factor)             # <<<<<<<<<<<<<<
+ *     new_height = int(orig_height * scale_factor)
+ * 
+ */
+  __pyx_t_3 = PyNumber_Multiply(__pyx_v_orig_width, __pyx_v_scale_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_new_width = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "random_video_effect.pyx":26
+ *     # Tnh kch thc mi sau khi phng to
+ *     new_width = int(orig_width * scale_factor)
+ *     new_height = int(orig_height * scale_factor)             # <<<<<<<<<<<<<<
+ * 
+ *     print(f"T l phng to: {scale_factor}")
+ */
+  __pyx_t_1 = PyNumber_Multiply(__pyx_v_orig_height, __pyx_v_scale_factor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_new_height = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "random_video_effect.pyx":28
+ *     new_height = int(orig_height * scale_factor)
+ * 
+ *     print(f"T l phng to: {scale_factor}")             # <<<<<<<<<<<<<<
+ *     print(f"Kch thc mi sau khi phng to: {new_width}x{new_height}")
+ * 
+ */
+  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_scale_factor, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = __Pyx_PyUnicode_Concat(__pyx_kp_u_T_l_phng_to, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "random_video_effect.pyx":29
+ * 
+ *     print(f"T l phng to: {scale_factor}")
+ *     print(f"Kch thc mi sau khi phng to: {new_width}x{new_height}")             # <<<<<<<<<<<<<<
+ * 
+ *     # Thay i kch thc nh
+ */
+  __pyx_t_3 = PyTuple_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_6 = 0;
+  __pyx_t_7 = 127;
+  __Pyx_INCREF(__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to);
+  __pyx_t_7 = (65535 > __pyx_t_7) ? 65535 : __pyx_t_7;
+  __pyx_t_6 += 33;
+  __Pyx_GIVEREF(__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to);
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_Kch_thc_mi_sau_khi_phng_to);
+  __pyx_t_1 = __Pyx_PyObject_FormatSimple(__pyx_v_new_width, __pyx_empty_unicode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) : __pyx_t_7;
+  __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __Pyx_INCREF(__pyx_n_u_x);
+  __pyx_t_6 += 1;
+  __Pyx_GIVEREF(__pyx_n_u_x);
+  PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_n_u_x);
+  __pyx_t_1 = __Pyx_PyObject_FormatSimple(__pyx_v_new_height, __pyx_empty_unicode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) : __pyx_t_7;
+  __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyUnicode_Join(__pyx_t_3, 4, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "random_video_effect.pyx":32
+ * 
+ *     # Thay i kch thc nh
+ *     resized_image = cv2.resize(image, (new_width, new_height))             # <<<<<<<<<<<<<<
+ * 
+ *     # Ct cn gia nu nh sau khi phng to vt qu kch thc mc tiu
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_v_new_width);
+  __Pyx_GIVEREF(__pyx_v_new_width);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_new_width)) __PYX_ERR(0, 32, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_new_height);
+  __Pyx_GIVEREF(__pyx_v_new_height);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_new_height)) __PYX_ERR(0, 32, __pyx_L1_error);
+  __pyx_t_8 = NULL;
   __pyx_t_4 = 0;
   #if CYTHON_UNPACK_METHODS
   if (unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_9)) {
+    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_8)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_9);
+      __Pyx_INCREF(__pyx_t_8);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_4 = 1;
@@ -3686,100 +3938,80 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
   }
   #endif
   {
-    PyObject *__pyx_callargs[3] = {__pyx_t_9, __pyx_v_image, __pyx_t_10};
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
-    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
+    PyObject *__pyx_callargs[3] = {__pyx_t_8, __pyx_v_image, __pyx_t_1};
+    __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_v_resized_image = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_v_resized_image = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":24
- *     cdef object resized_image = cv2.resize(image, (new_width, new_height))
+  /* "random_video_effect.pyx":35
  * 
- *     cdef int start_x = (new_width - target_width) // 2             # <<<<<<<<<<<<<<
- *     cdef int start_y = (new_height - target_height) // 2
+ *     # Ct cn gia nu nh sau khi phng to vt qu kch thc mc tiu
+ *     start_x = (new_width - target_width) // 2             # <<<<<<<<<<<<<<
+ *     start_y = (new_height - target_height) // 2
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_v_target_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_new_width, __pyx_v_target_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_3, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_start_x = __pyx_t_8;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_start_x = __pyx_t_2;
+  __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":25
+  /* "random_video_effect.pyx":36
+ *     # Ct cn gia nu nh sau khi phng to vt qu kch thc mc tiu
+ *     start_x = (new_width - target_width) // 2
+ *     start_y = (new_height - target_height) // 2             # <<<<<<<<<<<<<<
  * 
- *     cdef int start_x = (new_width - target_width) // 2
- *     cdef int start_y = (new_height - target_height) // 2             # <<<<<<<<<<<<<<
- * 
- *     cdef object cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
+ *     # Ct nh  c kch thc target_width x target_height
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_v_target_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Subtract(__pyx_v_new_height, __pyx_v_target_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_start_y = __pyx_t_8;
+  __pyx_v_start_y = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":27
- *     cdef int start_y = (new_height - target_height) // 2
+  /* "random_video_effect.pyx":39
  * 
- *     cdef object cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]             # <<<<<<<<<<<<<<
+ *     # Ct nh  c kch thc target_width x target_height
+ *     cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]             # <<<<<<<<<<<<<<
  * 
  *     return cropped_image
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_v_start_y, __pyx_v_target_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PySlice_New(__pyx_v_start_y, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_10 = PyNumber_Add(__pyx_t_2, __pyx_v_target_height); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_10, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyNumber_Add(__pyx_v_start_x, __pyx_v_target_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = PySlice_New(__pyx_v_start_x, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_9 = PyNumber_Add(__pyx_t_1, __pyx_v_target_width); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PySlice_New(__pyx_t_10, __pyx_t_9, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_cropped_image = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":29
- *     cdef object cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
+  /* "random_video_effect.pyx":41
+ *     cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
  * 
  *     return cropped_image             # <<<<<<<<<<<<<<
  * 
@@ -3791,11 +4023,11 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
   goto __pyx_L0;
 
   /* "random_video_effect.pyx":6
- * from libc.stdlib cimport malloc, free
+ * import numpy as np  # Import numpy
  * 
  * def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
- *     cdef object image = cv2.imread(image_path)
- * 
+ *     # c nh
+ *     image = cv2.imread(image_path)
  */
 
   /* function exit code */
@@ -3803,21 +4035,28 @@ static PyObject *__pyx_pf_19random_video_effect_resize_and_crop(CYTHON_UNUSED Py
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("random_video_effect.resize_and_crop", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_image);
+  __Pyx_XDECREF(__pyx_v_orig_height);
+  __Pyx_XDECREF(__pyx_v_orig_width);
+  __Pyx_XDECREF(__pyx_v_scale_w);
+  __Pyx_XDECREF(__pyx_v_scale_h);
   __Pyx_XDECREF(__pyx_v_scale_factor);
+  __Pyx_XDECREF(__pyx_v_new_width);
+  __Pyx_XDECREF(__pyx_v_new_height);
   __Pyx_XDECREF(__pyx_v_resized_image);
+  __Pyx_XDECREF(__pyx_v_start_x);
+  __Pyx_XDECREF(__pyx_v_start_y);
   __Pyx_XDECREF(__pyx_v_cropped_image);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":31
+/* "random_video_effect.pyx":43
  *     return cropped_image
  * 
  * def resize_and_limit(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
@@ -3835,21 +4074,21 @@ static PyObject *__pyx_pf_19random_video_effect_24__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_width)) __PYX_ERR(0, 31, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_width)) __PYX_ERR(0, 43, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_height)) __PYX_ERR(0, 31, __pyx_L1_error);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_self)->__pyx_arg_target_height)) __PYX_ERR(0, 43, __pyx_L1_error);
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, Py_None)) __PYX_ERR(0, 31, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, Py_None)) __PYX_ERR(0, 43, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
@@ -3930,26 +4169,26 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_target_width);
           if (value) { values[1] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_target_height);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 31, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "resize_and_limit") < 0)) __PYX_ERR(0, 31, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "resize_and_limit") < 0)) __PYX_ERR(0, 43, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -3968,7 +4207,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("resize_and_limit", 0, 1, 3, __pyx_nargs); __PYX_ERR(0, 31, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("resize_and_limit", 0, 1, 3, __pyx_nargs); __PYX_ERR(0, 43, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3982,9 +4221,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_target_width), (&PyInt_Type), 0, "target_width", 1))) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_target_height), (&PyInt_Type), 0, "target_height", 1))) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_target_width), (&PyInt_Type), 0, "target_width", 1))) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_target_height), (&PyInt_Type), 0, "target_height", 1))) __PYX_ERR(0, 43, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_2resize_and_limit(__pyx_self, __pyx_v_image_path, __pyx_v_target_width, __pyx_v_target_height);
 
   /* function exit code */
@@ -4032,16 +4271,16 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("resize_and_limit", 1);
 
-  /* "random_video_effect.pyx":35
+  /* "random_video_effect.pyx":47
  *     Thay i kch thc hnh nh sao cho mt trong hai cnh khng vt qu kch thc mc tiu.
  *     """
  *     cdef object image = cv2.imread(image_path)             # <<<<<<<<<<<<<<
  * 
  *     if image is None:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_imread); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_imread); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -4062,14 +4301,14 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_image_path};
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_v_image = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":37
+  /* "random_video_effect.pyx":49
  *     cdef object image = cv2.imread(image_path)
  * 
  *     if image is None:             # <<<<<<<<<<<<<<
@@ -4079,14 +4318,14 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
   __pyx_t_5 = (__pyx_v_image == Py_None);
   if (unlikely(__pyx_t_5)) {
 
-    /* "random_video_effect.pyx":38
+    /* "random_video_effect.pyx":50
  * 
  *     if image is None:
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")             # <<<<<<<<<<<<<<
  * 
  *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]
  */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = 0;
     __pyx_t_7 = 127;
@@ -4105,17 +4344,17 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
     __pyx_t_6 += 34;
     __Pyx_GIVEREF(__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
     PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
-    __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 38, __pyx_L1_error)
+    __PYX_ERR(0, 50, __pyx_L1_error)
 
-    /* "random_video_effect.pyx":37
+    /* "random_video_effect.pyx":49
  *     cdef object image = cv2.imread(image_path)
  * 
  *     if image is None:             # <<<<<<<<<<<<<<
@@ -4124,63 +4363,63 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
  */
   }
 
-  /* "random_video_effect.pyx":40
+  /* "random_video_effect.pyx":52
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")
  * 
  *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]             # <<<<<<<<<<<<<<
  * 
  *     cdef float scale_width = target_width / orig_width
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_orig_height = __pyx_t_8;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_orig_width = __pyx_t_8;
 
-  /* "random_video_effect.pyx":42
+  /* "random_video_effect.pyx":54
  *     cdef int orig_height = image.shape[0], orig_width = image.shape[1]
  * 
  *     cdef float scale_width = target_width / orig_width             # <<<<<<<<<<<<<<
  *     cdef float scale_height = target_height / orig_height
  *     cdef float scale_factor = min(scale_width, scale_height)  # Chn t l nh nht  khng vt qu kch thc
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_orig_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_orig_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_target_width, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_target_width, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_scale_width = __pyx_t_9;
 
-  /* "random_video_effect.pyx":43
+  /* "random_video_effect.pyx":55
  * 
  *     cdef float scale_width = target_width / orig_width
  *     cdef float scale_height = target_height / orig_height             # <<<<<<<<<<<<<<
  *     cdef float scale_factor = min(scale_width, scale_height)  # Chn t l nh nht  khng vt qu kch thc
  * 
  */
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_orig_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_orig_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_target_height, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_target_height, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_scale_height = __pyx_t_9;
 
-  /* "random_video_effect.pyx":44
+  /* "random_video_effect.pyx":56
  *     cdef float scale_width = target_width / orig_width
  *     cdef float scale_height = target_height / orig_height
  *     cdef float scale_factor = min(scale_width, scale_height)  # Chn t l nh nht  khng vt qu kch thc             # <<<<<<<<<<<<<<
@@ -4197,7 +4436,7 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
   }
   __pyx_v_scale_factor = __pyx_t_11;
 
-  /* "random_video_effect.pyx":46
+  /* "random_video_effect.pyx":58
  *     cdef float scale_factor = min(scale_width, scale_height)  # Chn t l nh nht  khng vt qu kch thc
  * 
  *     cdef int new_width = int(orig_width * scale_factor)             # <<<<<<<<<<<<<<
@@ -4206,7 +4445,7 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
  */
   __pyx_v_new_width = ((int)(__pyx_v_orig_width * __pyx_v_scale_factor));
 
-  /* "random_video_effect.pyx":47
+  /* "random_video_effect.pyx":59
  * 
  *     cdef int new_width = int(orig_width * scale_factor)
  *     cdef int new_height = int(orig_height * scale_factor)             # <<<<<<<<<<<<<<
@@ -4215,28 +4454,28 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
  */
   __pyx_v_new_height = ((int)(__pyx_v_orig_height * __pyx_v_scale_factor));
 
-  /* "random_video_effect.pyx":49
+  /* "random_video_effect.pyx":61
  *     cdef int new_height = int(orig_height * scale_factor)
  * 
  *     cdef object resized_image = cv2.resize(image, (new_width, new_height))             # <<<<<<<<<<<<<<
  * 
  *     return resized_image
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_13 = PyTuple_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_13 = PyTuple_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_12);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_12)) __PYX_ERR(0, 49, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_12)) __PYX_ERR(0, 61, __pyx_L1_error);
   __pyx_t_3 = 0;
   __pyx_t_12 = 0;
   __pyx_t_12 = NULL;
@@ -4258,14 +4497,14 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_resized_image = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":51
+  /* "random_video_effect.pyx":63
  *     cdef object resized_image = cv2.resize(image, (new_width, new_height))
  * 
  *     return resized_image             # <<<<<<<<<<<<<<
@@ -4277,7 +4516,7 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
   __pyx_r = __pyx_v_resized_image;
   goto __pyx_L0;
 
-  /* "random_video_effect.pyx":31
+  /* "random_video_effect.pyx":43
  *     return cropped_image
  * 
  * def resize_and_limit(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
@@ -4302,7 +4541,7 @@ static PyObject *__pyx_pf_19random_video_effect_2resize_and_limit(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":53
+/* "random_video_effect.pyx":65
  *     return resized_image
  * 
  * def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -4320,29 +4559,29 @@ static PyObject *__pyx_pf_19random_video_effect_26__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 53, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 65, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 53, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 65, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 53, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 65, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 53, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 65, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4432,7 +4671,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -4440,42 +4679,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_parallax_left_video", 0, 2, 6, 1); __PYX_ERR(0, 53, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_parallax_left_video", 0, 2, 6, 1); __PYX_ERR(0, 65, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_parallax_left_video") < 0)) __PYX_ERR(0, 53, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_parallax_left_video") < 0)) __PYX_ERR(0, 65, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -4496,7 +4735,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 65, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -4506,7 +4745,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_parallax_left_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 53, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_parallax_left_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 65, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4520,11 +4759,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 65, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_4create_parallax_left_video(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -4587,66 +4826,66 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_parallax_left_video", 1);
 
-  /* "random_video_effect.pyx":55
+  /* "random_video_effect.pyx":67
  * def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
  *     # Initialize frame variables
  *     cdef int total_frames = int(duration * fps)  # Tng s frame             # <<<<<<<<<<<<<<
  *     cdef int current_x_bg, current_x_img  # Movement variables
  *     cdef int total_1, total_2  # For background cropping
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_total_frames = __pyx_t_3;
 
-  /* "random_video_effect.pyx":63
+  /* "random_video_effect.pyx":75
  * 
  *     # Video writing setup
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # nh dng video MP4             # <<<<<<<<<<<<<<
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))  # Video output
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_fourcc = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":64
+  /* "random_video_effect.pyx":76
  *     # Video writing setup
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # nh dng video MP4
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))  # Video output             # <<<<<<<<<<<<<<
  * 
  *     # Call functions to resize images
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_width);
   __Pyx_GIVEREF(__pyx_v_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 64, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 76, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_height);
   __Pyx_GIVEREF(__pyx_v_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 64, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 76, __pyx_L1_error);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
@@ -4666,32 +4905,32 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 4+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 64, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 76, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_out = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":67
+  /* "random_video_effect.pyx":79
  * 
  *     # Call functions to resize images
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh ln (resize cho ph hp vi video)             # <<<<<<<<<<<<<<
  *     image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # nh nh
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 67, __pyx_L1_error);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 79, __pyx_L1_error);
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 67, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4699,37 +4938,37 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
   __pyx_v_image_1 = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":68
+  /* "random_video_effect.pyx":80
  *     # Call functions to resize images
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh ln (resize cho ph hp vi video)
  *     image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # nh nh             # <<<<<<<<<<<<<<
  * 
  *     scale_factor = 1.4  # T l phng to cho nh nn, iu ny c th thay i  iu chnh hiu ng
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_image_path)) __PYX_ERR(0, 68, __pyx_L1_error);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_image_path)) __PYX_ERR(0, 80, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyNumber_Multiply(__pyx_v_width, __pyx_float_0_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Multiply(__pyx_v_width, __pyx_float_0_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyNumber_Int(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyNumber_Int(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_t_7) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_t_7) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_float_0_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_float_0_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_t_4) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_t_4) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4737,7 +4976,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
   __pyx_v_image_2 = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":70
+  /* "random_video_effect.pyx":82
  *     image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # nh nh
  * 
  *     scale_factor = 1.4  # T l phng to cho nh nn, iu ny c th thay i  iu chnh hiu ng             # <<<<<<<<<<<<<<
@@ -4746,7 +4985,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
  */
   __pyx_v_scale_factor = 1.4;
 
-  /* "random_video_effect.pyx":71
+  /* "random_video_effect.pyx":83
  * 
  *     scale_factor = 1.4  # T l phng to cho nh nn, iu ny c th thay i  iu chnh hiu ng
  *     blur_strength = 41  #  mnh ca Gaussian blur             # <<<<<<<<<<<<<<
@@ -4755,40 +4994,40 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
  */
   __pyx_v_blur_strength = 41;
 
-  /* "random_video_effect.pyx":74
+  /* "random_video_effect.pyx":86
  * 
  *     # Resize nh ln v to nn m
  *     image_resized = cv2.resize(image_1, (int(width * scale_factor), int(height * scale_factor)))             # <<<<<<<<<<<<<<
  *     blurred_background = cv2.GaussianBlur(image_resized, (blur_strength, blur_strength), 0)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -4810,35 +5049,35 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 2+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 74, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_v_image_resized = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":75
+  /* "random_video_effect.pyx":87
  *     # Resize nh ln v to nn m
  *     image_resized = cv2.resize(image_1, (int(width * scale_factor), int(height * scale_factor)))
  *     blurred_background = cv2.GaussianBlur(image_resized, (blur_strength, blur_strength), 0)             # <<<<<<<<<<<<<<
  * 
  *     # Thm border cho nh nh
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_5)) __PYX_ERR(0, 75, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -4860,54 +5099,54 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_6, 3+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __pyx_v_blurred_background = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":78
+  /* "random_video_effect.pyx":90
  * 
  *     # Thm border cho nh nh
  *     image_2_with_border = cv2.copyMakeBorder(image_2, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=(255, 255, 255))             # <<<<<<<<<<<<<<
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_image_2);
   __Pyx_GIVEREF(__pyx_v_image_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image_2)) __PYX_ERR(0, 78, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image_2)) __PYX_ERR(0, 90, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_int_5)) __PYX_ERR(0, 78, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_int_5)) __PYX_ERR(0, 90, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_int_5)) __PYX_ERR(0, 78, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_int_5)) __PYX_ERR(0, 90, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_int_5)) __PYX_ERR(0, 78, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_int_5)) __PYX_ERR(0, 90, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 4, __pyx_int_5)) __PYX_ERR(0, 78, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 4, __pyx_int_5)) __PYX_ERR(0, 90, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_t_2)) __PYX_ERR(0, 90, __pyx_L1_error);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_value, __pyx_tuple_) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_value, __pyx_tuple__2) < 0) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4915,16 +5154,16 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
   __pyx_v_image_2_with_border = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":82
+  /* "random_video_effect.pyx":94
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     cdef int height_1, width_1, height_2, width_2
  *     height_1, width_1 = blurred_background.shape[:2]             # <<<<<<<<<<<<<<
  *     height_2, width_2 = image_2_with_border.shape[:2]
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_5, 0, 2, NULL, NULL, &__pyx_slice__2, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_5, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -4933,7 +5172,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 82, __pyx_L1_error)
+      __PYX_ERR(0, 94, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -4946,15 +5185,15 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_INCREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_t_4);
     #else
-    __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 82, __pyx_L1_error)
+    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     #endif
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_7 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 82, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
@@ -4962,7 +5201,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_GOTREF(__pyx_t_5);
     index = 1; __pyx_t_4 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_4)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 94, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     goto __pyx_L4_unpacking_done;
@@ -4970,26 +5209,26 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 82, __pyx_L1_error)
+    __PYX_ERR(0, 94, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_height_1 = __pyx_t_3;
   __pyx_v_width_1 = __pyx_t_9;
 
-  /* "random_video_effect.pyx":83
+  /* "random_video_effect.pyx":95
  *     cdef int height_1, width_1, height_2, width_2
  *     height_1, width_1 = blurred_background.shape[:2]
  *     height_2, width_2 = image_2_with_border.shape[:2]             # <<<<<<<<<<<<<<
  * 
  *     # Tnh ton qung ng di chuyn ca nn m
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_t_2, 0, 2, NULL, NULL, &__pyx_slice__2, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_t_2, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
@@ -4998,7 +5237,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 83, __pyx_L1_error)
+      __PYX_ERR(0, 95, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -5011,15 +5250,15 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_5);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 95, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 95, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     #endif
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 83, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 95, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_8 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
@@ -5027,7 +5266,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_GOTREF(__pyx_t_2);
     index = 1; __pyx_t_5 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_5)) goto __pyx_L5_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     goto __pyx_L6_unpacking_done;
@@ -5035,88 +5274,88 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 83, __pyx_L1_error)
+    __PYX_ERR(0, 95, __pyx_L1_error)
     __pyx_L6_unpacking_done:;
   }
-  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_height_2 = __pyx_t_9;
   __pyx_v_width_2 = __pyx_t_3;
 
-  /* "random_video_effect.pyx":86
+  /* "random_video_effect.pyx":98
  * 
  *     # Tnh ton qung ng di chuyn ca nn m
  *     total_move = width_1 - width             # <<<<<<<<<<<<<<
  *     move_per_frame_bg = total_move / total_frames  # Di chuyn mi frame cho nn m
  * 
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_width_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_width_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 98, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyNumber_Subtract(__pyx_t_4, __pyx_v_width); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Subtract(__pyx_t_4, __pyx_v_width); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 98, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_total_move = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":87
+  /* "random_video_effect.pyx":99
  *     # Tnh ton qung ng di chuyn ca nn m
  *     total_move = width_1 - width
  *     move_per_frame_bg = total_move / total_frames  # Di chuyn mi frame cho nn m             # <<<<<<<<<<<<<<
  * 
  *     # Tnh ton qung ng di chuyn ca nh nh
  */
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_v_total_move, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_v_total_move, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_move_per_frame_bg = __pyx_t_10;
 
-  /* "random_video_effect.pyx":90
+  /* "random_video_effect.pyx":102
  * 
  *     # Tnh ton qung ng di chuyn ca nh nh
  *     total_move_img = width - width_2             # <<<<<<<<<<<<<<
  *     move_per_frame_img = total_move_img / total_frames  # Di chuyn mi frame cho nh nh
  * 
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_width_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_width_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyNumber_Subtract(__pyx_v_width, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Subtract(__pyx_v_width, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_total_move_img = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":91
+  /* "random_video_effect.pyx":103
  *     # Tnh ton qung ng di chuyn ca nh nh
  *     total_move_img = width - width_2
  *     move_per_frame_img = total_move_img / total_frames  # Di chuyn mi frame cho nh nh             # <<<<<<<<<<<<<<
  * 
  *     # Loop over each frame
  */
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_v_total_move_img, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_v_total_move_img, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_move_per_frame_img = __pyx_t_10;
 
-  /* "random_video_effect.pyx":94
+  /* "random_video_effect.pyx":106
  * 
  *     # Loop over each frame
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *         # Tnh ton v tr di chuyn ca nn m (lc ny di chuyn ngc li - t tri sang phi)
  *         current_x_bg = int(frame * move_per_frame_bg)  # V tr X ca nn m
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 106, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 106, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
@@ -5124,9 +5363,9 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __pyx_t_11 = 0;
     __pyx_t_12 = NULL;
   } else {
-    __pyx_t_11 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 94, __pyx_L1_error)
+    __pyx_t_11 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_12 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 94, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 106, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   for (;;) {
@@ -5135,28 +5374,28 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 94, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 106, __pyx_L1_error)
           #endif
           if (__pyx_t_11 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_11); __Pyx_INCREF(__pyx_t_5); __pyx_t_11++; if (unlikely((0 < 0))) __PYX_ERR(0, 94, __pyx_L1_error)
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_11); __Pyx_INCREF(__pyx_t_5); __pyx_t_11++; if (unlikely((0 < 0))) __PYX_ERR(0, 106, __pyx_L1_error)
         #else
-        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 106, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 94, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 106, __pyx_L1_error)
           #endif
           if (__pyx_t_11 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_11); __Pyx_INCREF(__pyx_t_5); __pyx_t_11++; if (unlikely((0 < 0))) __PYX_ERR(0, 94, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_11); __Pyx_INCREF(__pyx_t_5); __pyx_t_11++; if (unlikely((0 < 0))) __PYX_ERR(0, 106, __pyx_L1_error)
         #else
-        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 106, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -5166,7 +5405,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 94, __pyx_L1_error)
+          else __PYX_ERR(0, 106, __pyx_L1_error)
         }
         break;
       }
@@ -5175,133 +5414,133 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "random_video_effect.pyx":96
+    /* "random_video_effect.pyx":108
  *     for frame in range(total_frames):
  *         # Tnh ton v tr di chuyn ca nn m (lc ny di chuyn ngc li - t tri sang phi)
  *         current_x_bg = int(frame * move_per_frame_bg)  # V tr X ca nn m             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr di chuyn ca nh nh
  */
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_bg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_bg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 108, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 108, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 108, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 108, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_current_x_bg = __pyx_t_3;
 
-    /* "random_video_effect.pyx":99
+    /* "random_video_effect.pyx":111
  * 
  *         # Tnh ton v tr di chuyn ca nh nh
  *         current_x_img = int(frame * move_per_frame_img)  # V tr X ca nh nh             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr ct nn m sao cho va vi video
  */
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_img); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_img); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 99, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_current_x_img = __pyx_t_3;
 
-    /* "random_video_effect.pyx":102
+    /* "random_video_effect.pyx":114
  * 
  *         # Tnh ton v tr ct nn m sao cho va vi video
  *         total_1 = (height_1 - height) // 2  #  cn gia nh ln             # <<<<<<<<<<<<<<
  *         cropped_background = blurred_background[total_1:total_1 + height, current_x_bg:current_x_bg + width]
  * 
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_height_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_height_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = PyNumber_Subtract(__pyx_t_5, __pyx_v_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_t_5, __pyx_v_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_total_1 = __pyx_t_3;
 
-    /* "random_video_effect.pyx":103
+    /* "random_video_effect.pyx":115
  *         # Tnh ton v tr ct nn m sao cho va vi video
  *         total_1 = (height_1 - height) // 2  #  cn gia nh ln
  *         cropped_background = blurred_background[total_1:total_1 + height, current_x_bg:current_x_bg + width]             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr nh nh trn nn m (cn gia trn nn)
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_v_height); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_v_height); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PySlice_New(__pyx_t_5, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_2 = PySlice_New(__pyx_t_5, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_5, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_5, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PySlice_New(__pyx_t_7, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_5 = PySlice_New(__pyx_t_7, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error);
     __pyx_t_2 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_blurred_background, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_blurred_background, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cropped_background, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "random_video_effect.pyx":106
+    /* "random_video_effect.pyx":118
  * 
  *         # Tnh ton v tr nh nh trn nn m (cn gia trn nn)
  *         total_2 = (height - height_2) // 2  #  cn gia nh nh trn nn             # <<<<<<<<<<<<<<
  * 
  *         result = cropped_background.copy()
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_height_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_height_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = PyNumber_Subtract(__pyx_v_height, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_v_height, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_total_2 = __pyx_t_3;
 
-    /* "random_video_effect.pyx":108
+    /* "random_video_effect.pyx":120
  *         total_2 = (height - height_2) // 2  #  cn gia nh nh trn nn
  * 
  *         result = cropped_background.copy()             # <<<<<<<<<<<<<<
  *         # Lng nh nh vo nn m
  *         result[total_2: total_2 + height_2, current_x_img:current_x_img + width_2] = image_2_with_border
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_background, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_background, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_2 = NULL;
     __pyx_t_6 = 0;
@@ -5321,55 +5560,55 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
       PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
       __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 108, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 120, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_result, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "random_video_effect.pyx":110
+    /* "random_video_effect.pyx":122
  *         result = cropped_background.copy()
  *         # Lng nh nh vo nn m
  *         result[total_2: total_2 + height_2, current_x_img:current_x_img + width_2] = image_2_with_border             # <<<<<<<<<<<<<<
  * 
  *         # Ghi frame vo video
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_total_2 + __pyx_v_height_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_total_2 + __pyx_v_height_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PySlice_New(__pyx_t_5, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_2 = PySlice_New(__pyx_t_5, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_x_img); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_x_img); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyInt_From_int((__pyx_v_current_x_img + __pyx_v_width_2)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int((__pyx_v_current_x_img + __pyx_v_width_2)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PySlice_New(__pyx_t_1, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_7 = PySlice_New(__pyx_t_1, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_7)) __PYX_ERR(0, 110, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_7)) __PYX_ERR(0, 122, __pyx_L1_error);
     __pyx_t_2 = 0;
     __pyx_t_7 = 0;
-    if (unlikely((PyObject_SetItem(__pyx_v_result, __pyx_t_5, __pyx_v_image_2_with_border) < 0))) __PYX_ERR(0, 110, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_result, __pyx_t_5, __pyx_v_image_2_with_border) < 0))) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "random_video_effect.pyx":113
+    /* "random_video_effect.pyx":125
  * 
  *         # Ghi frame vo video
  *         out.write(result)             # <<<<<<<<<<<<<<
  * 
  *     # Gii phng video writer v ng ca s OpenCV
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 113, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_2 = NULL;
     __pyx_t_6 = 0;
@@ -5389,13 +5628,13 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
       PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_result};
       __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 113, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "random_video_effect.pyx":94
+    /* "random_video_effect.pyx":106
  * 
  *     # Loop over each frame
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -5405,14 +5644,14 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":116
+  /* "random_video_effect.pyx":128
  * 
  *     # Gii phng video writer v ng ca s OpenCV
  *     out.release()             # <<<<<<<<<<<<<<
- *     cv2.destroyAllWindows()
+ * 
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 128, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_7 = NULL;
   __pyx_t_6 = 0;
@@ -5432,49 +5671,13 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
     PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 116, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":117
- *     # Gii phng video writer v ng ca s OpenCV
- *     out.release()
- *     cv2.destroyAllWindows()             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_cv2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 117, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_destroyAllWindows); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 117, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = NULL;
-  __pyx_t_6 = 0;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_7))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
-    if (likely(__pyx_t_5)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-      __Pyx_INCREF(__pyx_t_5);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_7, function);
-      __pyx_t_6 = 1;
-    }
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-  /* "random_video_effect.pyx":53
+  /* "random_video_effect.pyx":65
  *     return resized_image
  * 
  * def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -5511,7 +5714,7 @@ static PyObject *__pyx_pf_19random_video_effect_4create_parallax_left_video(CYTH
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":120
+/* "random_video_effect.pyx":131
  * 
  * 
  * def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -5529,29 +5732,29 @@ static PyObject *__pyx_pf_19random_video_effect_28__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 120, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 131, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 120, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 131, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 120, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 131, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 120, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 131, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5641,7 +5844,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -5649,42 +5852,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_parallax_right_video", 0, 2, 6, 1); __PYX_ERR(0, 120, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_parallax_right_video", 0, 2, 6, 1); __PYX_ERR(0, 131, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_parallax_right_video") < 0)) __PYX_ERR(0, 120, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_parallax_right_video") < 0)) __PYX_ERR(0, 131, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -5705,7 +5908,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 120, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -5715,7 +5918,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_parallax_right_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 120, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_parallax_right_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 131, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5729,11 +5932,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 131, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_6create_parallax_right_video(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -5795,85 +5998,85 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_parallax_right_video", 1);
 
-  /* "random_video_effect.pyx":121
+  /* "random_video_effect.pyx":132
  * 
  * def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
  *     cdef int total_frames = int(duration * fps)  # Tng s frame             # <<<<<<<<<<<<<<
  *     cdef int current_x_bg, current_x_img  # Movement variables
  *     cdef int total_1, total_2  # For background cropping
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_total_frames = __pyx_t_3;
 
-  /* "random_video_effect.pyx":129
+  /* "random_video_effect.pyx":140
  * 
  * 
  *     total_frames = int(duration * fps)  # Tng s frame             # <<<<<<<<<<<<<<
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # nh dng video MP4
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))  # Video output
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_total_frames = __pyx_t_3;
 
-  /* "random_video_effect.pyx":130
+  /* "random_video_effect.pyx":141
  * 
  *     total_frames = int(duration * fps)  # Tng s frame
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # nh dng video MP4             # <<<<<<<<<<<<<<
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))  # Video output
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_fourcc = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":131
+  /* "random_video_effect.pyx":142
  *     total_frames = int(duration * fps)  # Tng s frame
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # nh dng video MP4
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))  # Video output             # <<<<<<<<<<<<<<
  * 
  *     # Gi s bn c hm resize_and_crop v resize_and_limit  c nh ngha
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_width);
   __Pyx_GIVEREF(__pyx_v_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 131, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 142, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_height);
   __Pyx_GIVEREF(__pyx_v_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 131, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 142, __pyx_L1_error);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
@@ -5893,32 +6096,32 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 4+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 131, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 142, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_out = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":134
+  /* "random_video_effect.pyx":145
  * 
  *     # Gi s bn c hm resize_and_crop v resize_and_limit  c nh ngha
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh ln (resize cho ph hp vi video)             # <<<<<<<<<<<<<<
  *     image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # nh nh
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 134, __pyx_L1_error);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 145, __pyx_L1_error);
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 134, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 134, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 145, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5926,37 +6129,37 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   __pyx_v_image_1 = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":135
+  /* "random_video_effect.pyx":146
  *     # Gi s bn c hm resize_and_crop v resize_and_limit  c nh ngha
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh ln (resize cho ph hp vi video)
  *     image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # nh nh             # <<<<<<<<<<<<<<
  * 
  *     scale_factor = 1.4  # T l phng to cho nh nn, iu ny c th thay i  iu chnh hiu ng
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_image_path)) __PYX_ERR(0, 135, __pyx_L1_error);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_image_path)) __PYX_ERR(0, 146, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyNumber_Multiply(__pyx_v_width, __pyx_float_0_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Multiply(__pyx_v_width, __pyx_float_0_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyNumber_Int(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyNumber_Int(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_t_7) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_t_7) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_float_0_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_float_0_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_t_4) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_t_4) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5964,7 +6167,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   __pyx_v_image_2 = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":137
+  /* "random_video_effect.pyx":148
  *     image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # nh nh
  * 
  *     scale_factor = 1.4  # T l phng to cho nh nn, iu ny c th thay i  iu chnh hiu ng             # <<<<<<<<<<<<<<
@@ -5973,7 +6176,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
  */
   __pyx_v_scale_factor = 1.4;
 
-  /* "random_video_effect.pyx":138
+  /* "random_video_effect.pyx":149
  * 
  *     scale_factor = 1.4  # T l phng to cho nh nn, iu ny c th thay i  iu chnh hiu ng
  *     blur_strength = 41  #  mnh ca Gaussian blur             # <<<<<<<<<<<<<<
@@ -5982,40 +6185,40 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
  */
   __pyx_v_blur_strength = 41;
 
-  /* "random_video_effect.pyx":141
+  /* "random_video_effect.pyx":152
  * 
  *     # Resize nh ln v to nn m
  *     image_resized = cv2.resize(image_1, (int(width * scale_factor), int(height * scale_factor)))             # <<<<<<<<<<<<<<
  *     blurred_background = cv2.GaussianBlur(image_resized, (blur_strength, blur_strength), 0)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_scale_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Multiply(__pyx_v_height, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -6037,35 +6240,35 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 2+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_v_image_resized = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":142
+  /* "random_video_effect.pyx":153
  *     # Resize nh ln v to nn m
  *     image_resized = cv2.resize(image_1, (int(width * scale_factor), int(height * scale_factor)))
  *     blurred_background = cv2.GaussianBlur(image_resized, (blur_strength, blur_strength), 0)             # <<<<<<<<<<<<<<
  * 
  *     # Thm border cho nh nh
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_blur_strength); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_5)) __PYX_ERR(0, 153, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -6087,54 +6290,54 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_6, 3+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 142, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __pyx_v_blurred_background = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":145
+  /* "random_video_effect.pyx":156
  * 
  *     # Thm border cho nh nh
  *     image_2_with_border = cv2.copyMakeBorder(image_2, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=(255, 255, 255))             # <<<<<<<<<<<<<<
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_image_2);
   __Pyx_GIVEREF(__pyx_v_image_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image_2)) __PYX_ERR(0, 145, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image_2)) __PYX_ERR(0, 156, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_int_5)) __PYX_ERR(0, 145, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_int_5)) __PYX_ERR(0, 156, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_int_5)) __PYX_ERR(0, 145, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_int_5)) __PYX_ERR(0, 156, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_int_5)) __PYX_ERR(0, 145, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_int_5)) __PYX_ERR(0, 156, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_5);
   __Pyx_GIVEREF(__pyx_int_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 4, __pyx_int_5)) __PYX_ERR(0, 145, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 4, __pyx_int_5)) __PYX_ERR(0, 156, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_value, __pyx_tuple_) < 0) __PYX_ERR(0, 145, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 145, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_value, __pyx_tuple__2) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -6142,16 +6345,16 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   __pyx_v_image_2_with_border = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":148
+  /* "random_video_effect.pyx":159
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     height_1, width_1 = blurred_background.shape[:2]             # <<<<<<<<<<<<<<
  *     height_2, width_2 = image_2_with_border.shape[:2]
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_5, 0, 2, NULL, NULL, &__pyx_slice__2, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetSlice(__pyx_t_5, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -6160,7 +6363,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 148, __pyx_L1_error)
+      __PYX_ERR(0, 159, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -6173,15 +6376,15 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_INCREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_t_4);
     #else
-    __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 148, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 148, __pyx_L1_error)
+    __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     #endif
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_7 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 148, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
@@ -6189,7 +6392,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_GOTREF(__pyx_t_5);
     index = 1; __pyx_t_4 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_4)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 148, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     goto __pyx_L4_unpacking_done;
@@ -6197,7 +6400,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 148, __pyx_L1_error)
+    __PYX_ERR(0, 159, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_height_1 = __pyx_t_5;
@@ -6205,16 +6408,16 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   __pyx_v_width_1 = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":149
+  /* "random_video_effect.pyx":160
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     height_1, width_1 = blurred_background.shape[:2]
  *     height_2, width_2 = image_2_with_border.shape[:2]             # <<<<<<<<<<<<<<
  * 
  *     # Tnh ton qung ng di chuyn ca nn m
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_t_2, 0, 2, NULL, NULL, &__pyx_slice__2, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_t_2, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 160, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
@@ -6223,7 +6426,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 149, __pyx_L1_error)
+      __PYX_ERR(0, 160, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -6236,15 +6439,15 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_5);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 160, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     #endif
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 160, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_8 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
@@ -6252,7 +6455,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_GOTREF(__pyx_t_2);
     index = 1; __pyx_t_5 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_5)) goto __pyx_L5_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < 0) __PYX_ERR(0, 160, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     goto __pyx_L6_unpacking_done;
@@ -6260,7 +6463,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 149, __pyx_L1_error)
+    __PYX_ERR(0, 160, __pyx_L1_error)
     __pyx_L6_unpacking_done:;
   }
   __pyx_v_height_2 = __pyx_t_2;
@@ -6268,72 +6471,72 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   __pyx_v_width_2 = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":152
+  /* "random_video_effect.pyx":163
  * 
  *     # Tnh ton qung ng di chuyn ca nn m
  *     total_move = width_1 - width             # <<<<<<<<<<<<<<
  *     move_per_frame_bg = total_move / total_frames  # Di chuyn mi frame cho nn m
  * 
  */
-  __pyx_t_4 = PyNumber_Subtract(__pyx_v_width_1, __pyx_v_width); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Subtract(__pyx_v_width_1, __pyx_v_width); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_total_move = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":153
+  /* "random_video_effect.pyx":164
  *     # Tnh ton qung ng di chuyn ca nn m
  *     total_move = width_1 - width
  *     move_per_frame_bg = total_move / total_frames  # Di chuyn mi frame cho nn m             # <<<<<<<<<<<<<<
  * 
  *     # Tnh ton qung ng di chuyn ca nh nh
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyNumber_Divide(__pyx_v_total_move, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyNumber_Divide(__pyx_v_total_move, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_5); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_5); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_move_per_frame_bg = __pyx_t_9;
 
-  /* "random_video_effect.pyx":156
+  /* "random_video_effect.pyx":167
  * 
  *     # Tnh ton qung ng di chuyn ca nh nh
  *     total_move_img = width - width_2             # <<<<<<<<<<<<<<
  *     move_per_frame_img = total_move_img / total_frames  # Di chuyn mi frame cho nh nh
  * 
  */
-  __pyx_t_5 = PyNumber_Subtract(__pyx_v_width, __pyx_v_width_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Subtract(__pyx_v_width, __pyx_v_width_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_v_total_move_img = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "random_video_effect.pyx":157
+  /* "random_video_effect.pyx":168
  *     # Tnh ton qung ng di chuyn ca nh nh
  *     total_move_img = width - width_2
  *     move_per_frame_img = total_move_img / total_frames  # Di chuyn mi frame cho nh nh             # <<<<<<<<<<<<<<
  * 
  *     for frame in range(total_frames):
  */
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_v_total_move_img, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_v_total_move_img, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_9 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_move_per_frame_img = __pyx_t_9;
 
-  /* "random_video_effect.pyx":159
+  /* "random_video_effect.pyx":170
  *     move_per_frame_img = total_move_img / total_frames  # Di chuyn mi frame cho nh nh
  * 
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *         # Tnh ton v tr di chuyn ca nn m (di chuyn t phi qua tri)
  *         current_x_bg = int((total_frames - frame) * move_per_frame_bg)  # V tr X ca nn m t phi qua tri
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
@@ -6341,9 +6544,9 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __pyx_t_10 = 0;
     __pyx_t_11 = NULL;
   } else {
-    __pyx_t_10 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_10 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 170, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   for (;;) {
@@ -6352,28 +6555,28 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 159, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 170, __pyx_L1_error)
           #endif
           if (__pyx_t_10 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_10); __Pyx_INCREF(__pyx_t_5); __pyx_t_10++; if (unlikely((0 < 0))) __PYX_ERR(0, 159, __pyx_L1_error)
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_10); __Pyx_INCREF(__pyx_t_5); __pyx_t_10++; if (unlikely((0 < 0))) __PYX_ERR(0, 170, __pyx_L1_error)
         #else
-        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 159, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 170, __pyx_L1_error)
           #endif
           if (__pyx_t_10 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_10); __Pyx_INCREF(__pyx_t_5); __pyx_t_10++; if (unlikely((0 < 0))) __PYX_ERR(0, 159, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_10); __Pyx_INCREF(__pyx_t_5); __pyx_t_10++; if (unlikely((0 < 0))) __PYX_ERR(0, 170, __pyx_L1_error)
         #else
-        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -6383,7 +6586,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 159, __pyx_L1_error)
+          else __PYX_ERR(0, 170, __pyx_L1_error)
         }
         break;
       }
@@ -6392,139 +6595,139 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "random_video_effect.pyx":161
+    /* "random_video_effect.pyx":172
  *     for frame in range(total_frames):
  *         # Tnh ton v tr di chuyn ca nn m (di chuyn t phi qua tri)
  *         current_x_bg = int((total_frames - frame) * move_per_frame_bg)  # V tr X ca nn m t phi qua tri             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr di chuyn ca nh nh (di chuyn t phi qua tri)
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = PyNumber_Subtract(__pyx_t_5, __pyx_v_frame); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_t_5, __pyx_v_frame); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_bg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_bg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyNumber_Multiply(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Multiply(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_current_x_bg = __pyx_t_3;
 
-    /* "random_video_effect.pyx":164
+    /* "random_video_effect.pyx":175
  * 
  *         # Tnh ton v tr di chuyn ca nh nh (di chuyn t phi qua tri)
  *         current_x_img = int((total_frames - frame) * move_per_frame_img)  # V tr X ca nh nh t phi qua tri             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr ct nn m sao cho va vi video
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyNumber_Subtract(__pyx_t_5, __pyx_v_frame); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Subtract(__pyx_t_5, __pyx_v_frame); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_img); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_move_per_frame_img); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_current_x_img = __pyx_t_3;
 
-    /* "random_video_effect.pyx":167
+    /* "random_video_effect.pyx":178
  * 
  *         # Tnh ton v tr ct nn m sao cho va vi video
  *         total_1 = (height_1 - height) // 2  #  cn gia nh ln             # <<<<<<<<<<<<<<
  *         cropped_background = blurred_background[total_1:total_1 + height, current_x_bg:current_x_bg + width]
  * 
  */
-    __pyx_t_5 = PyNumber_Subtract(__pyx_v_height_1, __pyx_v_height); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 167, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Subtract(__pyx_v_height_1, __pyx_v_height); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_5, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_5, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 167, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_total_1 = __pyx_t_3;
 
-    /* "random_video_effect.pyx":168
+    /* "random_video_effect.pyx":179
  *         # Tnh ton v tr ct nn m sao cho va vi video
  *         total_1 = (height_1 - height) // 2  #  cn gia nh ln
  *         cropped_background = blurred_background[total_1:total_1 + height, current_x_bg:current_x_bg + width]             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr nh nh trn nn m (cn gia trn nn)
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_total_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_5, __pyx_v_height); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_5, __pyx_v_height); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PySlice_New(__pyx_t_2, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_5 = PySlice_New(__pyx_t_2, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_current_x_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PySlice_New(__pyx_t_7, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_2 = PySlice_New(__pyx_t_7, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_5)) __PYX_ERR(0, 168, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_5)) __PYX_ERR(0, 179, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error);
     __pyx_t_5 = 0;
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_blurred_background, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_blurred_background, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cropped_background, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":171
+    /* "random_video_effect.pyx":182
  * 
  *         # Tnh ton v tr nh nh trn nn m (cn gia trn nn)
  *         total_2 = (height - height_2) // 2  #  cn gia nh nh trn nn             # <<<<<<<<<<<<<<
  * 
  *         result = cropped_background.copy()
  */
-    __pyx_t_2 = PyNumber_Subtract(__pyx_v_height, __pyx_v_height_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_v_height, __pyx_v_height_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 182, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_total_2 = __pyx_t_3;
 
-    /* "random_video_effect.pyx":173
+    /* "random_video_effect.pyx":184
  *         total_2 = (height - height_2) // 2  #  cn gia nh nh trn nn
  * 
  *         result = cropped_background.copy()             # <<<<<<<<<<<<<<
  *         # Lng nh nh vo nn m
  *         result[total_2: total_2 + height_2, current_x_img:current_x_img + width_2] = image_2_with_border
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_background, __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_background, __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_5 = NULL;
     __pyx_t_6 = 0;
@@ -6544,61 +6747,61 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
       PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_result, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "random_video_effect.pyx":175
+    /* "random_video_effect.pyx":186
  *         result = cropped_background.copy()
  *         # Lng nh nh vo nn m
  *         result[total_2: total_2 + height_2, current_x_img:current_x_img + width_2] = image_2_with_border             # <<<<<<<<<<<<<<
  * 
  *         # Ghi frame vo video
  */
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_total_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_total_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PyNumber_Add(__pyx_t_2, __pyx_v_height_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Add(__pyx_t_2, __pyx_v_height_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_current_x_img); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_current_x_img); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_x_img); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_x_img); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_1, __pyx_v_width_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_1, __pyx_v_width_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PySlice_New(__pyx_t_5, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_1 = PySlice_New(__pyx_t_5, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error);
     __pyx_t_2 = 0;
     __pyx_t_1 = 0;
-    if (unlikely((PyObject_SetItem(__pyx_v_result, __pyx_t_7, __pyx_v_image_2_with_border) < 0))) __PYX_ERR(0, 175, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_result, __pyx_t_7, __pyx_v_image_2_with_border) < 0))) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":178
+    /* "random_video_effect.pyx":189
  * 
  *         # Ghi frame vo video
  *         out.write(result)             # <<<<<<<<<<<<<<
  * 
  *     # Gii phng video writer v ng ca s OpenCV
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_2 = NULL;
     __pyx_t_6 = 0;
@@ -6618,13 +6821,13 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
       PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_result};
       __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 178, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":159
+    /* "random_video_effect.pyx":170
  *     move_per_frame_img = total_move_img / total_frames  # Di chuyn mi frame cho nh nh
  * 
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -6634,14 +6837,14 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":181
+  /* "random_video_effect.pyx":192
  * 
  *     # Gii phng video writer v ng ca s OpenCV
  *     out.release()             # <<<<<<<<<<<<<<
- *     cv2.destroyAllWindows()
+ * 
  * 
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_1 = NULL;
   __pyx_t_6 = 0;
@@ -6661,49 +6864,13 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 192, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":182
- *     # Gii phng video writer v ng ca s OpenCV
- *     out.release()
- *     cv2.destroyAllWindows()             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_cv2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 182, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_destroyAllWindows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = NULL;
-  __pyx_t_6 = 0;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-      __pyx_t_6 = 1;
-    }
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 182, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-  /* "random_video_effect.pyx":120
+  /* "random_video_effect.pyx":131
  * 
  * 
  * def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -6744,7 +6911,7 @@ static PyObject *__pyx_pf_19random_video_effect_6create_parallax_right_video(CYT
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":185
+/* "random_video_effect.pyx":195
  * 
  * 
  * def create_scrolling_image_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -6762,29 +6929,29 @@ static PyObject *__pyx_pf_19random_video_effect_30__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 185, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 195, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 185, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 195, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 185, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 195, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 185, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 195, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6875,7 +7042,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -6883,42 +7050,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_scrolling_image_video", 0, 2, 6, 1); __PYX_ERR(0, 185, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_scrolling_image_video", 0, 2, 6, 1); __PYX_ERR(0, 195, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_scrolling_image_video") < 0)) __PYX_ERR(0, 185, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_scrolling_image_video") < 0)) __PYX_ERR(0, 195, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -6939,7 +7106,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -6949,7 +7116,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_scrolling_image_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 185, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_scrolling_image_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 195, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6963,11 +7130,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 195, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_8create_scrolling_image_video(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -7025,55 +7192,55 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_scrolling_image_video", 1);
 
-  /* "random_video_effect.pyx":196
+  /* "random_video_effect.pyx":206
  *     cdef object image, resized_image, cropped_image, fourcc, out
  *     cdef str direction
  *     cdef int target_width = width             # <<<<<<<<<<<<<<
  *     cdef int target_height = height
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 206, __pyx_L1_error)
   __pyx_v_target_width = __pyx_t_1;
 
-  /* "random_video_effect.pyx":197
+  /* "random_video_effect.pyx":207
  *     cdef str direction
  *     cdef int target_width = width
  *     cdef int target_height = height             # <<<<<<<<<<<<<<
  * 
  *     # Calculate total frames
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_height); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_height); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 207, __pyx_L1_error)
   __pyx_v_target_height = __pyx_t_1;
 
-  /* "random_video_effect.pyx":200
+  /* "random_video_effect.pyx":210
  * 
  *     # Calculate total frames
  *     total_frames = int(duration * fps)             # <<<<<<<<<<<<<<
  * 
  *     # Read the image
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_fps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_fps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_total_frames = __pyx_t_1;
 
-  /* "random_video_effect.pyx":203
+  /* "random_video_effect.pyx":213
  * 
  *     # Read the image
  *     image = cv2.imread(image_path)             # <<<<<<<<<<<<<<
  *     if image is None:
  *         raise ValueError(f"Cannot read image from {image_path}. Please check the path.")
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_imread); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_imread); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -7094,14 +7261,14 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_image_path};
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 213, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_v_image = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":204
+  /* "random_video_effect.pyx":214
  *     # Read the image
  *     image = cv2.imread(image_path)
  *     if image is None:             # <<<<<<<<<<<<<<
@@ -7111,14 +7278,14 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   __pyx_t_6 = (__pyx_v_image == Py_None);
   if (unlikely(__pyx_t_6)) {
 
-    /* "random_video_effect.pyx":205
+    /* "random_video_effect.pyx":215
  *     image = cv2.imread(image_path)
  *     if image is None:
  *         raise ValueError(f"Cannot read image from {image_path}. Please check the path.")             # <<<<<<<<<<<<<<
  * 
  *     # Get the original dimensions of the image
  */
-    __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_7 = 0;
     __pyx_t_8 = 127;
@@ -7135,17 +7302,17 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     __pyx_t_7 += 24;
     __Pyx_GIVEREF(__pyx_kp_u_Please_check_the_path);
     PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_kp_u_Please_check_the_path);
-    __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 215, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 205, __pyx_L1_error)
+    __PYX_ERR(0, 215, __pyx_L1_error)
 
-    /* "random_video_effect.pyx":204
+    /* "random_video_effect.pyx":214
  *     # Read the image
  *     image = cv2.imread(image_path)
  *     if image is None:             # <<<<<<<<<<<<<<
@@ -7154,16 +7321,16 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
   }
 
-  /* "random_video_effect.pyx":208
+  /* "random_video_effect.pyx":218
  * 
  *     # Get the original dimensions of the image
  *     orig_height, orig_width = image.shape[:2]             # <<<<<<<<<<<<<<
  * 
  *     # Determine scale factor based on the smaller dimension
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_t_2, 0, 2, NULL, NULL, &__pyx_slice__2, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_t_2, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
@@ -7172,7 +7339,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 208, __pyx_L1_error)
+      __PYX_ERR(0, 218, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -7185,15 +7352,15 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_3);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_9 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_9 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_10 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_9);
@@ -7201,7 +7368,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     __Pyx_GOTREF(__pyx_t_2);
     index = 1; __pyx_t_3 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_3)) goto __pyx_L4_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 208, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 218, __pyx_L1_error)
     __pyx_t_10 = NULL;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     goto __pyx_L5_unpacking_done;
@@ -7209,17 +7376,17 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_t_10 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 208, __pyx_L1_error)
+    __PYX_ERR(0, 218, __pyx_L1_error)
     __pyx_L5_unpacking_done:;
   }
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_orig_height = __pyx_t_1;
   __pyx_v_orig_width = __pyx_t_11;
 
-  /* "random_video_effect.pyx":211
+  /* "random_video_effect.pyx":221
  * 
  *     # Determine scale factor based on the smaller dimension
  *     if orig_width < orig_height:             # <<<<<<<<<<<<<<
@@ -7229,7 +7396,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   __pyx_t_6 = (__pyx_v_orig_width < __pyx_v_orig_height);
   if (__pyx_t_6) {
 
-    /* "random_video_effect.pyx":212
+    /* "random_video_effect.pyx":222
  *     # Determine scale factor based on the smaller dimension
  *     if orig_width < orig_height:
  *         scale_factor = target_width / orig_width             # <<<<<<<<<<<<<<
@@ -7238,11 +7405,11 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
     if (unlikely(__pyx_v_orig_width == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 212, __pyx_L1_error)
+      __PYX_ERR(0, 222, __pyx_L1_error)
     }
     __pyx_v_scale_factor = (((double)__pyx_v_target_width) / ((double)__pyx_v_orig_width));
 
-    /* "random_video_effect.pyx":211
+    /* "random_video_effect.pyx":221
  * 
  *     # Determine scale factor based on the smaller dimension
  *     if orig_width < orig_height:             # <<<<<<<<<<<<<<
@@ -7252,7 +7419,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     goto __pyx_L6;
   }
 
-  /* "random_video_effect.pyx":214
+  /* "random_video_effect.pyx":224
  *         scale_factor = target_width / orig_width
  *     else:
  *         scale_factor = target_height / orig_height             # <<<<<<<<<<<<<<
@@ -7262,13 +7429,13 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   /*else*/ {
     if (unlikely(__pyx_v_orig_height == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 214, __pyx_L1_error)
+      __PYX_ERR(0, 224, __pyx_L1_error)
     }
     __pyx_v_scale_factor = (((double)__pyx_v_target_height) / ((double)__pyx_v_orig_height));
   }
   __pyx_L6:;
 
-  /* "random_video_effect.pyx":217
+  /* "random_video_effect.pyx":227
  * 
  *     # Calculate the new resized dimensions
  *     new_width = int(orig_width * scale_factor)             # <<<<<<<<<<<<<<
@@ -7277,7 +7444,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
   __pyx_v_new_width = ((int)(__pyx_v_orig_width * __pyx_v_scale_factor));
 
-  /* "random_video_effect.pyx":218
+  /* "random_video_effect.pyx":228
  *     # Calculate the new resized dimensions
  *     new_width = int(orig_width * scale_factor)
  *     new_height = int(orig_height * scale_factor)             # <<<<<<<<<<<<<<
@@ -7286,28 +7453,28 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
   __pyx_v_new_height = ((int)(__pyx_v_orig_height * __pyx_v_scale_factor));
 
-  /* "random_video_effect.pyx":220
+  /* "random_video_effect.pyx":230
  *     new_height = int(orig_height * scale_factor)
  * 
  *     resized_image = cv2.resize(image, (new_width, new_height))             # <<<<<<<<<<<<<<
  * 
  *     # Set up video writer codec
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_9);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_12, 1, __pyx_t_9)) __PYX_ERR(0, 220, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_12, 1, __pyx_t_9)) __PYX_ERR(0, 230, __pyx_L1_error);
   __pyx_t_3 = 0;
   __pyx_t_9 = 0;
   __pyx_t_9 = NULL;
@@ -7329,56 +7496,56 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 2+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_resized_image = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":223
+  /* "random_video_effect.pyx":233
  * 
  *     # Set up video writer codec
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')             # <<<<<<<<<<<<<<
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (target_width, target_height))
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_4 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_fourcc = __pyx_t_12;
   __pyx_t_12 = 0;
 
-  /* "random_video_effect.pyx":224
+  /* "random_video_effect.pyx":234
  *     # Set up video writer codec
  *     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
  *     out = cv2.VideoWriter(output_path, fourcc, fps, (target_width, target_height))             # <<<<<<<<<<<<<<
  * 
  *     # Check if the resized image is the same as the target dimensions
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_target_width); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_target_width); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_target_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_target_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_9);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_9)) __PYX_ERR(0, 234, __pyx_L1_error);
   __pyx_t_4 = 0;
   __pyx_t_9 = 0;
   __pyx_t_9 = NULL;
@@ -7400,14 +7567,14 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 4+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 224, __pyx_L1_error)
+    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_out = __pyx_t_12;
   __pyx_t_12 = 0;
 
-  /* "random_video_effect.pyx":227
+  /* "random_video_effect.pyx":237
  * 
  *     # Check if the resized image is the same as the target dimensions
  *     if new_width == target_width:  # Vertical scrolling             # <<<<<<<<<<<<<<
@@ -7417,26 +7584,26 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   __pyx_t_6 = (__pyx_v_new_width == __pyx_v_target_width);
   if (__pyx_t_6) {
 
-    /* "random_video_effect.pyx":228
+    /* "random_video_effect.pyx":238
  *     # Check if the resized image is the same as the target dimensions
  *     if new_width == target_width:  # Vertical scrolling
  *         direction = random.choice(['up_down', 'down_up'])             # <<<<<<<<<<<<<<
  *         print(f"Scrolling direction: {direction}")
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_random); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_random); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_choice); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_choice); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_n_u_up_down);
     __Pyx_GIVEREF(__pyx_n_u_up_down);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_u_up_down)) __PYX_ERR(0, 228, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_u_up_down)) __PYX_ERR(0, 238, __pyx_L1_error);
     __Pyx_INCREF(__pyx_n_u_down_up);
     __Pyx_GIVEREF(__pyx_n_u_down_up);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_u_down_up)) __PYX_ERR(0, 228, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_u_down_up)) __PYX_ERR(0, 238, __pyx_L1_error);
     __pyx_t_9 = NULL;
     __pyx_t_5 = 0;
     #if CYTHON_UNPACK_METHODS
@@ -7456,42 +7623,42 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 228, __pyx_L1_error)
+      if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 238, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_12))||((__pyx_t_12) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_12))) __PYX_ERR(0, 228, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_12))||((__pyx_t_12) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_12))) __PYX_ERR(0, 238, __pyx_L1_error)
     __pyx_v_direction = ((PyObject*)__pyx_t_12);
     __pyx_t_12 = 0;
 
-    /* "random_video_effect.pyx":229
+    /* "random_video_effect.pyx":239
  *     if new_width == target_width:  # Vertical scrolling
  *         direction = random.choice(['up_down', 'down_up'])
  *         print(f"Scrolling direction: {direction}")             # <<<<<<<<<<<<<<
  * 
  *         if direction == 'up_down':
  */
-    __pyx_t_12 = __Pyx_PyUnicode_Unicode(__pyx_v_direction); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 229, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyUnicode_Unicode(__pyx_v_direction); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 239, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Scrolling_direction, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Scrolling_direction, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 229, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 239, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-    /* "random_video_effect.pyx":231
+    /* "random_video_effect.pyx":241
  *         print(f"Scrolling direction: {direction}")
  * 
  *         if direction == 'up_down':             # <<<<<<<<<<<<<<
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float
  */
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_up_down, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 231, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_up_down, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 241, __pyx_L1_error)
     if (__pyx_t_6) {
 
-      /* "random_video_effect.pyx":232
+      /* "random_video_effect.pyx":242
  * 
  *         if direction == 'up_down':
  *             total_move = new_height - target_height             # <<<<<<<<<<<<<<
@@ -7500,7 +7667,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       __pyx_v_total_move = (__pyx_v_new_height - __pyx_v_target_height);
 
-      /* "random_video_effect.pyx":233
+      /* "random_video_effect.pyx":243
  *         if direction == 'up_down':
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float             # <<<<<<<<<<<<<<
@@ -7509,20 +7676,20 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       if (unlikely(__pyx_v_total_frames == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 233, __pyx_L1_error)
+        __PYX_ERR(0, 243, __pyx_L1_error)
       }
       __pyx_v_move_per_frame = (((double)__pyx_v_total_move) / ((double)__pyx_v_total_frames));
 
-      /* "random_video_effect.pyx":234
+      /* "random_video_effect.pyx":244
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *                 current_y = int(frame * move_per_frame)
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]
  */
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 234, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 244, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
@@ -7530,9 +7697,9 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __pyx_t_7 = 0;
         __pyx_t_13 = NULL;
       } else {
-        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 234, __pyx_L1_error)
+        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 244, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 234, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 244, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       for (;;) {
@@ -7541,28 +7708,28 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 234, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 244, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_3 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 234, __pyx_L1_error)
+            __pyx_t_3 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 244, __pyx_L1_error)
             #else
-            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
             #endif
           } else {
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 234, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 244, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 234, __pyx_L1_error)
+            __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 244, __pyx_L1_error)
             #else
-            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
             #endif
           }
@@ -7572,7 +7739,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else __PYX_ERR(0, 234, __pyx_L1_error)
+              else __PYX_ERR(0, 244, __pyx_L1_error)
             }
             break;
           }
@@ -7581,67 +7748,67 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "random_video_effect.pyx":235
+        /* "random_video_effect.pyx":245
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):
  *                 current_y = int(frame * move_per_frame)             # <<<<<<<<<<<<<<
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]
  *                 out.write(cropped_image)
  */
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_2 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 245, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_current_y = __pyx_t_11;
 
-        /* "random_video_effect.pyx":236
+        /* "random_video_effect.pyx":246
  *             for frame in range(total_frames):
  *                 current_y = int(frame * move_per_frame)
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]             # <<<<<<<<<<<<<<
  *                 out.write(cropped_image)
  * 
  */
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_current_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_current_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyInt_From_int((__pyx_v_current_y + __pyx_v_target_height)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int((__pyx_v_current_y + __pyx_v_target_height)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = PySlice_New(__pyx_t_3, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_9 = PySlice_New(__pyx_t_3, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_target_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_target_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_3 = PySlice_New(__pyx_int_0, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_3 = PySlice_New(__pyx_int_0, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_9);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_9)) __PYX_ERR(0, 236, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_9)) __PYX_ERR(0, 246, __pyx_L1_error);
         __Pyx_GIVEREF(__pyx_t_3);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error);
         __pyx_t_9 = 0;
         __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_XDECREF_SET(__pyx_v_cropped_image, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "random_video_effect.pyx":237
+        /* "random_video_effect.pyx":247
  *                 current_y = int(frame * move_per_frame)
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]
  *                 out.write(cropped_image)             # <<<<<<<<<<<<<<
  * 
  *         elif direction == 'down_up':
  */
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_9 = NULL;
         __pyx_t_5 = 0;
@@ -7661,13 +7828,13 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
           PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_v_cropped_image};
           __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 247, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "random_video_effect.pyx":234
+        /* "random_video_effect.pyx":244
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -7677,7 +7844,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       }
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "random_video_effect.pyx":231
+      /* "random_video_effect.pyx":241
  *         print(f"Scrolling direction: {direction}")
  * 
  *         if direction == 'up_down':             # <<<<<<<<<<<<<<
@@ -7687,17 +7854,17 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       goto __pyx_L8;
     }
 
-    /* "random_video_effect.pyx":239
+    /* "random_video_effect.pyx":249
  *                 out.write(cropped_image)
  * 
  *         elif direction == 'down_up':             # <<<<<<<<<<<<<<
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float
  */
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_down_up, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_down_up, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 249, __pyx_L1_error)
     if (__pyx_t_6) {
 
-      /* "random_video_effect.pyx":240
+      /* "random_video_effect.pyx":250
  * 
  *         elif direction == 'down_up':
  *             total_move = new_height - target_height             # <<<<<<<<<<<<<<
@@ -7706,7 +7873,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       __pyx_v_total_move = (__pyx_v_new_height - __pyx_v_target_height);
 
-      /* "random_video_effect.pyx":241
+      /* "random_video_effect.pyx":251
  *         elif direction == 'down_up':
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float             # <<<<<<<<<<<<<<
@@ -7715,20 +7882,20 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       if (unlikely(__pyx_v_total_frames == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 241, __pyx_L1_error)
+        __PYX_ERR(0, 251, __pyx_L1_error)
       }
       __pyx_v_move_per_frame = (((double)__pyx_v_total_move) / ((double)__pyx_v_total_frames));
 
-      /* "random_video_effect.pyx":242
+      /* "random_video_effect.pyx":252
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *                 current_y = int(total_move - (frame * move_per_frame))
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]
  */
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 242, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 252, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
@@ -7736,9 +7903,9 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __pyx_t_7 = 0;
         __pyx_t_13 = NULL;
       } else {
-        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 242, __pyx_L1_error)
+        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 252, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 242, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 252, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       for (;;) {
@@ -7747,28 +7914,28 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 242, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_3 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 242, __pyx_L1_error)
+            __pyx_t_3 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
             #else
-            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
             #endif
           } else {
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 242, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 242, __pyx_L1_error)
+            __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_3); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 252, __pyx_L1_error)
             #else
-            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
             #endif
           }
@@ -7778,7 +7945,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else __PYX_ERR(0, 242, __pyx_L1_error)
+              else __PYX_ERR(0, 252, __pyx_L1_error)
             }
             break;
           }
@@ -7787,73 +7954,73 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "random_video_effect.pyx":243
+        /* "random_video_effect.pyx":253
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):
  *                 current_y = int(total_move - (frame * move_per_frame))             # <<<<<<<<<<<<<<
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]
  *                 out.write(cropped_image)
  */
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_total_move); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 243, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_total_move); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 243, __pyx_L1_error)
+        __pyx_t_2 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 243, __pyx_L1_error)
+        __pyx_t_9 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyNumber_Subtract(__pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 243, __pyx_L1_error)
+        __pyx_t_2 = PyNumber_Subtract(__pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_9 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 243, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 243, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 253, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_v_current_y = __pyx_t_11;
 
-        /* "random_video_effect.pyx":244
+        /* "random_video_effect.pyx":254
  *             for frame in range(total_frames):
  *                 current_y = int(total_move - (frame * move_per_frame))
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]             # <<<<<<<<<<<<<<
  *                 out.write(cropped_image)
  * 
  */
-        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_y); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_y); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_2 = __Pyx_PyInt_From_int((__pyx_v_current_y + __pyx_v_target_height)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int((__pyx_v_current_y + __pyx_v_target_height)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_3 = PySlice_New(__pyx_t_9, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_3 = PySlice_New(__pyx_t_9, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_target_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_target_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = PySlice_New(__pyx_int_0, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_9 = PySlice_New(__pyx_int_0, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_3);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error);
         __Pyx_GIVEREF(__pyx_t_9);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_9)) __PYX_ERR(0, 244, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_9)) __PYX_ERR(0, 254, __pyx_L1_error);
         __pyx_t_3 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 254, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_XDECREF_SET(__pyx_v_cropped_image, __pyx_t_9);
         __pyx_t_9 = 0;
 
-        /* "random_video_effect.pyx":245
+        /* "random_video_effect.pyx":255
  *                 current_y = int(total_move - (frame * move_per_frame))
  *                 cropped_image = resized_image[current_y:current_y + target_height, 0:target_width]
  *                 out.write(cropped_image)             # <<<<<<<<<<<<<<
  * 
  *     elif new_height == target_height:  # Horizontal scrolling
  */
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_3 = NULL;
         __pyx_t_5 = 0;
@@ -7873,13 +8040,13 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
           PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_cropped_image};
           __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 245, __pyx_L1_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 255, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         }
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-        /* "random_video_effect.pyx":242
+        /* "random_video_effect.pyx":252
  *             total_move = new_height - target_height
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -7889,7 +8056,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       }
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "random_video_effect.pyx":239
+      /* "random_video_effect.pyx":249
  *                 out.write(cropped_image)
  * 
  *         elif direction == 'down_up':             # <<<<<<<<<<<<<<
@@ -7899,7 +8066,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     }
     __pyx_L8:;
 
-    /* "random_video_effect.pyx":227
+    /* "random_video_effect.pyx":237
  * 
  *     # Check if the resized image is the same as the target dimensions
  *     if new_width == target_width:  # Vertical scrolling             # <<<<<<<<<<<<<<
@@ -7909,7 +8076,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     goto __pyx_L7;
   }
 
-  /* "random_video_effect.pyx":247
+  /* "random_video_effect.pyx":257
  *                 out.write(cropped_image)
  * 
  *     elif new_height == target_height:  # Horizontal scrolling             # <<<<<<<<<<<<<<
@@ -7919,26 +8086,26 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   __pyx_t_6 = (__pyx_v_new_height == __pyx_v_target_height);
   if (__pyx_t_6) {
 
-    /* "random_video_effect.pyx":248
+    /* "random_video_effect.pyx":258
  * 
  *     elif new_height == target_height:  # Horizontal scrolling
  *         direction = random.choice(['left_right', 'right_left'])             # <<<<<<<<<<<<<<
  *         print(f"Scrolling direction: {direction}")
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_random); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_random); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_choice); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_choice); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = PyList_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __pyx_t_9 = PyList_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_INCREF(__pyx_n_u_left_right);
     __Pyx_GIVEREF(__pyx_n_u_left_right);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_9, 0, __pyx_n_u_left_right)) __PYX_ERR(0, 248, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_9, 0, __pyx_n_u_left_right)) __PYX_ERR(0, 258, __pyx_L1_error);
     __Pyx_INCREF(__pyx_n_u_right_left);
     __Pyx_GIVEREF(__pyx_n_u_right_left);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_9, 1, __pyx_n_u_right_left)) __PYX_ERR(0, 248, __pyx_L1_error);
+    if (__Pyx_PyList_SET_ITEM(__pyx_t_9, 1, __pyx_n_u_right_left)) __PYX_ERR(0, 258, __pyx_L1_error);
     __pyx_t_3 = NULL;
     __pyx_t_5 = 0;
     #if CYTHON_UNPACK_METHODS
@@ -7958,42 +8125,42 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 248, __pyx_L1_error)
+      if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 258, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_12))||((__pyx_t_12) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_12))) __PYX_ERR(0, 248, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_12))||((__pyx_t_12) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_12))) __PYX_ERR(0, 258, __pyx_L1_error)
     __pyx_v_direction = ((PyObject*)__pyx_t_12);
     __pyx_t_12 = 0;
 
-    /* "random_video_effect.pyx":249
+    /* "random_video_effect.pyx":259
  *     elif new_height == target_height:  # Horizontal scrolling
  *         direction = random.choice(['left_right', 'right_left'])
  *         print(f"Scrolling direction: {direction}")             # <<<<<<<<<<<<<<
  * 
  *         if direction == 'left_right':
  */
-    __pyx_t_12 = __Pyx_PyUnicode_Unicode(__pyx_v_direction); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyUnicode_Unicode(__pyx_v_direction); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 259, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Scrolling_direction, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Scrolling_direction, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 259, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-    /* "random_video_effect.pyx":251
+    /* "random_video_effect.pyx":261
  *         print(f"Scrolling direction: {direction}")
  * 
  *         if direction == 'left_right':             # <<<<<<<<<<<<<<
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float
  */
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_left_right, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 251, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_left_right, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 261, __pyx_L1_error)
     if (__pyx_t_6) {
 
-      /* "random_video_effect.pyx":252
+      /* "random_video_effect.pyx":262
  * 
  *         if direction == 'left_right':
  *             total_move = new_width - target_width             # <<<<<<<<<<<<<<
@@ -8002,7 +8169,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       __pyx_v_total_move = (__pyx_v_new_width - __pyx_v_target_width);
 
-      /* "random_video_effect.pyx":253
+      /* "random_video_effect.pyx":263
  *         if direction == 'left_right':
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float             # <<<<<<<<<<<<<<
@@ -8011,20 +8178,20 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       if (unlikely(__pyx_v_total_frames == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 253, __pyx_L1_error)
+        __PYX_ERR(0, 263, __pyx_L1_error)
       }
       __pyx_v_move_per_frame = (((double)__pyx_v_total_move) / ((double)__pyx_v_total_frames));
 
-      /* "random_video_effect.pyx":254
+      /* "random_video_effect.pyx":264
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *                 current_x = int(frame * move_per_frame)
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]
  */
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 254, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 264, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -8032,9 +8199,9 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __pyx_t_7 = 0;
         __pyx_t_13 = NULL;
       } else {
-        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 254, __pyx_L1_error)
+        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 264, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 254, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 264, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       for (;;) {
@@ -8043,28 +8210,28 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 254, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 264, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_2 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 254, __pyx_L1_error)
+            __pyx_t_2 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 264, __pyx_L1_error)
             #else
-            __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             #endif
           } else {
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 254, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 264, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 254, __pyx_L1_error)
+            __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 264, __pyx_L1_error)
             #else
-            __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             #endif
           }
@@ -8074,7 +8241,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else __PYX_ERR(0, 254, __pyx_L1_error)
+              else __PYX_ERR(0, 264, __pyx_L1_error)
             }
             break;
           }
@@ -8083,67 +8250,67 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "random_video_effect.pyx":255
+        /* "random_video_effect.pyx":265
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):
  *                 current_x = int(frame * move_per_frame)             # <<<<<<<<<<<<<<
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]
  *                 out.write(cropped_image)
  */
-        __pyx_t_2 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __pyx_t_2 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __pyx_t_9 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 265, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 255, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 265, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_v_current_x = __pyx_t_11;
 
-        /* "random_video_effect.pyx":256
+        /* "random_video_effect.pyx":266
  *             for frame in range(total_frames):
  *                 current_x = int(frame * move_per_frame)
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]             # <<<<<<<<<<<<<<
  *                 out.write(cropped_image)
  * 
  */
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_target_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_target_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = PySlice_New(__pyx_int_0, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_9 = PySlice_New(__pyx_int_0, __pyx_t_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_current_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_current_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_current_x + __pyx_v_target_width)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_current_x + __pyx_v_target_width)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = PySlice_New(__pyx_t_2, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_4 = PySlice_New(__pyx_t_2, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_9);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_9)) __PYX_ERR(0, 256, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_9)) __PYX_ERR(0, 266, __pyx_L1_error);
         __Pyx_GIVEREF(__pyx_t_4);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_4)) __PYX_ERR(0, 266, __pyx_L1_error);
         __pyx_t_9 = 0;
         __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 266, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF_SET(__pyx_v_cropped_image, __pyx_t_4);
         __pyx_t_4 = 0;
 
-        /* "random_video_effect.pyx":257
+        /* "random_video_effect.pyx":267
  *                 current_x = int(frame * move_per_frame)
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]
  *                 out.write(cropped_image)             # <<<<<<<<<<<<<<
  * 
  *         elif direction == 'right_left':
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_t_9 = NULL;
         __pyx_t_5 = 0;
@@ -8163,13 +8330,13 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
           PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_v_cropped_image};
           __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 267, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "random_video_effect.pyx":254
+        /* "random_video_effect.pyx":264
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -8179,7 +8346,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       }
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "random_video_effect.pyx":251
+      /* "random_video_effect.pyx":261
  *         print(f"Scrolling direction: {direction}")
  * 
  *         if direction == 'left_right':             # <<<<<<<<<<<<<<
@@ -8189,17 +8356,17 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       goto __pyx_L15;
     }
 
-    /* "random_video_effect.pyx":259
+    /* "random_video_effect.pyx":269
  *                 out.write(cropped_image)
  * 
  *         elif direction == 'right_left':             # <<<<<<<<<<<<<<
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float
  */
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_right_left, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 259, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_direction, __pyx_n_u_right_left, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 269, __pyx_L1_error)
     if (__pyx_t_6) {
 
-      /* "random_video_effect.pyx":260
+      /* "random_video_effect.pyx":270
  * 
  *         elif direction == 'right_left':
  *             total_move = new_width - target_width             # <<<<<<<<<<<<<<
@@ -8208,7 +8375,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       __pyx_v_total_move = (__pyx_v_new_width - __pyx_v_target_width);
 
-      /* "random_video_effect.pyx":261
+      /* "random_video_effect.pyx":271
  *         elif direction == 'right_left':
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float             # <<<<<<<<<<<<<<
@@ -8217,20 +8384,20 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  */
       if (unlikely(__pyx_v_total_frames == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 261, __pyx_L1_error)
+        __PYX_ERR(0, 271, __pyx_L1_error)
       }
       __pyx_v_move_per_frame = (((double)__pyx_v_total_move) / ((double)__pyx_v_total_frames));
 
-      /* "random_video_effect.pyx":262
+      /* "random_video_effect.pyx":272
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *                 current_x = int(total_move - (frame * move_per_frame))
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]
  */
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 262, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 272, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_12); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 272, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
@@ -8238,9 +8405,9 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __pyx_t_7 = 0;
         __pyx_t_13 = NULL;
       } else {
-        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 262, __pyx_L1_error)
+        __pyx_t_7 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 272, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 262, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 272, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       for (;;) {
@@ -8249,28 +8416,28 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 262, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 272, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_4 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 262, __pyx_L1_error)
+            __pyx_t_4 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 272, __pyx_L1_error)
             #else
-            __pyx_t_4 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 272, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_4);
             #endif
           } else {
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_12);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 262, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 272, __pyx_L1_error)
               #endif
               if (__pyx_t_7 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 262, __pyx_L1_error)
+            __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely((0 < 0))) __PYX_ERR(0, 272, __pyx_L1_error)
             #else
-            __pyx_t_4 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PySequence_ITEM(__pyx_t_12, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 272, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_4);
             #endif
           }
@@ -8280,7 +8447,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else __PYX_ERR(0, 262, __pyx_L1_error)
+              else __PYX_ERR(0, 272, __pyx_L1_error)
             }
             break;
           }
@@ -8289,73 +8456,73 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
         __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_4);
         __pyx_t_4 = 0;
 
-        /* "random_video_effect.pyx":263
+        /* "random_video_effect.pyx":273
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):
  *                 current_x = int(total_move - (frame * move_per_frame))             # <<<<<<<<<<<<<<
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]
  *                 out.write(cropped_image)
  */
-        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_move); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_move); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 273, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_move_per_frame); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 273, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_9 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_9 = PyNumber_Multiply(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 273, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyNumber_Subtract(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_3 = PyNumber_Subtract(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 273, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_9 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 273, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 273, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_v_current_x = __pyx_t_11;
 
-        /* "random_video_effect.pyx":264
+        /* "random_video_effect.pyx":274
  *             for frame in range(total_frames):
  *                 current_x = int(total_move - (frame * move_per_frame))
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]             # <<<<<<<<<<<<<<
  *                 out.write(cropped_image)
  *     else:
  */
-        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_target_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_target_height); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_3 = PySlice_New(__pyx_int_0, __pyx_t_9, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_3 = PySlice_New(__pyx_int_0, __pyx_t_9, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_x); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_x); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_current_x + __pyx_v_target_width)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_current_x + __pyx_v_target_width)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_2 = PySlice_New(__pyx_t_9, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_2 = PySlice_New(__pyx_t_9, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_GIVEREF(__pyx_t_3);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3)) __PYX_ERR(0, 274, __pyx_L1_error);
         __Pyx_GIVEREF(__pyx_t_2);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error);
         __pyx_t_3 = 0;
         __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF_SET(__pyx_v_cropped_image, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "random_video_effect.pyx":265
+        /* "random_video_effect.pyx":275
  *                 current_x = int(total_move - (frame * move_per_frame))
  *                 cropped_image = resized_image[0:target_height, current_x:current_x + target_width]
  *                 out.write(cropped_image)             # <<<<<<<<<<<<<<
  *     else:
  *         # If image doesn't match any of the target dimensions, just write the whole resized image
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 265, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 275, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_3 = NULL;
         __pyx_t_5 = 0;
@@ -8375,13 +8542,13 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
           PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_cropped_image};
           __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "random_video_effect.pyx":262
+        /* "random_video_effect.pyx":272
  *             total_move = new_width - target_width
  *             move_per_frame = total_move / total_frames  # This will now be a float
  *             for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -8391,7 +8558,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       }
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-      /* "random_video_effect.pyx":259
+      /* "random_video_effect.pyx":269
  *                 out.write(cropped_image)
  * 
  *         elif direction == 'right_left':             # <<<<<<<<<<<<<<
@@ -8401,7 +8568,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     }
     __pyx_L15:;
 
-    /* "random_video_effect.pyx":247
+    /* "random_video_effect.pyx":257
  *                 out.write(cropped_image)
  * 
  *     elif new_height == target_height:  # Horizontal scrolling             # <<<<<<<<<<<<<<
@@ -8411,7 +8578,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     goto __pyx_L7;
   }
 
-  /* "random_video_effect.pyx":268
+  /* "random_video_effect.pyx":278
  *     else:
  *         # If image doesn't match any of the target dimensions, just write the whole resized image
  *         out.write(resized_image)             # <<<<<<<<<<<<<<
@@ -8419,7 +8586,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
  *     # Release the video writer and finalize the video
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_4 = NULL;
     __pyx_t_5 = 0;
@@ -8439,7 +8606,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
       PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_v_resized_image};
       __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 268, __pyx_L1_error)
+      if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 278, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
@@ -8447,14 +8614,14 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   }
   __pyx_L7:;
 
-  /* "random_video_effect.pyx":271
+  /* "random_video_effect.pyx":281
  * 
  *     # Release the video writer and finalize the video
  *     out.release()             # <<<<<<<<<<<<<<
  *     print(f"Video created successfully at: {output_path}")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -8474,27 +8641,27 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
     PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
     __pyx_t_12 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 271, __pyx_L1_error)
+    if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 281, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-  /* "random_video_effect.pyx":272
+  /* "random_video_effect.pyx":282
  *     # Release the video writer and finalize the video
  *     out.release()
  *     print(f"Video created successfully at: {output_path}")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_created_successfully_at, __pyx_v_output_path); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 272, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_created_successfully_at, __pyx_v_output_path); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":185
+  /* "random_video_effect.pyx":195
  * 
  * 
  * def create_scrolling_image_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -8526,7 +8693,7 @@ static PyObject *__pyx_pf_19random_video_effect_8create_scrolling_image_video(CY
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":275
+/* "random_video_effect.pyx":285
  * 
  * 
  * def create_zoom_in_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -8544,29 +8711,29 @@ static PyObject *__pyx_pf_19random_video_effect_32__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 275, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 285, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 275, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 285, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 275, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 285, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 275, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 285, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8657,7 +8824,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -8665,42 +8832,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_zoom_in_video", 0, 2, 6, 1); __PYX_ERR(0, 275, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_zoom_in_video", 0, 2, 6, 1); __PYX_ERR(0, 285, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_in_video") < 0)) __PYX_ERR(0, 275, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_in_video") < 0)) __PYX_ERR(0, 285, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -8721,7 +8888,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -8731,7 +8898,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_zoom_in_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 275, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_zoom_in_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 285, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -8745,11 +8912,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 285, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_10create_zoom_in_video(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -8800,25 +8967,25 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_zoom_in_video", 1);
 
-  /* "random_video_effect.pyx":287
+  /* "random_video_effect.pyx":297
  *     """
  *     # Resize and crop the image (this should return an image that is the right size)
  *     cdef object image = resize_and_crop(image_path, target_width=width, target_height=height)             # <<<<<<<<<<<<<<
  * 
  *     # Set up the codec and video writer
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 287, __pyx_L1_error);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 297, __pyx_L1_error);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -8826,47 +8993,47 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
   __pyx_v_image = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":290
+  /* "random_video_effect.pyx":300
  * 
  *     # Set up the codec and video writer
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')             # <<<<<<<<<<<<<<
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_4 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_fourcc = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":291
+  /* "random_video_effect.pyx":301
  *     # Set up the codec and video writer
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))             # <<<<<<<<<<<<<<
  * 
  *     # Total number of frames in the video
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_width);
   __Pyx_GIVEREF(__pyx_v_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_width)) __PYX_ERR(0, 291, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_width)) __PYX_ERR(0, 301, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_height);
   __Pyx_GIVEREF(__pyx_v_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_height)) __PYX_ERR(0, 291, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_height)) __PYX_ERR(0, 301, __pyx_L1_error);
   __pyx_t_1 = NULL;
   __pyx_t_5 = 0;
   #if CYTHON_UNPACK_METHODS
@@ -8886,33 +9053,33 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 4+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_v_out = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":294
+  /* "random_video_effect.pyx":304
  * 
  *     # Total number of frames in the video
  *     cdef int total_frames = int(duration * fps)             # <<<<<<<<<<<<<<
  * 
  *     # Zoom effect scaling parameters
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_fps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_fps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_total_frames = __pyx_t_6;
 
-  /* "random_video_effect.pyx":297
+  /* "random_video_effect.pyx":307
  * 
  *     # Zoom effect scaling parameters
  *     cdef float start_scale = 1.0  # Start from 1.0 (original size)             # <<<<<<<<<<<<<<
@@ -8921,7 +9088,7 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
  */
   __pyx_v_start_scale = 1.0;
 
-  /* "random_video_effect.pyx":298
+  /* "random_video_effect.pyx":308
  *     # Zoom effect scaling parameters
  *     cdef float start_scale = 1.0  # Start from 1.0 (original size)
  *     cdef float end_scale = 1.6    # Zoom in to 1.6 times the original size             # <<<<<<<<<<<<<<
@@ -8930,7 +9097,7 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
  */
   __pyx_v_end_scale = 1.6;
 
-  /* "random_video_effect.pyx":306
+  /* "random_video_effect.pyx":316
  * 
  *     # Write each frame with the zoom-in effect
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -8942,7 +9109,7 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_frame = __pyx_t_8;
 
-    /* "random_video_effect.pyx":308
+    /* "random_video_effect.pyx":318
  *     for frame in range(total_frames):
  *         # Calculate the current scale factor
  *         current_scale = start_scale + (end_scale - start_scale) * (frame / (total_frames - 1))             # <<<<<<<<<<<<<<
@@ -8952,90 +9119,90 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
     __pyx_t_9 = (__pyx_v_total_frames - 1);
     if (unlikely(__pyx_t_9 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 308, __pyx_L1_error)
+      __PYX_ERR(0, 318, __pyx_L1_error)
     }
     __pyx_v_current_scale = (__pyx_v_start_scale + ((__pyx_v_end_scale - __pyx_v_start_scale) * (((double)__pyx_v_frame) / ((double)__pyx_t_9))));
 
-    /* "random_video_effect.pyx":311
+    /* "random_video_effect.pyx":321
  * 
  *         # Calculate the new dimensions
  *         new_width = int(width * current_scale)             # <<<<<<<<<<<<<<
  *         new_height = int(height * current_scale)
  * 
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 311, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 311, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 321, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_new_width = __pyx_t_10;
 
-    /* "random_video_effect.pyx":312
+    /* "random_video_effect.pyx":322
  *         # Calculate the new dimensions
  *         new_width = int(width * current_scale)
  *         new_height = int(height * current_scale)             # <<<<<<<<<<<<<<
  * 
  *         # Resize the image
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_new_height = __pyx_t_10;
 
-    /* "random_video_effect.pyx":315
+    /* "random_video_effect.pyx":325
  * 
  *         # Resize the image
  *         resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_LINEAR)             # <<<<<<<<<<<<<<
  * 
  *         # Calculate the center crop position
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_4);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4)) __PYX_ERR(0, 325, __pyx_L1_error);
     __pyx_t_2 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_image);
     __Pyx_GIVEREF(__pyx_v_image);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image)) __PYX_ERR(0, 315, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image)) __PYX_ERR(0, 325, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error);
     __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_INTER_LINEAR); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_INTER_LINEAR); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_interpolation, __pyx_t_11) < 0) __PYX_ERR(0, 315, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_interpolation, __pyx_t_11) < 0) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 315, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 325, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9043,95 +9210,95 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
     __Pyx_XDECREF_SET(__pyx_v_resized_image, __pyx_t_11);
     __pyx_t_11 = 0;
 
-    /* "random_video_effect.pyx":318
+    /* "random_video_effect.pyx":328
  * 
  *         # Calculate the center crop position
  *         start_x = (new_width - width) // 2             # <<<<<<<<<<<<<<
  *         start_y = (new_height - height) // 2
  * 
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_start_x = __pyx_t_10;
 
-    /* "random_video_effect.pyx":319
+    /* "random_video_effect.pyx":329
  *         # Calculate the center crop position
  *         start_x = (new_width - width) // 2
  *         start_y = (new_height - height) // 2             # <<<<<<<<<<<<<<
  * 
  *         # Crop the image to the target size
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_start_y = __pyx_t_10;
 
-    /* "random_video_effect.pyx":322
+    /* "random_video_effect.pyx":332
  * 
  *         # Crop the image to the target size
  *         cropped_image = resized_image[start_y:start_y + height, start_x:start_x + width]             # <<<<<<<<<<<<<<
  * 
  *         # Write the frame to the video
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyNumber_Add(__pyx_t_1, __pyx_v_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Add(__pyx_t_1, __pyx_v_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PySlice_New(__pyx_t_11, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_1 = PySlice_New(__pyx_t_11, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_3 = PyNumber_Add(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Add(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PySlice_New(__pyx_t_4, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_11 = PySlice_New(__pyx_t_4, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_11);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_11)) __PYX_ERR(0, 322, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_11)) __PYX_ERR(0, 332, __pyx_L1_error);
     __pyx_t_1 = 0;
     __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 332, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cropped_image, __pyx_t_11);
     __pyx_t_11 = 0;
 
-    /* "random_video_effect.pyx":325
+    /* "random_video_effect.pyx":335
  * 
  *         # Write the frame to the video
  *         out.write(cropped_image)             # <<<<<<<<<<<<<<
  * 
  *     # Release the video writer
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 325, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 335, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = NULL;
     __pyx_t_5 = 0;
@@ -9151,21 +9318,21 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
       PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_cropped_image};
       __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 325, __pyx_L1_error)
+      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 335, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   }
 
-  /* "random_video_effect.pyx":328
+  /* "random_video_effect.pyx":338
  * 
  *     # Release the video writer
  *     out.release()             # <<<<<<<<<<<<<<
  * 
  *     print(f"Zoom-in video created successfully at: {output_path}")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = NULL;
   __pyx_t_5 = 0;
@@ -9185,27 +9352,27 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 328, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 338, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-  /* "random_video_effect.pyx":330
+  /* "random_video_effect.pyx":340
  *     out.release()
  * 
  *     print(f"Zoom-in video created successfully at: {output_path}")             # <<<<<<<<<<<<<<
  * 
  * def create_zoom_out_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
  */
-  __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Zoom_in_video_created_successful, __pyx_v_output_path); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Zoom_in_video_created_successful, __pyx_v_output_path); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":275
+  /* "random_video_effect.pyx":285
  * 
  * 
  * def create_zoom_in_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -9235,7 +9402,7 @@ static PyObject *__pyx_pf_19random_video_effect_10create_zoom_in_video(CYTHON_UN
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":332
+/* "random_video_effect.pyx":342
  *     print(f"Zoom-in video created successfully at: {output_path}")
  * 
  * def create_zoom_out_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -9253,29 +9420,29 @@ static PyObject *__pyx_pf_19random_video_effect_34__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 342, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 332, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 342, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 332, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 342, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 332, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 342, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 332, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 342, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 332, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 342, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9365,7 +9532,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -9373,42 +9540,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_zoom_out_video", 0, 2, 6, 1); __PYX_ERR(0, 332, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_zoom_out_video", 0, 2, 6, 1); __PYX_ERR(0, 342, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_out_video") < 0)) __PYX_ERR(0, 332, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_out_video") < 0)) __PYX_ERR(0, 342, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -9429,7 +9596,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 332, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 342, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -9439,7 +9606,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_zoom_out_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 332, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_zoom_out_video", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 342, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9453,11 +9620,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 342, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_12create_zoom_out_video(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -9508,25 +9675,25 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_zoom_out_video", 1);
 
-  /* "random_video_effect.pyx":333
+  /* "random_video_effect.pyx":343
  * 
  * def create_zoom_out_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
  *     cdef object image = resize_and_crop(image_path, target_width=width, target_height=height)             # <<<<<<<<<<<<<<
  * 
  *     # Set up the codec and video writer
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 333, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 333, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 333, __pyx_L1_error);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 333, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 343, __pyx_L1_error);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 333, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 333, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 333, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9534,47 +9701,47 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
   __pyx_v_image = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":336
+  /* "random_video_effect.pyx":346
  * 
  *     # Set up the codec and video writer
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')             # <<<<<<<<<<<<<<
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_t_4 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_fourcc = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":337
+  /* "random_video_effect.pyx":347
  *     # Set up the codec and video writer
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))             # <<<<<<<<<<<<<<
  * 
  *     # Total number of frames in the video
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cv2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_width);
   __Pyx_GIVEREF(__pyx_v_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_width)) __PYX_ERR(0, 337, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_width)) __PYX_ERR(0, 347, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_height);
   __Pyx_GIVEREF(__pyx_v_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_height)) __PYX_ERR(0, 337, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_height)) __PYX_ERR(0, 347, __pyx_L1_error);
   __pyx_t_1 = NULL;
   __pyx_t_5 = 0;
   #if CYTHON_UNPACK_METHODS
@@ -9594,33 +9761,33 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 4+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 347, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_v_out = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":340
+  /* "random_video_effect.pyx":350
  * 
  *     # Total number of frames in the video
  *     cdef int total_frames = int(duration * fps)             # <<<<<<<<<<<<<<
  * 
  *     # Zoom effect scaling parameters
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_fps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_v_fps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_total_frames = __pyx_t_6;
 
-  /* "random_video_effect.pyx":343
+  /* "random_video_effect.pyx":353
  * 
  *     # Zoom effect scaling parameters
  *     cdef float start_scale = 1.6  # Start from 1.0 (original size)             # <<<<<<<<<<<<<<
@@ -9629,7 +9796,7 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
  */
   __pyx_v_start_scale = 1.6;
 
-  /* "random_video_effect.pyx":344
+  /* "random_video_effect.pyx":354
  *     # Zoom effect scaling parameters
  *     cdef float start_scale = 1.6  # Start from 1.0 (original size)
  *     cdef float end_scale = 1.0    # Zoom in to 1.6 times the original size             # <<<<<<<<<<<<<<
@@ -9638,7 +9805,7 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
  */
   __pyx_v_end_scale = 1.0;
 
-  /* "random_video_effect.pyx":351
+  /* "random_video_effect.pyx":361
  *     cdef object resized_image, cropped_image
  *     # Ghi tng khung hnh vi hiu ng zoom out
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -9650,7 +9817,7 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_frame = __pyx_t_8;
 
-    /* "random_video_effect.pyx":353
+    /* "random_video_effect.pyx":363
  *     for frame in range(total_frames):
  *         # Tnh ton t l thu phng (gim dn t 1.4 n 1.0)
  *         current_scale = start_scale - (start_scale - end_scale) * (frame / (total_frames - 1))             # <<<<<<<<<<<<<<
@@ -9660,90 +9827,90 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
     __pyx_t_9 = (__pyx_v_total_frames - 1);
     if (unlikely(__pyx_t_9 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 353, __pyx_L1_error)
+      __PYX_ERR(0, 363, __pyx_L1_error)
     }
     __pyx_v_current_scale = (__pyx_v_start_scale - ((__pyx_v_start_scale - __pyx_v_end_scale) * (((double)__pyx_v_frame) / ((double)__pyx_t_9))));
 
-    /* "random_video_effect.pyx":356
+    /* "random_video_effect.pyx":366
  * 
  *         # Tnh kch thc mi
  *         new_width = int(width * current_scale)             # <<<<<<<<<<<<<<
  *         new_height = int(height * current_scale)
  * 
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_v_width, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_new_width = __pyx_t_10;
 
-    /* "random_video_effect.pyx":357
+    /* "random_video_effect.pyx":367
  *         # Tnh kch thc mi
  *         new_width = int(width * current_scale)
  *         new_height = int(height * current_scale)             # <<<<<<<<<<<<<<
  * 
  *         # Resize hnh nh
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_current_scale); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 357, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 357, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_new_height = __pyx_t_10;
 
-    /* "random_video_effect.pyx":360
+    /* "random_video_effect.pyx":370
  * 
  *         # Resize hnh nh
  *         resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_LINEAR)             # <<<<<<<<<<<<<<
  * 
  *         # Tnh ton v tr  cn gia
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_4);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4)) __PYX_ERR(0, 360, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4)) __PYX_ERR(0, 370, __pyx_L1_error);
     __pyx_t_2 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_image);
     __Pyx_GIVEREF(__pyx_v_image);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image)) __PYX_ERR(0, 360, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_image)) __PYX_ERR(0, 370, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error);
     __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_INTER_LINEAR); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_INTER_LINEAR); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_interpolation, __pyx_t_11) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_interpolation, __pyx_t_11) < 0) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9751,95 +9918,95 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
     __Pyx_XDECREF_SET(__pyx_v_resized_image, __pyx_t_11);
     __pyx_t_11 = 0;
 
-    /* "random_video_effect.pyx":363
+    /* "random_video_effect.pyx":373
  * 
  *         # Tnh ton v tr  cn gia
  *         start_x = (new_width - width) // 2             # <<<<<<<<<<<<<<
  *         start_y = (new_height - height) // 2
  * 
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 363, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 363, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 363, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_start_x = __pyx_t_10;
 
-    /* "random_video_effect.pyx":364
+    /* "random_video_effect.pyx":374
  *         # Tnh ton v tr  cn gia
  *         start_x = (new_width - width) // 2
  *         start_y = (new_height - height) // 2             # <<<<<<<<<<<<<<
  * 
  *         # Ct hnh nh  gi nguyn kch thc video
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_new_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_start_y = __pyx_t_10;
 
-    /* "random_video_effect.pyx":367
+    /* "random_video_effect.pyx":377
  * 
  *         # Ct hnh nh  gi nguyn kch thc video
  *         cropped_image = resized_image[start_y:start_y+height, start_x:start_x+width]             # <<<<<<<<<<<<<<
  * 
  *         # Ghi khung hnh
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyNumber_Add(__pyx_t_1, __pyx_v_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Add(__pyx_t_1, __pyx_v_height); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PySlice_New(__pyx_t_11, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_1 = PySlice_New(__pyx_t_11, __pyx_t_4, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_3 = PyNumber_Add(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Add(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PySlice_New(__pyx_t_4, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_11 = PySlice_New(__pyx_t_4, __pyx_t_3, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1)) __PYX_ERR(0, 377, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_11);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_11)) __PYX_ERR(0, 367, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error);
     __pyx_t_1 = 0;
     __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_v_resized_image, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cropped_image, __pyx_t_11);
     __pyx_t_11 = 0;
 
-    /* "random_video_effect.pyx":370
+    /* "random_video_effect.pyx":380
  * 
  *         # Ghi khung hnh
  *         out.write(cropped_image)             # <<<<<<<<<<<<<<
  * 
  *     # Gii phng i tng VideoWriter
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = NULL;
     __pyx_t_5 = 0;
@@ -9859,21 +10026,21 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
       PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_cropped_image};
       __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 370, __pyx_L1_error)
+      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   }
 
-  /* "random_video_effect.pyx":373
+  /* "random_video_effect.pyx":383
  * 
  *     # Gii phng i tng VideoWriter
  *     out.release()             # <<<<<<<<<<<<<<
  * 
  *     print(f"Video zoom out  c to thnh cng ti: {output_path}")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 383, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = NULL;
   __pyx_t_5 = 0;
@@ -9893,27 +10060,27 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 373, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-  /* "random_video_effect.pyx":375
+  /* "random_video_effect.pyx":385
  *     out.release()
  * 
  *     print(f"Video zoom out  c to thnh cng ti: {output_path}")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti, __pyx_v_output_path); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti, __pyx_v_output_path); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 385, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":332
+  /* "random_video_effect.pyx":342
  *     print(f"Zoom-in video created successfully at: {output_path}")
  * 
  * def create_zoom_out_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -9943,7 +10110,7 @@ static PyObject *__pyx_pf_19random_video_effect_12create_zoom_out_video(CYTHON_U
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":379
+/* "random_video_effect.pyx":389
  * 
  * # Hm to video vi hiu ng zoom v background
  * def create_zoom_in_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -9961,29 +10128,29 @@ static PyObject *__pyx_pf_19random_video_effect_36__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 379, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 389, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 379, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 389, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 379, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 389, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 379, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 389, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10074,7 +10241,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -10082,42 +10249,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_zoom_in_video_with_background", 0, 2, 6, 1); __PYX_ERR(0, 379, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_zoom_in_video_with_background", 0, 2, 6, 1); __PYX_ERR(0, 389, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_in_video_with_background") < 0)) __PYX_ERR(0, 379, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_in_video_with_background") < 0)) __PYX_ERR(0, 389, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -10138,7 +10305,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -10148,7 +10315,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_zoom_in_video_with_background", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 379, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_zoom_in_video_with_background", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 389, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10162,11 +10329,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 389, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_14create_zoom_in_video_with_background(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -10230,7 +10397,7 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_zoom_in_video_with_background", 1);
 
-  /* "random_video_effect.pyx":386
+  /* "random_video_effect.pyx":396
  *     cdef int total_frames, start_x_bg, start_y_bg, start_x_small, start_y_small
  *     cdef float scale_bg, scale_img
  *     cdef int blur_strength = 41  #  mnh ca Gaussian blur             # <<<<<<<<<<<<<<
@@ -10239,25 +10406,25 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
  */
   __pyx_v_blur_strength = 41;
 
-  /* "random_video_effect.pyx":389
+  /* "random_video_effect.pyx":399
  * 
  *     # Resize nh ln v nh nh
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nn             # <<<<<<<<<<<<<<
  *     image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nh
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 389, __pyx_L1_error);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 399, __pyx_L1_error);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 399, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 399, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10265,25 +10432,25 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
   __pyx_v_image_1 = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":390
+  /* "random_video_effect.pyx":400
  *     # Resize nh ln v nh nh
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nn
  *     image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nh             # <<<<<<<<<<<<<<
  * 
  *     # Thit lp codec v i tng VideoWriter
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 390, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 400, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 390, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 400, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_path)) __PYX_ERR(0, 390, __pyx_L1_error);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_path)) __PYX_ERR(0, 400, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 390, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 390, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 390, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 400, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 400, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 400, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -10291,47 +10458,47 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
   __pyx_v_image_2 = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":393
+  /* "random_video_effect.pyx":403
  * 
  *     # Thit lp codec v i tng VideoWriter
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')             # <<<<<<<<<<<<<<
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 403, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 393, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 403, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_fourcc = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":394
+  /* "random_video_effect.pyx":404
  *     # Thit lp codec v i tng VideoWriter
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))             # <<<<<<<<<<<<<<
  * 
  *     # Tng s khung hnh trong video
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_width);
   __Pyx_GIVEREF(__pyx_v_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 394, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 404, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_height);
   __Pyx_GIVEREF(__pyx_v_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 394, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 404, __pyx_L1_error);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
   #if CYTHON_UNPACK_METHODS
@@ -10351,33 +10518,33 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
     __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 4+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 394, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_out = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":397
+  /* "random_video_effect.pyx":407
  * 
  *     # Tng s khung hnh trong video
  *     total_frames = int(duration * fps)             # <<<<<<<<<<<<<<
  * 
  *     # Hiu ng zoom cho nn (t 1.4 v 1.0)
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 397, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 407, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 397, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 407, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 397, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 407, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 397, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 407, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_total_frames = __pyx_t_6;
 
-  /* "random_video_effect.pyx":400
+  /* "random_video_effect.pyx":410
  * 
  *     # Hiu ng zoom cho nn (t 1.4 v 1.0)
  *     start_scale_bg = 1.5             # <<<<<<<<<<<<<<
@@ -10386,7 +10553,7 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
  */
   __pyx_v_start_scale_bg = 1.5;
 
-  /* "random_video_effect.pyx":401
+  /* "random_video_effect.pyx":411
  *     # Hiu ng zoom cho nn (t 1.4 v 1.0)
  *     start_scale_bg = 1.5
  *     end_scale_bg = 1.0             # <<<<<<<<<<<<<<
@@ -10395,7 +10562,7 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
  */
   __pyx_v_end_scale_bg = 1.0;
 
-  /* "random_video_effect.pyx":404
+  /* "random_video_effect.pyx":414
  * 
  *     # Hiu ng zoom cho nh nh (t 0.8 v 0.5)
  *     start_scale_img = 0.5             # <<<<<<<<<<<<<<
@@ -10404,7 +10571,7 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
  */
   __pyx_v_start_scale_img = 0.5;
 
-  /* "random_video_effect.pyx":405
+  /* "random_video_effect.pyx":415
  *     # Hiu ng zoom cho nh nh (t 0.8 v 0.5)
  *     start_scale_img = 0.5
  *     end_scale_img = 0.8             # <<<<<<<<<<<<<<
@@ -10413,28 +10580,28 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
  */
   __pyx_v_end_scale_img = 0.8;
 
-  /* "random_video_effect.pyx":408
+  /* "random_video_effect.pyx":418
  * 
  *     # M nh nn  lm nn m
  *     blurred_background = cv2.GaussianBlur(image_1, (blur_strength, blur_strength), 0)             # <<<<<<<<<<<<<<
  * 
  *     # Thm border trng cho nh nh
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 418, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 408, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 418, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 408, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_4)) __PYX_ERR(0, 408, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -10456,54 +10623,54 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
     __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_5, 3+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 408, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_v_blurred_background = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":411
+  /* "random_video_effect.pyx":421
  * 
  *     # Thm border trng cho nh nh
  *     image_2_with_border = cv2.copyMakeBorder(image_2, 10, 10, 10, 10, cv2.BORDER_CONSTANT, value=(255, 255, 255))             # <<<<<<<<<<<<<<
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_image_2);
   __Pyx_GIVEREF(__pyx_v_image_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_2)) __PYX_ERR(0, 411, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_2)) __PYX_ERR(0, 421, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_int_10)) __PYX_ERR(0, 411, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_int_10)) __PYX_ERR(0, 421, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_int_10)) __PYX_ERR(0, 411, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_int_10)) __PYX_ERR(0, 421, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_int_10)) __PYX_ERR(0, 411, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_int_10)) __PYX_ERR(0, 421, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_int_10)) __PYX_ERR(0, 411, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_int_10)) __PYX_ERR(0, 421, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_7);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_t_7)) __PYX_ERR(0, 411, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_t_7)) __PYX_ERR(0, 421, __pyx_L1_error);
   __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 411, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_value, __pyx_tuple_) < 0) __PYX_ERR(0, 411, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 411, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_value, __pyx_tuple__2) < 0) __PYX_ERR(0, 421, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -10511,80 +10678,80 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
   __pyx_v_image_2_with_border = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":414
+  /* "random_video_effect.pyx":424
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     cdef int height_1 = blurred_background.shape[0]             # <<<<<<<<<<<<<<
  *     cdef int width_1 = blurred_background.shape[1]
  *     cdef int height_2 = image_2_with_border.shape[0]
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 414, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 414, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 414, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_height_1 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":415
+  /* "random_video_effect.pyx":425
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     cdef int height_1 = blurred_background.shape[0]
  *     cdef int width_1 = blurred_background.shape[1]             # <<<<<<<<<<<<<<
  *     cdef int height_2 = image_2_with_border.shape[0]
  *     cdef int width_2 = image_2_with_border.shape[1]
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 415, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 425, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 415, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 425, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 415, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 425, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_width_1 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":416
+  /* "random_video_effect.pyx":426
  *     cdef int height_1 = blurred_background.shape[0]
  *     cdef int width_1 = blurred_background.shape[1]
  *     cdef int height_2 = image_2_with_border.shape[0]             # <<<<<<<<<<<<<<
  *     cdef int width_2 = image_2_with_border.shape[1]
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 426, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 426, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 426, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_height_2 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":417
+  /* "random_video_effect.pyx":427
  *     cdef int width_1 = blurred_background.shape[1]
  *     cdef int height_2 = image_2_with_border.shape[0]
  *     cdef int width_2 = image_2_with_border.shape[1]             # <<<<<<<<<<<<<<
  * 
  *     for frame in range(total_frames):
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 417, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 417, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 417, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_width_2 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":419
+  /* "random_video_effect.pyx":429
  *     cdef int width_2 = image_2_with_border.shape[1]
  * 
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *         # Tnh t l zoom cho nh nn v nh nh ti frame hin ti
  *         scale_bg = start_scale_bg - (frame / total_frames) * (start_scale_bg - end_scale_bg)  # Zoom out cho nn
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 419, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (likely(PyList_CheckExact(__pyx_t_7)) || PyTuple_CheckExact(__pyx_t_7)) {
@@ -10592,9 +10759,9 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
     __pyx_t_8 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+    __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 419, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 429, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   for (;;) {
@@ -10603,28 +10770,28 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
         #else
-        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 429, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       } else {
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 429, __pyx_L1_error)
         #else
-        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 429, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       }
@@ -10634,7 +10801,7 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 419, __pyx_L1_error)
+          else __PYX_ERR(0, 429, __pyx_L1_error)
         }
         break;
       }
@@ -10643,84 +10810,84 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
     __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":421
+    /* "random_video_effect.pyx":431
  *     for frame in range(total_frames):
  *         # Tnh t l zoom cho nh nn v nh nh ti frame hin ti
  *         scale_bg = start_scale_bg - (frame / total_frames) * (start_scale_bg - end_scale_bg)  # Zoom out cho nn             # <<<<<<<<<<<<<<
  *         scale_img = start_scale_img + (frame / total_frames) * (end_scale_img - start_scale_img)  # Zoom in cho nh nh
  * 
  */
-    __pyx_t_7 = PyFloat_FromDouble(__pyx_v_start_scale_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_7 = PyFloat_FromDouble(__pyx_v_start_scale_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyFloat_FromDouble((__pyx_v_start_scale_bg - __pyx_v_end_scale_bg)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble((__pyx_v_start_scale_bg - __pyx_v_end_scale_bg)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Subtract(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Subtract(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 421, __pyx_L1_error)
+    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_scale_bg = __pyx_t_10;
 
-    /* "random_video_effect.pyx":422
+    /* "random_video_effect.pyx":432
  *         # Tnh t l zoom cho nh nn v nh nh ti frame hin ti
  *         scale_bg = start_scale_bg - (frame / total_frames) * (start_scale_bg - end_scale_bg)  # Zoom out cho nn
  *         scale_img = start_scale_img + (frame / total_frames) * (end_scale_img - start_scale_img)  # Zoom in cho nh nh             # <<<<<<<<<<<<<<
  * 
  *         # Thay i kch thc nh nn v nh nh theo t l
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_start_scale_img); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_start_scale_img); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyFloat_FromDouble((__pyx_v_end_scale_img - __pyx_v_start_scale_img)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble((__pyx_v_end_scale_img - __pyx_v_start_scale_img)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyNumber_Multiply(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Multiply(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 422, __pyx_L1_error)
+    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_scale_img = __pyx_t_10;
 
-    /* "random_video_effect.pyx":425
+    /* "random_video_effect.pyx":435
  * 
  *         # Thay i kch thc nh nn v nh nh theo t l
  *         resized_bg = cv2.resize(blurred_background, (int(width_1 * scale_bg), int(height_1 * scale_bg)))             # <<<<<<<<<<<<<<
  *         resized_small = cv2.resize(image_2_with_border, (int(width_2 * scale_img), int(height_2 * scale_img)))
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_FromDouble((__pyx_v_width_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_FromDouble((__pyx_v_width_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 425, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1)) __PYX_ERR(0, 425, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1)) __PYX_ERR(0, 435, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_7)) __PYX_ERR(0, 425, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_7)) __PYX_ERR(0, 435, __pyx_L1_error);
     __pyx_t_1 = 0;
     __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -10742,35 +10909,35 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 2+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 425, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_resized_bg, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":426
+    /* "random_video_effect.pyx":436
  *         # Thay i kch thc nh nn v nh nh theo t l
  *         resized_bg = cv2.resize(blurred_background, (int(width_1 * scale_bg), int(height_1 * scale_bg)))
  *         resized_small = cv2.resize(image_2_with_border, (int(width_2 * scale_img), int(height_2 * scale_img)))             # <<<<<<<<<<<<<<
  * 
  *         # Ct phn trung tm ca nh nn  ph hp vi kch thc video
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_FromDouble((__pyx_v_width_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_FromDouble((__pyx_v_width_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_3);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3)) __PYX_ERR(0, 426, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_7)) __PYX_ERR(0, 426, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_7)) __PYX_ERR(0, 436, __pyx_L1_error);
     __pyx_t_3 = 0;
     __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -10792,152 +10959,152 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+1-__pyx_t_5, 2+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 426, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 436, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_resized_small, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":429
+    /* "random_video_effect.pyx":439
  * 
  *         # Ct phn trung tm ca nh nn  ph hp vi kch thc video
  *         start_x_bg = (resized_bg.shape[1] - width) // 2             # <<<<<<<<<<<<<<
  *         start_y_bg = (resized_bg.shape[0] - height) // 2
  *         cropped_bg = resized_bg[start_y_bg:start_y_bg + height, start_x_bg:start_x_bg + width]
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 439, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 439, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 439, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_start_x_bg = __pyx_t_6;
 
-    /* "random_video_effect.pyx":430
+    /* "random_video_effect.pyx":440
  *         # Ct phn trung tm ca nh nn  ph hp vi kch thc video
  *         start_x_bg = (resized_bg.shape[1] - width) // 2
  *         start_y_bg = (resized_bg.shape[0] - height) // 2             # <<<<<<<<<<<<<<
  *         cropped_bg = resized_bg[start_y_bg:start_y_bg + height, start_x_bg:start_x_bg + width]
  * 
  */
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyNumber_Subtract(__pyx_t_2, __pyx_v_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_11 = PyNumber_Subtract(__pyx_t_2, __pyx_v_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_11, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_11, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 440, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_start_y_bg = __pyx_t_6;
 
-    /* "random_video_effect.pyx":431
+    /* "random_video_effect.pyx":441
  *         start_x_bg = (resized_bg.shape[1] - width) // 2
  *         start_y_bg = (resized_bg.shape[0] - height) // 2
  *         cropped_bg = resized_bg[start_y_bg:start_y_bg + height, start_x_bg:start_x_bg + width]             # <<<<<<<<<<<<<<
  * 
  *         # Ct phn nh nh  cn gia
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PySlice_New(__pyx_t_2, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_11 = PySlice_New(__pyx_t_2, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_v_width); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_v_width); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_11);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11)) __PYX_ERR(0, 431, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11)) __PYX_ERR(0, 441, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_2)) __PYX_ERR(0, 441, __pyx_L1_error);
     __pyx_t_11 = 0;
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_resized_bg, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_resized_bg, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cropped_bg, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":434
+    /* "random_video_effect.pyx":444
  * 
  *         # Ct phn nh nh  cn gia
  *         start_x_small = (width - resized_small.shape[1]) // 2             # <<<<<<<<<<<<<<
  *         start_y_small = (height - resized_small.shape[0]) // 2
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 444, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 444, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Subtract(__pyx_v_width, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_v_width, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 444, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 444, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 444, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_start_x_small = __pyx_t_6;
 
-    /* "random_video_effect.pyx":435
+    /* "random_video_effect.pyx":445
  *         # Ct phn nh nh  cn gia
  *         start_x_small = (width - resized_small.shape[1]) // 2
  *         start_y_small = (height - resized_small.shape[0]) // 2             # <<<<<<<<<<<<<<
  * 
  *         # To frame kt hp gia nh nn v nh nh
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 435, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_7, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_7, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_Subtract(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 435, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Subtract(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_7, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_7, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 435, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 445, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_start_y_small = __pyx_t_6;
 
-    /* "random_video_effect.pyx":438
+    /* "random_video_effect.pyx":448
  * 
  *         # To frame kt hp gia nh nn v nh nh
  *         frame_result = cropped_bg.copy()             # <<<<<<<<<<<<<<
  *         frame_result[start_y_small:start_y_small + resized_small.shape[0], start_x_small:start_x_small + resized_small.shape[1]] = resized_small
  * 
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_bg, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 438, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_bg, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 448, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_11 = NULL;
     __pyx_t_5 = 0;
@@ -10957,73 +11124,73 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
       PyObject *__pyx_callargs[2] = {__pyx_t_11, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 448, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_frame_result, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":439
+    /* "random_video_effect.pyx":449
  *         # To frame kt hp gia nh nn v nh nh
  *         frame_result = cropped_bg.copy()
  *         frame_result[start_y_small:start_y_small + resized_small.shape[0], start_x_small:start_x_small + resized_small.shape[1]] = resized_small             # <<<<<<<<<<<<<<
  * 
  *         # Ghi frame vo video
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyNumber_Add(__pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_11 = PyNumber_Add(__pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PySlice_New(__pyx_t_2, __pyx_t_11, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_1 = PySlice_New(__pyx_t_2, __pyx_t_11, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PySlice_New(__pyx_t_11, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_3 = PySlice_New(__pyx_t_11, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_3);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_3)) __PYX_ERR(0, 449, __pyx_L1_error);
     __pyx_t_1 = 0;
     __pyx_t_3 = 0;
-    if (unlikely((PyObject_SetItem(__pyx_v_frame_result, __pyx_t_7, __pyx_v_resized_small) < 0))) __PYX_ERR(0, 439, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_frame_result, __pyx_t_7, __pyx_v_resized_small) < 0))) __PYX_ERR(0, 449, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":442
+    /* "random_video_effect.pyx":452
  * 
  *         # Ghi frame vo video
  *         out.write(frame_result)             # <<<<<<<<<<<<<<
  * 
  *     # Gii phng i tng VideoWriter
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 442, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 452, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = NULL;
     __pyx_t_5 = 0;
@@ -11043,13 +11210,13 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
       PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_frame_result};
       __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 442, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 452, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":419
+    /* "random_video_effect.pyx":429
  *     cdef int width_2 = image_2_with_border.shape[1]
  * 
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -11059,14 +11226,14 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":445
+  /* "random_video_effect.pyx":455
  * 
  *     # Gii phng i tng VideoWriter
  *     out.release()             # <<<<<<<<<<<<<<
  *     print(f"Video  c to thnh cng ti: {output_path}")
  * 
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 445, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -11086,27 +11253,27 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 445, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 455, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":446
+  /* "random_video_effect.pyx":456
  *     # Gii phng i tng VideoWriter
  *     out.release()
  *     print(f"Video  c to thnh cng ti: {output_path}")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_c_to_thnh_cng_ti, __pyx_v_output_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 446, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_c_to_thnh_cng_ti, __pyx_v_output_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 456, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 446, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 456, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "random_video_effect.pyx":379
+  /* "random_video_effect.pyx":389
  * 
  * # Hm to video vi hiu ng zoom v background
  * def create_zoom_in_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -11143,7 +11310,7 @@ static PyObject *__pyx_pf_19random_video_effect_14create_zoom_in_video_with_back
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":449
+/* "random_video_effect.pyx":459
  * 
  * 
  * def create_zoom_out_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -11161,29 +11328,29 @@ static PyObject *__pyx_pf_19random_video_effect_38__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 449, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 459, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 449, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 459, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 449, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 459, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 449, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 449, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 459, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -11274,7 +11441,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -11282,42 +11449,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("create_zoom_out_video_with_background", 0, 2, 6, 1); __PYX_ERR(0, 449, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("create_zoom_out_video_with_background", 0, 2, 6, 1); __PYX_ERR(0, 459, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_out_video_with_background") < 0)) __PYX_ERR(0, 449, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "create_zoom_out_video_with_background") < 0)) __PYX_ERR(0, 459, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -11338,7 +11505,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 449, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 459, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -11348,7 +11515,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("create_zoom_out_video_with_background", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 449, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("create_zoom_out_video_with_background", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 459, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11362,11 +11529,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 449, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 459, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_16create_zoom_out_video_with_background(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -11430,7 +11597,7 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("create_zoom_out_video_with_background", 1);
 
-  /* "random_video_effect.pyx":456
+  /* "random_video_effect.pyx":466
  *     cdef int total_frames, start_x_bg, start_y_bg, start_x_small, start_y_small
  *     cdef float scale_bg, scale_img
  *     cdef int blur_strength = 41  #  mnh ca Gaussian blur             # <<<<<<<<<<<<<<
@@ -11439,25 +11606,25 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
  */
   __pyx_v_blur_strength = 41;
 
-  /* "random_video_effect.pyx":459
+  /* "random_video_effect.pyx":469
  * 
  *     # Resize nh ln v nh nh
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nn             # <<<<<<<<<<<<<<
  *     image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nh
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 459, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 459, __pyx_L1_error);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_image_path)) __PYX_ERR(0, 469, __pyx_L1_error);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 469, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 469, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -11465,25 +11632,25 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
   __pyx_v_image_1 = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":460
+  /* "random_video_effect.pyx":470
  *     # Resize nh ln v nh nh
  *     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nn
  *     image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # nh nh             # <<<<<<<<<<<<<<
  * 
  *     # Thit lp codec v i tng VideoWriter
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 460, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_resize_and_crop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 460, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_image_path);
   __Pyx_GIVEREF(__pyx_v_image_path);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_path)) __PYX_ERR(0, 460, __pyx_L1_error);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 460, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_path)) __PYX_ERR(0, 470, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 460, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 460, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 460, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_v_width) < 0) __PYX_ERR(0, 470, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_v_height) < 0) __PYX_ERR(0, 470, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11491,47 +11658,47 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
   __pyx_v_image_2 = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":463
+  /* "random_video_effect.pyx":473
  * 
  *     # Thit lp codec v i tng VideoWriter
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')             # <<<<<<<<<<<<<<
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 463, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 463, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter_fourcc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 463, __pyx_L1_error)
+  __pyx_t_1 = PySequence_Tuple(__pyx_n_u_mp4v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 463, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_fourcc = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":464
+  /* "random_video_effect.pyx":474
  *     # Thit lp codec v i tng VideoWriter
  *     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
  *     cdef object out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))             # <<<<<<<<<<<<<<
  * 
  *     # Tng s khung hnh trong video
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_VideoWriter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_width);
   __Pyx_GIVEREF(__pyx_v_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 464, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_width)) __PYX_ERR(0, 474, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_height);
   __Pyx_GIVEREF(__pyx_v_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 464, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_height)) __PYX_ERR(0, 474, __pyx_L1_error);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
   #if CYTHON_UNPACK_METHODS
@@ -11551,33 +11718,33 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
     __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_5, 4+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 464, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 474, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_out = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":467
+  /* "random_video_effect.pyx":477
  * 
  *     # Tng s khung hnh trong video
  *     total_frames = int(duration * fps)             # <<<<<<<<<<<<<<
  * 
  *     # Hiu ng zoom cho nn (t 1.4 v 1.0)
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 467, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 467, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_v_fps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 467, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 467, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_total_frames = __pyx_t_6;
 
-  /* "random_video_effect.pyx":470
+  /* "random_video_effect.pyx":480
  * 
  *     # Hiu ng zoom cho nn (t 1.4 v 1.0)
  *     start_scale_bg = 1.0             # <<<<<<<<<<<<<<
@@ -11586,7 +11753,7 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
  */
   __pyx_v_start_scale_bg = 1.0;
 
-  /* "random_video_effect.pyx":471
+  /* "random_video_effect.pyx":481
  *     # Hiu ng zoom cho nn (t 1.4 v 1.0)
  *     start_scale_bg = 1.0
  *     end_scale_bg = 1.5             # <<<<<<<<<<<<<<
@@ -11595,7 +11762,7 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
  */
   __pyx_v_end_scale_bg = 1.5;
 
-  /* "random_video_effect.pyx":474
+  /* "random_video_effect.pyx":484
  * 
  *     # Hiu ng zoom cho nh nh (t 0.8 v 0.5)
  *     start_scale_img = 0.8             # <<<<<<<<<<<<<<
@@ -11604,7 +11771,7 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
  */
   __pyx_v_start_scale_img = 0.8;
 
-  /* "random_video_effect.pyx":475
+  /* "random_video_effect.pyx":485
  *     # Hiu ng zoom cho nh nh (t 0.8 v 0.5)
  *     start_scale_img = 0.8
  *     end_scale_img = 0.6             # <<<<<<<<<<<<<<
@@ -11613,28 +11780,28 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
  */
   __pyx_v_end_scale_img = 0.6;
 
-  /* "random_video_effect.pyx":478
+  /* "random_video_effect.pyx":488
  * 
  *     # M nh nn  lm nn m
  *     blurred_background = cv2.GaussianBlur(image_1, (blur_strength, blur_strength), 0)             # <<<<<<<<<<<<<<
  * 
  *     # Thm border trng cho nh nh
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 478, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 478, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_GaussianBlur); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 478, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 478, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_blur_strength); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 478, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 478, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2)) __PYX_ERR(0, 488, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_4)) __PYX_ERR(0, 478, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_4)) __PYX_ERR(0, 488, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -11656,54 +11823,54 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
     __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_5, 3+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 478, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 488, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_v_blurred_background = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":481
+  /* "random_video_effect.pyx":491
  * 
  *     # Thm border trng cho nh nh
  *     image_2_with_border = cv2.copyMakeBorder(image_2, 10, 10, 10, 10, cv2.BORDER_CONSTANT, value=(255, 255, 255))             # <<<<<<<<<<<<<<
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copyMakeBorder); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_BORDER_CONSTANT); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_image_2);
   __Pyx_GIVEREF(__pyx_v_image_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_2)) __PYX_ERR(0, 481, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_image_2)) __PYX_ERR(0, 491, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_int_10)) __PYX_ERR(0, 481, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_int_10)) __PYX_ERR(0, 491, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_int_10)) __PYX_ERR(0, 481, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_int_10)) __PYX_ERR(0, 491, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_int_10)) __PYX_ERR(0, 481, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_int_10)) __PYX_ERR(0, 491, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_10);
   __Pyx_GIVEREF(__pyx_int_10);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_int_10)) __PYX_ERR(0, 481, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_int_10)) __PYX_ERR(0, 491, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_7);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_t_7)) __PYX_ERR(0, 481, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_t_7)) __PYX_ERR(0, 491, __pyx_L1_error);
   __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_value, __pyx_tuple_) < 0) __PYX_ERR(0, 481, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 481, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_value, __pyx_tuple__2) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 491, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11711,80 +11878,80 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
   __pyx_v_image_2_with_border = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":484
+  /* "random_video_effect.pyx":494
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     cdef int height_1 = blurred_background.shape[0]             # <<<<<<<<<<<<<<
  *     cdef int width_1 = blurred_background.shape[1]
  *     cdef int height_2 = image_2_with_border.shape[0]
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 484, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 494, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 484, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 494, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 484, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 494, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_height_1 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":485
+  /* "random_video_effect.pyx":495
  *     # Kch thc ca nh ln v nh nh sau khi border
  *     cdef int height_1 = blurred_background.shape[0]
  *     cdef int width_1 = blurred_background.shape[1]             # <<<<<<<<<<<<<<
  *     cdef int height_2 = image_2_with_border.shape[0]
  *     cdef int width_2 = image_2_with_border.shape[1]
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 485, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_blurred_background, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 495, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 485, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 495, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 485, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 495, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_width_1 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":486
+  /* "random_video_effect.pyx":496
  *     cdef int height_1 = blurred_background.shape[0]
  *     cdef int width_1 = blurred_background.shape[1]
  *     cdef int height_2 = image_2_with_border.shape[0]             # <<<<<<<<<<<<<<
  *     cdef int width_2 = image_2_with_border.shape[1]
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 486, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 496, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 486, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 496, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 486, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 496, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_height_2 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":487
+  /* "random_video_effect.pyx":497
  *     cdef int width_1 = blurred_background.shape[1]
  *     cdef int height_2 = image_2_with_border.shape[0]
  *     cdef int width_2 = image_2_with_border.shape[1]             # <<<<<<<<<<<<<<
  * 
  *     for frame in range(total_frames):
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 487, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_image_2_with_border, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 497, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 487, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 497, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 487, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 497, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_width_2 = __pyx_t_6;
 
-  /* "random_video_effect.pyx":489
+  /* "random_video_effect.pyx":499
  *     cdef int width_2 = image_2_with_border.shape[1]
  * 
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
  *         # Tnh t l zoom cho nh nn v nh nh ti frame hin ti
  *         scale_bg = start_scale_bg - (frame / total_frames) * (start_scale_bg - end_scale_bg)  # Zoom out cho nn
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 489, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 499, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 489, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 499, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (likely(PyList_CheckExact(__pyx_t_7)) || PyTuple_CheckExact(__pyx_t_7)) {
@@ -11792,9 +11959,9 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
     __pyx_t_8 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 489, __pyx_L1_error)
+    __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 499, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 489, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 499, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   for (;;) {
@@ -11803,28 +11970,28 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 489, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 499, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 489, __pyx_L1_error)
+        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 499, __pyx_L1_error)
         #else
-        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 489, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 499, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       } else {
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 489, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 499, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 489, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_7); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 499, __pyx_L1_error)
         #else
-        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 489, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 499, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       }
@@ -11834,7 +12001,7 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 489, __pyx_L1_error)
+          else __PYX_ERR(0, 499, __pyx_L1_error)
         }
         break;
       }
@@ -11843,84 +12010,84 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
     __Pyx_XDECREF_SET(__pyx_v_frame, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":491
+    /* "random_video_effect.pyx":501
  *     for frame in range(total_frames):
  *         # Tnh t l zoom cho nh nn v nh nh ti frame hin ti
  *         scale_bg = start_scale_bg - (frame / total_frames) * (start_scale_bg - end_scale_bg)  # Zoom out cho nn             # <<<<<<<<<<<<<<
  *         scale_img = start_scale_img + (frame / total_frames) * (end_scale_img - start_scale_img)  # Zoom in cho nh nh
  * 
  */
-    __pyx_t_7 = PyFloat_FromDouble(__pyx_v_start_scale_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_7 = PyFloat_FromDouble(__pyx_v_start_scale_bg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyFloat_FromDouble((__pyx_v_start_scale_bg - __pyx_v_end_scale_bg)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble((__pyx_v_start_scale_bg - __pyx_v_end_scale_bg)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Subtract(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Subtract(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 491, __pyx_L1_error)
+    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 501, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_scale_bg = __pyx_t_10;
 
-    /* "random_video_effect.pyx":492
+    /* "random_video_effect.pyx":502
  *         # Tnh t l zoom cho nh nn v nh nh ti frame hin ti
  *         scale_bg = start_scale_bg - (frame / total_frames) * (start_scale_bg - end_scale_bg)  # Zoom out cho nn
  *         scale_img = start_scale_img + (frame / total_frames) * (end_scale_img - start_scale_img)  # Zoom in cho nh nh             # <<<<<<<<<<<<<<
  * 
  *         # Thay i kch thc nh nn v nh nh theo t l
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_start_scale_img); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_start_scale_img); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_total_frames); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyNumber_Divide(__pyx_v_frame, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyFloat_FromDouble((__pyx_v_end_scale_img - __pyx_v_start_scale_img)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble((__pyx_v_end_scale_img - __pyx_v_start_scale_img)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyNumber_Multiply(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Multiply(__pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 492, __pyx_L1_error)
+    __pyx_t_10 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_10 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_scale_img = __pyx_t_10;
 
-    /* "random_video_effect.pyx":495
+    /* "random_video_effect.pyx":505
  * 
  *         # Thay i kch thc nh nn v nh nh theo t l
  *         resized_bg = cv2.resize(blurred_background, (int(width_1 * scale_bg), int(height_1 * scale_bg)))             # <<<<<<<<<<<<<<
  *         resized_small = cv2.resize(image_2_with_border, (int(width_2 * scale_img), int(height_2 * scale_img)))
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 495, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cv2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 495, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 505, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_FromDouble((__pyx_v_width_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 495, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_FromDouble((__pyx_v_width_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 495, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_1 * __pyx_v_scale_bg)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 505, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 495, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 505, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1)) __PYX_ERR(0, 495, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_7)) __PYX_ERR(0, 495, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_7)) __PYX_ERR(0, 505, __pyx_L1_error);
     __pyx_t_1 = 0;
     __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -11942,35 +12109,35 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 2+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 495, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 505, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_resized_bg, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":496
+    /* "random_video_effect.pyx":506
  *         # Thay i kch thc nh nn v nh nh theo t l
  *         resized_bg = cv2.resize(blurred_background, (int(width_1 * scale_bg), int(height_1 * scale_bg)))
  *         resized_small = cv2.resize(image_2_with_border, (int(width_2 * scale_img), int(height_2 * scale_img)))             # <<<<<<<<<<<<<<
  * 
  *         # Ct phn trung tm ca nh nn  ph hp vi kch thc video
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 496, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_cv2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 506, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 496, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 506, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_FromDouble((__pyx_v_width_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 496, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_FromDouble((__pyx_v_width_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 506, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 496, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_FromDouble((__pyx_v_height_2 * __pyx_v_scale_img)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 506, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 496, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 506, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_3);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3)) __PYX_ERR(0, 496, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3)) __PYX_ERR(0, 506, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_7);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_7)) __PYX_ERR(0, 496, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_7)) __PYX_ERR(0, 506, __pyx_L1_error);
     __pyx_t_3 = 0;
     __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -11992,152 +12159,152 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_11, __pyx_callargs+1-__pyx_t_5, 2+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 496, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 506, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_resized_small, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":499
+    /* "random_video_effect.pyx":509
  * 
  *         # Ct phn trung tm ca nh nn  ph hp vi kch thc video
  *         start_x_bg = (resized_bg.shape[1] - width) // 2             # <<<<<<<<<<<<<<
  *         start_y_bg = (resized_bg.shape[0] - height) // 2
  *         cropped_bg = resized_bg[start_y_bg:start_y_bg + height, start_x_bg:start_x_bg + width]
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 499, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 509, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 499, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 509, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 499, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_t_11, __pyx_v_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 509, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 499, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 509, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 499, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 509, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_start_x_bg = __pyx_t_6;
 
-    /* "random_video_effect.pyx":500
+    /* "random_video_effect.pyx":510
  *         # Ct phn trung tm ca nh nn  ph hp vi kch thc video
  *         start_x_bg = (resized_bg.shape[1] - width) // 2
  *         start_y_bg = (resized_bg.shape[0] - height) // 2             # <<<<<<<<<<<<<<
  *         cropped_bg = resized_bg[start_y_bg:start_y_bg + height, start_x_bg:start_x_bg + width]
  * 
  */
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 500, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_bg, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 510, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 500, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 510, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyNumber_Subtract(__pyx_t_2, __pyx_v_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 500, __pyx_L1_error)
+    __pyx_t_11 = PyNumber_Subtract(__pyx_t_2, __pyx_v_height); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 510, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_11, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 500, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_11, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 510, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 510, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_start_y_bg = __pyx_t_6;
 
-    /* "random_video_effect.pyx":501
+    /* "random_video_effect.pyx":511
  *         start_x_bg = (resized_bg.shape[1] - width) // 2
  *         start_y_bg = (resized_bg.shape[0] - height) // 2
  *         cropped_bg = resized_bg[start_y_bg:start_y_bg + height, start_x_bg:start_x_bg + width]             # <<<<<<<<<<<<<<
  * 
  *         # Ct phn nh nh  cn gia
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_y_bg); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_11, __pyx_v_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PySlice_New(__pyx_t_2, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_11 = PySlice_New(__pyx_t_2, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_bg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_v_width); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_v_width); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_2 = PySlice_New(__pyx_t_1, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_11);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11)) __PYX_ERR(0, 501, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11)) __PYX_ERR(0, 511, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_2)) __PYX_ERR(0, 511, __pyx_L1_error);
     __pyx_t_11 = 0;
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_resized_bg, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_resized_bg, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 511, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cropped_bg, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":504
+    /* "random_video_effect.pyx":514
  * 
  *         # Ct phn nh nh  cn gia
  *         start_x_small = (width - resized_small.shape[1]) // 2             # <<<<<<<<<<<<<<
  *         start_y_small = (height - resized_small.shape[0]) // 2
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 504, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 514, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 504, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 514, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Subtract(__pyx_v_width, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 504, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Subtract(__pyx_v_width, __pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 514, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 504, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_2, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 514, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 504, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 514, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_start_x_small = __pyx_t_6;
 
-    /* "random_video_effect.pyx":505
+    /* "random_video_effect.pyx":515
  *         # Ct phn nh nh  cn gia
  *         start_x_small = (width - resized_small.shape[1]) // 2
  *         start_y_small = (height - resized_small.shape[0]) // 2             # <<<<<<<<<<<<<<
  * 
  *         # To frame kt hp gia nh nn v nh nh
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 505, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_7, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 505, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_7, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_Subtract(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 505, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Subtract(__pyx_v_height, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_7, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 505, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_FloorDivideObjC(__pyx_t_7, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 505, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_start_y_small = __pyx_t_6;
 
-    /* "random_video_effect.pyx":508
+    /* "random_video_effect.pyx":518
  * 
  *         # To frame kt hp gia nh nn v nh nh
  *         frame_result = cropped_bg.copy()             # <<<<<<<<<<<<<<
  *         frame_result[start_y_small:start_y_small + resized_small.shape[0], start_x_small:start_x_small + resized_small.shape[1]] = resized_small
  * 
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_bg, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 508, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_cropped_bg, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 518, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_11 = NULL;
     __pyx_t_5 = 0;
@@ -12157,73 +12324,73 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
       PyObject *__pyx_callargs[2] = {__pyx_t_11, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 508, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 518, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_frame_result, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "random_video_effect.pyx":509
+    /* "random_video_effect.pyx":519
  *         # To frame kt hp gia nh nn v nh nh
  *         frame_result = cropped_bg.copy()
  *         frame_result[start_y_small:start_y_small + resized_small.shape[0], start_x_small:start_x_small + resized_small.shape[1]] = resized_small             # <<<<<<<<<<<<<<
  * 
  *         # Ghi frame vo video
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start_y_small); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyNumber_Add(__pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_11 = PyNumber_Add(__pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PySlice_New(__pyx_t_2, __pyx_t_11, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_1 = PySlice_New(__pyx_t_2, __pyx_t_11, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start_x_small); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_resized_small, __pyx_n_s_shape); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PySlice_New(__pyx_t_11, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_3 = PySlice_New(__pyx_t_11, __pyx_t_7, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 509, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_1);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1)) __PYX_ERR(0, 509, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1)) __PYX_ERR(0, 519, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_3);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_3)) __PYX_ERR(0, 509, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_3)) __PYX_ERR(0, 519, __pyx_L1_error);
     __pyx_t_1 = 0;
     __pyx_t_3 = 0;
-    if (unlikely((PyObject_SetItem(__pyx_v_frame_result, __pyx_t_7, __pyx_v_resized_small) < 0))) __PYX_ERR(0, 509, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_frame_result, __pyx_t_7, __pyx_v_resized_small) < 0))) __PYX_ERR(0, 519, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":512
+    /* "random_video_effect.pyx":522
  * 
  *         # Ghi frame vo video
  *         out.write(frame_result)             # <<<<<<<<<<<<<<
  * 
  *     # Gii phng i tng VideoWriter
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 512, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 522, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = NULL;
     __pyx_t_5 = 0;
@@ -12243,13 +12410,13 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
       PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_frame_result};
       __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_5, 1+__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 512, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 522, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":489
+    /* "random_video_effect.pyx":499
  *     cdef int width_2 = image_2_with_border.shape[1]
  * 
  *     for frame in range(total_frames):             # <<<<<<<<<<<<<<
@@ -12259,14 +12426,14 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":515
+  /* "random_video_effect.pyx":525
  * 
  *     # Gii phng i tng VideoWriter
  *     out.release()             # <<<<<<<<<<<<<<
  *     print(f"Video  c to thnh cng ti: {output_path}")
  * 
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 515, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_out, __pyx_n_s_release); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -12286,27 +12453,27 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_5, 0+__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 515, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 525, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "random_video_effect.pyx":516
+  /* "random_video_effect.pyx":526
  *     # Gii phng i tng VideoWriter
  *     out.release()
  *     print(f"Video  c to thnh cng ti: {output_path}")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_c_to_thnh_cng_ti, __pyx_v_output_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 516, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Video_c_to_thnh_cng_ti, __pyx_v_output_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 516, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "random_video_effect.pyx":449
+  /* "random_video_effect.pyx":459
  * 
  * 
  * def create_zoom_out_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -12343,7 +12510,7 @@ static PyObject *__pyx_pf_19random_video_effect_16create_zoom_out_video_with_bac
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":519
+/* "random_video_effect.pyx":529
  * 
  * 
  * def check_image_ratio(image_path: str):             # <<<<<<<<<<<<<<
@@ -12405,12 +12572,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 519, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 529, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "check_image_ratio") < 0)) __PYX_ERR(0, 519, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "check_image_ratio") < 0)) __PYX_ERR(0, 529, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
@@ -12421,7 +12588,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("check_image_ratio", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 519, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("check_image_ratio", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 529, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12435,7 +12602,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 519, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 529, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_18check_image_ratio(__pyx_self, __pyx_v_image_path);
 
   /* function exit code */
@@ -12473,16 +12640,16 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("check_image_ratio", 1);
 
-  /* "random_video_effect.pyx":529
+  /* "random_video_effect.pyx":539
  *     """
  *     # c nh
  *     image = cv2.imread(image_path)             # <<<<<<<<<<<<<<
  * 
  *     if image is None:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 529, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cv2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_imread); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 529, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_imread); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -12503,14 +12670,14 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_image_path};
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 529, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 539, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_v_image = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "random_video_effect.pyx":531
+  /* "random_video_effect.pyx":541
  *     image = cv2.imread(image_path)
  * 
  *     if image is None:             # <<<<<<<<<<<<<<
@@ -12520,14 +12687,14 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
   __pyx_t_5 = (__pyx_v_image == Py_None);
   if (unlikely(__pyx_t_5)) {
 
-    /* "random_video_effect.pyx":532
+    /* "random_video_effect.pyx":542
  * 
  *     if image is None:
  *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")             # <<<<<<<<<<<<<<
  * 
  *     # Ly kch thc ca nh
  */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = 0;
     __pyx_t_7 = 127;
@@ -12546,17 +12713,17 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     __pyx_t_6 += 34;
     __Pyx_GIVEREF(__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
     PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_Vui_lng_kim_tra_li_ng_dn);
-    __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 532, __pyx_L1_error)
+    __PYX_ERR(0, 542, __pyx_L1_error)
 
-    /* "random_video_effect.pyx":531
+    /* "random_video_effect.pyx":541
  *     image = cv2.imread(image_path)
  * 
  *     if image is None:             # <<<<<<<<<<<<<<
@@ -12565,16 +12732,16 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
  */
   }
 
-  /* "random_video_effect.pyx":535
+  /* "random_video_effect.pyx":545
  * 
  *     # Ly kch thc ca nh
  *     height, width = image.shape[:2]             # <<<<<<<<<<<<<<
  * 
  *     # Kim tra iu kin nh dc
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_image, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 545, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, 2, NULL, NULL, &__pyx_slice__2, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_t_1, 0, 2, NULL, NULL, &__pyx_slice_, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 545, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -12583,7 +12750,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 535, __pyx_L1_error)
+      __PYX_ERR(0, 545, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -12596,15 +12763,15 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     __Pyx_INCREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 535, __pyx_L1_error)
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 545, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 545, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 535, __pyx_L1_error)
+    __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 545, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_9 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_8);
@@ -12612,7 +12779,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     __Pyx_GOTREF(__pyx_t_1);
     index = 1; __pyx_t_2 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_2)) goto __pyx_L4_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 535, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 545, __pyx_L1_error)
     __pyx_t_9 = NULL;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     goto __pyx_L5_unpacking_done;
@@ -12620,7 +12787,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_9 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 535, __pyx_L1_error)
+    __PYX_ERR(0, 545, __pyx_L1_error)
     __pyx_L5_unpacking_done:;
   }
   __pyx_v_height = __pyx_t_1;
@@ -12628,19 +12795,19 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
   __pyx_v_width = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":538
+  /* "random_video_effect.pyx":548
  * 
  *     # Kim tra iu kin nh dc
  *     if height > width:             # <<<<<<<<<<<<<<
  *         return True
  * 
  */
-  __pyx_t_3 = PyObject_RichCompare(__pyx_v_height, __pyx_v_width, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 538, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 538, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_v_height, __pyx_v_width, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 548, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 548, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_5) {
 
-    /* "random_video_effect.pyx":539
+    /* "random_video_effect.pyx":549
  *     # Kim tra iu kin nh dc
  *     if height > width:
  *         return True             # <<<<<<<<<<<<<<
@@ -12652,7 +12819,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "random_video_effect.pyx":538
+    /* "random_video_effect.pyx":548
  * 
  *     # Kim tra iu kin nh dc
  *     if height > width:             # <<<<<<<<<<<<<<
@@ -12661,22 +12828,22 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
  */
   }
 
-  /* "random_video_effect.pyx":542
+  /* "random_video_effect.pyx":552
  * 
  *     # Kim tra iu kin nh ngang (chiu rng phi t nht ln hn 1.3 ln chiu cao)
  *     if width >= height * 1.3:             # <<<<<<<<<<<<<<
  *         return True
  * 
  */
-  __pyx_t_3 = PyNumber_Multiply(__pyx_v_height, __pyx_float_1_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 542, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_v_height, __pyx_float_1_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 552, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_width, __pyx_t_3, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 542, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_width, __pyx_t_3, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 552, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 542, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 552, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "random_video_effect.pyx":543
+    /* "random_video_effect.pyx":553
  *     # Kim tra iu kin nh ngang (chiu rng phi t nht ln hn 1.3 ln chiu cao)
  *     if width >= height * 1.3:
  *         return True             # <<<<<<<<<<<<<<
@@ -12688,7 +12855,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "random_video_effect.pyx":542
+    /* "random_video_effect.pyx":552
  * 
  *     # Kim tra iu kin nh ngang (chiu rng phi t nht ln hn 1.3 ln chiu cao)
  *     if width >= height * 1.3:             # <<<<<<<<<<<<<<
@@ -12697,7 +12864,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
  */
   }
 
-  /* "random_video_effect.pyx":545
+  /* "random_video_effect.pyx":555
  *         return True
  * 
  *     return False             # <<<<<<<<<<<<<<
@@ -12709,7 +12876,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "random_video_effect.pyx":519
+  /* "random_video_effect.pyx":529
  * 
  * 
  * def check_image_ratio(image_path: str):             # <<<<<<<<<<<<<<
@@ -12734,7 +12901,7 @@ static PyObject *__pyx_pf_19random_video_effect_18check_image_ratio(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "random_video_effect.pyx":547
+/* "random_video_effect.pyx":557
  *     return False
  * 
  * def random_video_effect_cython(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -12752,29 +12919,29 @@ static PyObject *__pyx_pf_19random_video_effect_40__defaults__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__defaults__", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(((double)10.0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 547, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 557, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_fps);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_fps);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 547, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_fps)) __PYX_ERR(0, 557, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_width);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_width);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 547, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_width)) __PYX_ERR(0, 557, __pyx_L1_error);
   __Pyx_INCREF(__Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_height);
   __Pyx_GIVEREF(__Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_height);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 547, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 3, __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_self)->__pyx_arg_height)) __PYX_ERR(0, 557, __pyx_L1_error);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 547, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2)) __PYX_ERR(0, 557, __pyx_L1_error);
   __Pyx_INCREF(Py_None);
   __Pyx_GIVEREF(Py_None);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 547, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, Py_None)) __PYX_ERR(0, 557, __pyx_L1_error);
   __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12864,7 +13031,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -12872,42 +13039,42 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("random_video_effect_cython", 0, 2, 6, 1); __PYX_ERR(0, 547, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("random_video_effect_cython", 0, 2, 6, 1); __PYX_ERR(0, 557, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_duration);
           if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_fps);
           if (value) { values[3] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_width);
           if (value) { values[4] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (kw_args > 0) {
           PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_height);
           if (value) { values[5] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
-          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "random_video_effect_cython") < 0)) __PYX_ERR(0, 547, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "random_video_effect_cython") < 0)) __PYX_ERR(0, 557, __pyx_L3_error)
       }
     } else {
       switch (__pyx_nargs) {
@@ -12928,7 +13095,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_image_path = ((PyObject*)values[0]);
     __pyx_v_output_path = ((PyObject*)values[1]);
     if (values[2]) {
-      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L3_error)
+      __pyx_v_duration = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_duration == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L3_error)
     } else {
       __pyx_v_duration = ((double)((double)10.0));
     }
@@ -12938,7 +13105,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("random_video_effect_cython", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 547, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("random_video_effect_cython", 0, 2, 6, __pyx_nargs); __PYX_ERR(0, 557, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12952,11 +13119,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 547, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_path), (&PyUnicode_Type), 0, "image_path", 1))) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_path), (&PyUnicode_Type), 0, "output_path", 1))) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fps), (&PyInt_Type), 0, "fps", 1))) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_width), (&PyInt_Type), 0, "width", 1))) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_height), (&PyInt_Type), 0, "height", 1))) __PYX_ERR(0, 557, __pyx_L1_error)
   __pyx_r = __pyx_pf_19random_video_effect_20random_video_effect_cython(__pyx_self, __pyx_v_image_path, __pyx_v_output_path, __pyx_v_duration, __pyx_v_fps, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
@@ -12977,6 +13144,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_image_path, PyObject *__pyx_v_output_path, double __pyx_v_duration, PyObject *__pyx_v_fps, PyObject *__pyx_v_width, PyObject *__pyx_v_height) {
   PyObject *__pyx_v_functions = NULL;
   PyObject *__pyx_v_selected_function = NULL;
+  PyObject *__pyx_v_f = NULL;
   PyObject *__pyx_v_e = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -12991,101 +13159,105 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
   PyObject *__pyx_t_9 = NULL;
   PyObject *__pyx_t_10 = NULL;
   unsigned int __pyx_t_11;
-  int __pyx_t_12;
-  int __pyx_t_13;
-  char const *__pyx_t_14;
+  PyObject *__pyx_t_12 = NULL;
+  PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
   PyObject *__pyx_t_15 = NULL;
-  PyObject *__pyx_t_16 = NULL;
-  PyObject *__pyx_t_17 = NULL;
+  Py_ssize_t __pyx_t_16;
+  Py_UCS4 __pyx_t_17;
   PyObject *__pyx_t_18 = NULL;
-  PyObject *__pyx_t_19 = NULL;
-  PyObject *__pyx_t_20 = NULL;
+  int __pyx_t_19;
+  int __pyx_t_20;
+  int __pyx_t_21;
+  int __pyx_t_22;
+  char const *__pyx_t_23;
+  PyObject *__pyx_t_24 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("random_video_effect_cython", 1);
 
-  /* "random_video_effect.pyx":550
+  /* "random_video_effect.pyx":560
  *     # Danh sch cc hm cn chn
  *     functions = [
  *         create_zoom_in_video_with_background,             # <<<<<<<<<<<<<<
  *         create_zoom_out_video_with_background,
  *         create_zoom_in_video,
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_create_zoom_in_video_with_backgr); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 550, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_create_zoom_in_video_with_backgr); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 560, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "random_video_effect.pyx":551
+  /* "random_video_effect.pyx":561
  *     functions = [
  *         create_zoom_in_video_with_background,
  *         create_zoom_out_video_with_background,             # <<<<<<<<<<<<<<
  *         create_zoom_in_video,
  *         create_zoom_out_video,
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_create_zoom_out_video_with_backg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 551, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_create_zoom_out_video_with_backg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 561, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "random_video_effect.pyx":552
+  /* "random_video_effect.pyx":562
  *         create_zoom_in_video_with_background,
  *         create_zoom_out_video_with_background,
  *         create_zoom_in_video,             # <<<<<<<<<<<<<<
  *         create_zoom_out_video,
  *         create_parallax_left_video,
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_create_zoom_in_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_create_zoom_in_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 562, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "random_video_effect.pyx":553
+  /* "random_video_effect.pyx":563
  *         create_zoom_out_video_with_background,
  *         create_zoom_in_video,
  *         create_zoom_out_video,             # <<<<<<<<<<<<<<
  *         create_parallax_left_video,
  *         create_parallax_right_video
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_create_zoom_out_video); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 553, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_create_zoom_out_video); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 563, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
 
-  /* "random_video_effect.pyx":554
+  /* "random_video_effect.pyx":564
  *         create_zoom_in_video,
  *         create_zoom_out_video,
  *         create_parallax_left_video,             # <<<<<<<<<<<<<<
  *         create_parallax_right_video
  *     ]
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_create_parallax_left_video); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 554, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_create_parallax_left_video); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 564, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "random_video_effect.pyx":555
+  /* "random_video_effect.pyx":565
  *         create_zoom_out_video,
  *         create_parallax_left_video,
  *         create_parallax_right_video             # <<<<<<<<<<<<<<
  *     ]
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_create_parallax_right_video); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 555, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_create_parallax_right_video); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 565, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
 
-  /* "random_video_effect.pyx":549
+  /* "random_video_effect.pyx":559
  * def random_video_effect_cython(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
  *     # Danh sch cc hm cn chn
  *     functions = [             # <<<<<<<<<<<<<<
  *         create_zoom_in_video_with_background,
  *         create_zoom_out_video_with_background,
  */
-  __pyx_t_7 = PyList_New(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 549, __pyx_L1_error)
+  __pyx_t_7 = PyList_New(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 559, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 0, __pyx_t_1)) __PYX_ERR(0, 549, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 0, __pyx_t_1)) __PYX_ERR(0, 559, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 1, __pyx_t_2)) __PYX_ERR(0, 549, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 1, __pyx_t_2)) __PYX_ERR(0, 559, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 2, __pyx_t_3)) __PYX_ERR(0, 549, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 2, __pyx_t_3)) __PYX_ERR(0, 559, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 3, __pyx_t_4)) __PYX_ERR(0, 549, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 3, __pyx_t_4)) __PYX_ERR(0, 559, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 4, __pyx_t_5)) __PYX_ERR(0, 549, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 4, __pyx_t_5)) __PYX_ERR(0, 559, __pyx_L1_error);
   __Pyx_GIVEREF(__pyx_t_6);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 5, __pyx_t_6)) __PYX_ERR(0, 549, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_7, 5, __pyx_t_6)) __PYX_ERR(0, 559, __pyx_L1_error);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
@@ -13095,7 +13267,7 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
   __pyx_v_functions = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
 
-  /* "random_video_effect.pyx":558
+  /* "random_video_effect.pyx":568
  *     ]
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13111,16 +13283,16 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
     __Pyx_XGOTREF(__pyx_t_10);
     /*try:*/ {
 
-      /* "random_video_effect.pyx":560
+      /* "random_video_effect.pyx":570
  *     try:
  *         # Chn ngu nhin mt hm t danh sch
  *         selected_function = random.choice(functions)             # <<<<<<<<<<<<<<
  * 
- *         # Gi hm c chn ngu nhin vi cc tham s  nh ngha
+ *         with open("success.txt", "a") as f:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_random); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 560, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_random); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 570, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_choice); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 560, __pyx_L3_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_choice); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 570, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_6 = NULL;
@@ -13141,31 +13313,366 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
         PyObject *__pyx_callargs[2] = {__pyx_t_6, __pyx_v_functions};
         __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_11, 1+__pyx_t_11);
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 560, __pyx_L3_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 570, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
       __pyx_v_selected_function = __pyx_t_7;
       __pyx_t_7 = 0;
 
-      /* "random_video_effect.pyx":563
+      /* "random_video_effect.pyx":572
+ *         selected_function = random.choice(functions)
+ * 
+ *         with open("success.txt", "a") as f:             # <<<<<<<<<<<<<<
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Selected function: {output_path}\n")
+ */
+      /*with:*/ {
+        __pyx_t_7 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 572, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __pyx_t_12 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_exit); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 572, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_6 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_enter); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 572, __pyx_L9_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __pyx_t_4 = NULL;
+        __pyx_t_11 = 0;
+        #if CYTHON_UNPACK_METHODS
+        if (likely(PyMethod_Check(__pyx_t_6))) {
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_6);
+          if (likely(__pyx_t_4)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
+            __Pyx_INCREF(__pyx_t_4);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_6, function);
+            __pyx_t_11 = 1;
+          }
+        }
+        #endif
+        {
+          PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
+          __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+1-__pyx_t_11, 0+__pyx_t_11);
+          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 572, __pyx_L9_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        }
+        __pyx_t_6 = __pyx_t_5;
+        __pyx_t_5 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        /*try:*/ {
+          {
+            __Pyx_PyThreadState_declare
+            __Pyx_PyThreadState_assign
+            __Pyx_ExceptionSave(&__pyx_t_13, &__pyx_t_14, &__pyx_t_15);
+            __Pyx_XGOTREF(__pyx_t_13);
+            __Pyx_XGOTREF(__pyx_t_14);
+            __Pyx_XGOTREF(__pyx_t_15);
+            /*try:*/ {
+              __pyx_v_f = __pyx_t_6;
+              __pyx_t_6 = 0;
+
+              /* "random_video_effect.pyx":573
+ * 
+ *         with open("success.txt", "a") as f:
+ *             f.write(f"Error occurred for image: {image_path}\n")             # <<<<<<<<<<<<<<
+ *             f.write(f"Selected function: {output_path}\n")
+ *             f.write(f"Duration: {duration}, FPS: {fps}, Width: {width}, Height: {height}\n")
+ */
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 573, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 573, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_16 = 0;
+              __pyx_t_17 = 127;
+              __Pyx_INCREF(__pyx_kp_u_Error_occurred_for_image);
+              __pyx_t_16 += 26;
+              __Pyx_GIVEREF(__pyx_kp_u_Error_occurred_for_image);
+              PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_kp_u_Error_occurred_for_image);
+              __Pyx_INCREF(__pyx_v_image_path);
+              __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_v_image_path) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_v_image_path) : __pyx_t_17;
+              __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_v_image_path);
+              __Pyx_GIVEREF(__pyx_v_image_path);
+              PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_v_image_path);
+              __Pyx_INCREF(__pyx_kp_u__4);
+              __pyx_t_16 += 1;
+              __Pyx_GIVEREF(__pyx_kp_u__4);
+              PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_kp_u__4);
+              __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_5, 3, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 573, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_4);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_5 = NULL;
+              __pyx_t_11 = 0;
+              #if CYTHON_UNPACK_METHODS
+              if (likely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_5)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_5);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                  __pyx_t_11 = 1;
+                }
+              }
+              #endif
+              {
+                PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_t_4};
+                __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_11, 1+__pyx_t_11);
+                __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 573, __pyx_L13_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+              /* "random_video_effect.pyx":574
+ *         with open("success.txt", "a") as f:
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Selected function: {output_path}\n")             # <<<<<<<<<<<<<<
+ *             f.write(f"Duration: {duration}, FPS: {fps}, Width: {width}, Height: {height}\n")
+ * 
+ */
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 574, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 574, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_4);
+              __pyx_t_16 = 0;
+              __pyx_t_17 = 127;
+              __Pyx_INCREF(__pyx_kp_u_Selected_function);
+              __pyx_t_16 += 19;
+              __Pyx_GIVEREF(__pyx_kp_u_Selected_function);
+              PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_kp_u_Selected_function);
+              __Pyx_INCREF(__pyx_v_output_path);
+              __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_v_output_path) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_v_output_path) : __pyx_t_17;
+              __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_v_output_path);
+              __Pyx_GIVEREF(__pyx_v_output_path);
+              PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_output_path);
+              __Pyx_INCREF(__pyx_kp_u__4);
+              __pyx_t_16 += 1;
+              __Pyx_GIVEREF(__pyx_kp_u__4);
+              PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_kp_u__4);
+              __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_4, 3, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 574, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+              __pyx_t_4 = NULL;
+              __pyx_t_11 = 0;
+              #if CYTHON_UNPACK_METHODS
+              if (likely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_4)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_4);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                  __pyx_t_11 = 1;
+                }
+              }
+              #endif
+              {
+                PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_5};
+                __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_11, 1+__pyx_t_11);
+                __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 574, __pyx_L13_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+              /* "random_video_effect.pyx":575
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Selected function: {output_path}\n")
+ *             f.write(f"Duration: {duration}, FPS: {fps}, Width: {width}, Height: {height}\n")             # <<<<<<<<<<<<<<
+ * 
+ *         # Gi hm c chn ngu nhin vi cc tham s  nh ngha
+ */
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_5 = PyTuple_New(9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_16 = 0;
+              __pyx_t_17 = 127;
+              __Pyx_INCREF(__pyx_kp_u_Duration);
+              __pyx_t_16 += 10;
+              __Pyx_GIVEREF(__pyx_kp_u_Duration);
+              PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_kp_u_Duration);
+              __pyx_t_4 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_4);
+              __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+              __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_17;
+              __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+              __Pyx_GIVEREF(__pyx_t_3);
+              PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_3);
+              __pyx_t_3 = 0;
+              __Pyx_INCREF(__pyx_kp_u_FPS);
+              __pyx_t_16 += 7;
+              __Pyx_GIVEREF(__pyx_kp_u_FPS);
+              PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_kp_u_FPS);
+              __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_fps, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_17;
+              __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+              __Pyx_GIVEREF(__pyx_t_3);
+              PyTuple_SET_ITEM(__pyx_t_5, 3, __pyx_t_3);
+              __pyx_t_3 = 0;
+              __Pyx_INCREF(__pyx_kp_u_Width);
+              __pyx_t_16 += 9;
+              __Pyx_GIVEREF(__pyx_kp_u_Width);
+              PyTuple_SET_ITEM(__pyx_t_5, 4, __pyx_kp_u_Width);
+              __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_width, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_17;
+              __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+              __Pyx_GIVEREF(__pyx_t_3);
+              PyTuple_SET_ITEM(__pyx_t_5, 5, __pyx_t_3);
+              __pyx_t_3 = 0;
+              __Pyx_INCREF(__pyx_kp_u_Height);
+              __pyx_t_16 += 10;
+              __Pyx_GIVEREF(__pyx_kp_u_Height);
+              PyTuple_SET_ITEM(__pyx_t_5, 6, __pyx_kp_u_Height);
+              __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_height, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_17;
+              __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+              __Pyx_GIVEREF(__pyx_t_3);
+              PyTuple_SET_ITEM(__pyx_t_5, 7, __pyx_t_3);
+              __pyx_t_3 = 0;
+              __Pyx_INCREF(__pyx_kp_u__4);
+              __pyx_t_16 += 1;
+              __Pyx_GIVEREF(__pyx_kp_u__4);
+              PyTuple_SET_ITEM(__pyx_t_5, 8, __pyx_kp_u__4);
+              __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_5, 9, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 575, __pyx_L13_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_5 = NULL;
+              __pyx_t_11 = 0;
+              #if CYTHON_UNPACK_METHODS
+              if (likely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_5)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_5);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                  __pyx_t_11 = 1;
+                }
+              }
+              #endif
+              {
+                PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_t_3};
+                __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_11, 1+__pyx_t_11);
+                __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 575, __pyx_L13_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+              /* "random_video_effect.pyx":572
+ *         selected_function = random.choice(functions)
+ * 
+ *         with open("success.txt", "a") as f:             # <<<<<<<<<<<<<<
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Selected function: {output_path}\n")
+ */
+            }
+            __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+            __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+            __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
+            goto __pyx_L18_try_end;
+            __pyx_L13_error:;
+            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+            __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+            __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+            __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+            __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+            /*except:*/ {
+              __Pyx_AddTraceback("random_video_effect.random_video_effect_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+              if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_7, &__pyx_t_3) < 0) __PYX_ERR(0, 572, __pyx_L15_except_error)
+              __Pyx_XGOTREF(__pyx_t_6);
+              __Pyx_XGOTREF(__pyx_t_7);
+              __Pyx_XGOTREF(__pyx_t_3);
+              __pyx_t_5 = PyTuple_Pack(3, __pyx_t_6, __pyx_t_7, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 572, __pyx_L15_except_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_18 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_5, NULL);
+              __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 572, __pyx_L15_except_error)
+              __Pyx_GOTREF(__pyx_t_18);
+              __pyx_t_19 = __Pyx_PyObject_IsTrue(__pyx_t_18);
+              __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
+              if (__pyx_t_19 < 0) __PYX_ERR(0, 572, __pyx_L15_except_error)
+              __pyx_t_20 = (!__pyx_t_19);
+              if (unlikely(__pyx_t_20)) {
+                __Pyx_GIVEREF(__pyx_t_6);
+                __Pyx_GIVEREF(__pyx_t_7);
+                __Pyx_XGIVEREF(__pyx_t_3);
+                __Pyx_ErrRestoreWithState(__pyx_t_6, __pyx_t_7, __pyx_t_3);
+                __pyx_t_6 = 0; __pyx_t_7 = 0; __pyx_t_3 = 0; 
+                __PYX_ERR(0, 572, __pyx_L15_except_error)
+              }
+              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+              goto __pyx_L14_exception_handled;
+            }
+            __pyx_L15_except_error:;
+            __Pyx_XGIVEREF(__pyx_t_13);
+            __Pyx_XGIVEREF(__pyx_t_14);
+            __Pyx_XGIVEREF(__pyx_t_15);
+            __Pyx_ExceptionReset(__pyx_t_13, __pyx_t_14, __pyx_t_15);
+            goto __pyx_L3_error;
+            __pyx_L14_exception_handled:;
+            __Pyx_XGIVEREF(__pyx_t_13);
+            __Pyx_XGIVEREF(__pyx_t_14);
+            __Pyx_XGIVEREF(__pyx_t_15);
+            __Pyx_ExceptionReset(__pyx_t_13, __pyx_t_14, __pyx_t_15);
+            __pyx_L18_try_end:;
+          }
+        }
+        /*finally:*/ {
+          /*normal exit:*/{
+            if (__pyx_t_12) {
+              __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_tuple__5, NULL);
+              __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+              if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 572, __pyx_L3_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+            }
+            goto __pyx_L12;
+          }
+          __pyx_L12:;
+        }
+        goto __pyx_L22;
+        __pyx_L9_error:;
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        goto __pyx_L3_error;
+        __pyx_L22:;
+      }
+
+      /* "random_video_effect.pyx":578
  * 
  *         # Gi hm c chn ngu nhin vi cc tham s  nh ngha
  *         selected_function(image_path, output_path, duration, fps, width, height)             # <<<<<<<<<<<<<<
  *         return True
  *     except Exception as e:
  */
-      __pyx_t_5 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 563, __pyx_L3_error)
-      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_7 = PyFloat_FromDouble(__pyx_v_duration); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 578, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_v_selected_function);
-      __pyx_t_6 = __pyx_v_selected_function; __pyx_t_4 = NULL;
+      __pyx_t_6 = __pyx_v_selected_function; __pyx_t_5 = NULL;
       __pyx_t_11 = 0;
       #if CYTHON_UNPACK_METHODS
       if (unlikely(PyMethod_Check(__pyx_t_6))) {
-        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_6);
-        if (likely(__pyx_t_4)) {
+        __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_6);
+        if (likely(__pyx_t_5)) {
           PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_5);
           __Pyx_INCREF(function);
           __Pyx_DECREF_SET(__pyx_t_6, function);
           __pyx_t_11 = 1;
@@ -13173,17 +13680,17 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
       }
       #endif
       {
-        PyObject *__pyx_callargs[7] = {__pyx_t_4, __pyx_v_image_path, __pyx_v_output_path, __pyx_t_5, __pyx_v_fps, __pyx_v_width, __pyx_v_height};
-        __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+1-__pyx_t_11, 6+__pyx_t_11);
-        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 563, __pyx_L3_error)
-        __Pyx_GOTREF(__pyx_t_7);
+        PyObject *__pyx_callargs[7] = {__pyx_t_5, __pyx_v_image_path, __pyx_v_output_path, __pyx_t_7, __pyx_v_fps, __pyx_v_width, __pyx_v_height};
+        __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_6, __pyx_callargs+1-__pyx_t_11, 6+__pyx_t_11);
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 578, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "random_video_effect.pyx":564
+      /* "random_video_effect.pyx":579
  *         # Gi hm c chn ngu nhin vi cc tham s  nh ngha
  *         selected_function(image_path, output_path, duration, fps, width, height)
  *         return True             # <<<<<<<<<<<<<<
@@ -13195,7 +13702,7 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
       __pyx_r = Py_True;
       goto __pyx_L7_try_return;
 
-      /* "random_video_effect.pyx":558
+      /* "random_video_effect.pyx":568
  *     ]
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13212,110 +13719,352 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "random_video_effect.pyx":565
+    /* "random_video_effect.pyx":580
  *         selected_function(image_path, output_path, duration, fps, width, height)
  *         return True
  *     except Exception as e:             # <<<<<<<<<<<<<<
  *         print(f"Error occurred while executing the selected function: {e}")
- *         return False
+ *         with open("error_log.txt", "a") as f:
  */
-    __pyx_t_12 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
-    if (__pyx_t_12) {
+    __pyx_t_21 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
+    if (__pyx_t_21) {
       __Pyx_AddTraceback("random_video_effect.random_video_effect_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_6, &__pyx_t_5) < 0) __PYX_ERR(0, 565, __pyx_L5_except_error)
-      __Pyx_XGOTREF(__pyx_t_7);
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_6, &__pyx_t_7) < 0) __PYX_ERR(0, 580, __pyx_L5_except_error)
+      __Pyx_XGOTREF(__pyx_t_3);
       __Pyx_XGOTREF(__pyx_t_6);
-      __Pyx_XGOTREF(__pyx_t_5);
+      __Pyx_XGOTREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_6);
       __pyx_v_e = __pyx_t_6;
       /*try:*/ {
 
-        /* "random_video_effect.pyx":566
+        /* "random_video_effect.pyx":581
  *         return True
  *     except Exception as e:
  *         print(f"Error occurred while executing the selected function: {e}")             # <<<<<<<<<<<<<<
- *         return False
+ *         with open("error_log.txt", "a") as f:
+ *             f.write(f"Error occurred for image: {image_path}\n")
  */
-        __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 566, __pyx_L14_error)
+        __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 581, __pyx_L28_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Error_occurred_while_executing_t, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 581, __pyx_L28_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Error_occurred_while_executing_t, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 566, __pyx_L14_error)
-        __Pyx_GOTREF(__pyx_t_3);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 581, __pyx_L28_error)
+        __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 566, __pyx_L14_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "random_video_effect.pyx":567
+        /* "random_video_effect.pyx":582
  *     except Exception as e:
  *         print(f"Error occurred while executing the selected function: {e}")
+ *         with open("error_log.txt", "a") as f:             # <<<<<<<<<<<<<<
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Error message: {e}\n\n")
+ */
+        /*with:*/ {
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 582, __pyx_L28_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_12 = __Pyx_PyObject_LookupSpecial(__pyx_t_5, __pyx_n_s_exit); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 582, __pyx_L28_error)
+          __Pyx_GOTREF(__pyx_t_12);
+          __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_5, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 582, __pyx_L30_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_1 = NULL;
+          __pyx_t_11 = 0;
+          #if CYTHON_UNPACK_METHODS
+          if (likely(PyMethod_Check(__pyx_t_2))) {
+            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+            if (likely(__pyx_t_1)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_2, function);
+              __pyx_t_11 = 1;
+            }
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+            __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_11, 0+__pyx_t_11);
+            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 582, __pyx_L30_error)
+            __Pyx_GOTREF(__pyx_t_4);
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          }
+          __pyx_t_2 = __pyx_t_4;
+          __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          /*try:*/ {
+            {
+              __Pyx_PyThreadState_declare
+              __Pyx_PyThreadState_assign
+              __Pyx_ExceptionSave(&__pyx_t_15, &__pyx_t_14, &__pyx_t_13);
+              __Pyx_XGOTREF(__pyx_t_15);
+              __Pyx_XGOTREF(__pyx_t_14);
+              __Pyx_XGOTREF(__pyx_t_13);
+              /*try:*/ {
+                __Pyx_XDECREF_SET(__pyx_v_f, __pyx_t_2);
+                __pyx_t_2 = 0;
+
+                /* "random_video_effect.pyx":583
+ *         print(f"Error occurred while executing the selected function: {e}")
+ *         with open("error_log.txt", "a") as f:
+ *             f.write(f"Error occurred for image: {image_path}\n")             # <<<<<<<<<<<<<<
+ *             f.write(f"Error message: {e}\n\n")
+ *         return False
+ */
+                __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 583, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 583, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_4);
+                __pyx_t_16 = 0;
+                __pyx_t_17 = 127;
+                __Pyx_INCREF(__pyx_kp_u_Error_occurred_for_image);
+                __pyx_t_16 += 26;
+                __Pyx_GIVEREF(__pyx_kp_u_Error_occurred_for_image);
+                PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_kp_u_Error_occurred_for_image);
+                __Pyx_INCREF(__pyx_v_image_path);
+                __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_v_image_path) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_v_image_path) : __pyx_t_17;
+                __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_v_image_path);
+                __Pyx_GIVEREF(__pyx_v_image_path);
+                PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_image_path);
+                __Pyx_INCREF(__pyx_kp_u__4);
+                __pyx_t_16 += 1;
+                __Pyx_GIVEREF(__pyx_kp_u__4);
+                PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_kp_u__4);
+                __pyx_t_1 = __Pyx_PyUnicode_Join(__pyx_t_4, 3, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 583, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+                __pyx_t_4 = NULL;
+                __pyx_t_11 = 0;
+                #if CYTHON_UNPACK_METHODS
+                if (likely(PyMethod_Check(__pyx_t_5))) {
+                  __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
+                  if (likely(__pyx_t_4)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                    __Pyx_INCREF(__pyx_t_4);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_5, function);
+                    __pyx_t_11 = 1;
+                  }
+                }
+                #endif
+                {
+                  PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_t_1};
+                  __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_11, 1+__pyx_t_11);
+                  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 583, __pyx_L36_error)
+                  __Pyx_GOTREF(__pyx_t_2);
+                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+                /* "random_video_effect.pyx":584
+ *         with open("error_log.txt", "a") as f:
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Error message: {e}\n\n")             # <<<<<<<<<<<<<<
+ *         return False
+ */
+                __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 584, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 584, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_16 = 0;
+                __pyx_t_17 = 127;
+                __Pyx_INCREF(__pyx_kp_u_Error_message);
+                __pyx_t_16 += 15;
+                __Pyx_GIVEREF(__pyx_kp_u_Error_message);
+                PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_Error_message);
+                __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 584, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_4);
+                __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_17;
+                __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
+                __Pyx_GIVEREF(__pyx_t_4);
+                PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4);
+                __pyx_t_4 = 0;
+                __Pyx_INCREF(__pyx_kp_u__7);
+                __pyx_t_16 += 2;
+                __Pyx_GIVEREF(__pyx_kp_u__7);
+                PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
+                __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 584, __pyx_L36_error)
+                __Pyx_GOTREF(__pyx_t_4);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = NULL;
+                __pyx_t_11 = 0;
+                #if CYTHON_UNPACK_METHODS
+                if (likely(PyMethod_Check(__pyx_t_5))) {
+                  __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
+                  if (likely(__pyx_t_1)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                    __Pyx_INCREF(__pyx_t_1);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_5, function);
+                    __pyx_t_11 = 1;
+                  }
+                }
+                #endif
+                {
+                  PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_t_4};
+                  __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_11, 1+__pyx_t_11);
+                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+                  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 584, __pyx_L36_error)
+                  __Pyx_GOTREF(__pyx_t_2);
+                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+                /* "random_video_effect.pyx":582
+ *     except Exception as e:
+ *         print(f"Error occurred while executing the selected function: {e}")
+ *         with open("error_log.txt", "a") as f:             # <<<<<<<<<<<<<<
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Error message: {e}\n\n")
+ */
+              }
+              __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
+              __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+              __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+              goto __pyx_L43_try_end;
+              __pyx_L36_error:;
+              __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+              __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+              __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+              /*except:*/ {
+                __Pyx_AddTraceback("random_video_effect.random_video_effect_cython", __pyx_clineno, __pyx_lineno, __pyx_filename);
+                if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_4) < 0) __PYX_ERR(0, 582, __pyx_L38_except_error)
+                __Pyx_XGOTREF(__pyx_t_2);
+                __Pyx_XGOTREF(__pyx_t_5);
+                __Pyx_XGOTREF(__pyx_t_4);
+                __pyx_t_1 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 582, __pyx_L38_except_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_18 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_1, NULL);
+                __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 582, __pyx_L38_except_error)
+                __Pyx_GOTREF(__pyx_t_18);
+                __pyx_t_20 = __Pyx_PyObject_IsTrue(__pyx_t_18);
+                __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
+                if (__pyx_t_20 < 0) __PYX_ERR(0, 582, __pyx_L38_except_error)
+                __pyx_t_19 = (!__pyx_t_20);
+                if (unlikely(__pyx_t_19)) {
+                  __Pyx_GIVEREF(__pyx_t_2);
+                  __Pyx_GIVEREF(__pyx_t_5);
+                  __Pyx_XGIVEREF(__pyx_t_4);
+                  __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_5, __pyx_t_4);
+                  __pyx_t_2 = 0; __pyx_t_5 = 0; __pyx_t_4 = 0; 
+                  __PYX_ERR(0, 582, __pyx_L38_except_error)
+                }
+                __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+                goto __pyx_L37_exception_handled;
+              }
+              __pyx_L38_except_error:;
+              __Pyx_XGIVEREF(__pyx_t_15);
+              __Pyx_XGIVEREF(__pyx_t_14);
+              __Pyx_XGIVEREF(__pyx_t_13);
+              __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_14, __pyx_t_13);
+              goto __pyx_L28_error;
+              __pyx_L37_exception_handled:;
+              __Pyx_XGIVEREF(__pyx_t_15);
+              __Pyx_XGIVEREF(__pyx_t_14);
+              __Pyx_XGIVEREF(__pyx_t_13);
+              __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_14, __pyx_t_13);
+              __pyx_L43_try_end:;
+            }
+          }
+          /*finally:*/ {
+            /*normal exit:*/{
+              if (__pyx_t_12) {
+                __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_tuple__5, NULL);
+                __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+                if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 582, __pyx_L28_error)
+                __Pyx_GOTREF(__pyx_t_13);
+                __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+              }
+              goto __pyx_L35;
+            }
+            __pyx_L35:;
+          }
+          goto __pyx_L47;
+          __pyx_L30_error:;
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+          goto __pyx_L28_error;
+          __pyx_L47:;
+        }
+
+        /* "random_video_effect.pyx":585
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Error message: {e}\n\n")
  *         return False             # <<<<<<<<<<<<<<
  */
         __Pyx_XDECREF(__pyx_r);
         __Pyx_INCREF(Py_False);
         __pyx_r = Py_False;
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        goto __pyx_L13_return;
+        goto __pyx_L27_return;
       }
 
-      /* "random_video_effect.pyx":565
+      /* "random_video_effect.pyx":580
  *         selected_function(image_path, output_path, duration, fps, width, height)
  *         return True
  *     except Exception as e:             # <<<<<<<<<<<<<<
  *         print(f"Error occurred while executing the selected function: {e}")
- *         return False
+ *         with open("error_log.txt", "a") as f:
  */
       /*finally:*/ {
-        __pyx_L14_error:;
+        __pyx_L28_error:;
         /*exception exit:*/{
           __Pyx_PyThreadState_declare
           __Pyx_PyThreadState_assign
-          __pyx_t_15 = 0; __pyx_t_16 = 0; __pyx_t_17 = 0; __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0;
+          __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0; __pyx_t_15 = 0; __pyx_t_18 = 0; __pyx_t_24 = 0;
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_18, &__pyx_t_19, &__pyx_t_20);
-          if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_15, &__pyx_t_16, &__pyx_t_17) < 0)) __Pyx_ErrFetch(&__pyx_t_15, &__pyx_t_16, &__pyx_t_17);
+          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+          if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_15, &__pyx_t_18, &__pyx_t_24);
+          if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_12, &__pyx_t_13, &__pyx_t_14) < 0)) __Pyx_ErrFetch(&__pyx_t_12, &__pyx_t_13, &__pyx_t_14);
+          __Pyx_XGOTREF(__pyx_t_12);
+          __Pyx_XGOTREF(__pyx_t_13);
+          __Pyx_XGOTREF(__pyx_t_14);
           __Pyx_XGOTREF(__pyx_t_15);
-          __Pyx_XGOTREF(__pyx_t_16);
-          __Pyx_XGOTREF(__pyx_t_17);
           __Pyx_XGOTREF(__pyx_t_18);
-          __Pyx_XGOTREF(__pyx_t_19);
-          __Pyx_XGOTREF(__pyx_t_20);
-          __pyx_t_12 = __pyx_lineno; __pyx_t_13 = __pyx_clineno; __pyx_t_14 = __pyx_filename;
+          __Pyx_XGOTREF(__pyx_t_24);
+          __pyx_t_21 = __pyx_lineno; __pyx_t_22 = __pyx_clineno; __pyx_t_23 = __pyx_filename;
           {
             __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
           }
           if (PY_MAJOR_VERSION >= 3) {
+            __Pyx_XGIVEREF(__pyx_t_15);
             __Pyx_XGIVEREF(__pyx_t_18);
-            __Pyx_XGIVEREF(__pyx_t_19);
-            __Pyx_XGIVEREF(__pyx_t_20);
-            __Pyx_ExceptionReset(__pyx_t_18, __pyx_t_19, __pyx_t_20);
+            __Pyx_XGIVEREF(__pyx_t_24);
+            __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_18, __pyx_t_24);
           }
-          __Pyx_XGIVEREF(__pyx_t_15);
-          __Pyx_XGIVEREF(__pyx_t_16);
-          __Pyx_XGIVEREF(__pyx_t_17);
-          __Pyx_ErrRestore(__pyx_t_15, __pyx_t_16, __pyx_t_17);
-          __pyx_t_15 = 0; __pyx_t_16 = 0; __pyx_t_17 = 0; __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0;
-          __pyx_lineno = __pyx_t_12; __pyx_clineno = __pyx_t_13; __pyx_filename = __pyx_t_14;
+          __Pyx_XGIVEREF(__pyx_t_12);
+          __Pyx_XGIVEREF(__pyx_t_13);
+          __Pyx_XGIVEREF(__pyx_t_14);
+          __Pyx_ErrRestore(__pyx_t_12, __pyx_t_13, __pyx_t_14);
+          __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0; __pyx_t_15 = 0; __pyx_t_18 = 0; __pyx_t_24 = 0;
+          __pyx_lineno = __pyx_t_21; __pyx_clineno = __pyx_t_22; __pyx_filename = __pyx_t_23;
           goto __pyx_L5_except_error;
         }
-        __pyx_L13_return: {
-          __pyx_t_20 = __pyx_r;
+        __pyx_L27_return: {
+          __pyx_t_24 = __pyx_r;
           __pyx_r = 0;
           __Pyx_DECREF(__pyx_v_e); __pyx_v_e = 0;
-          __pyx_r = __pyx_t_20;
-          __pyx_t_20 = 0;
+          __pyx_r = __pyx_t_24;
+          __pyx_t_24 = 0;
           goto __pyx_L6_except_return;
         }
       }
     }
     goto __pyx_L5_except_error;
 
-    /* "random_video_effect.pyx":558
+    /* "random_video_effect.pyx":568
  *     ]
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13342,7 +14091,7 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
     goto __pyx_L0;
   }
 
-  /* "random_video_effect.pyx":547
+  /* "random_video_effect.pyx":557
  *     return False
  * 
  * def random_video_effect_cython(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
@@ -13364,6 +14113,7 @@ static PyObject *__pyx_pf_19random_video_effect_20random_video_effect_cython(CYT
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_functions);
   __Pyx_XDECREF(__pyx_v_selected_function);
+  __Pyx_XDECREF(__pyx_v_f);
   __Pyx_XDECREF(__pyx_v_e);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -13388,13 +14138,22 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
   __Pyx_StringTabEntry __pyx_string_tab[] = {
     {&__pyx_n_s_BORDER_CONSTANT, __pyx_k_BORDER_CONSTANT, sizeof(__pyx_k_BORDER_CONSTANT), 0, 0, 1, 1},
     {&__pyx_kp_u_Cannot_read_image_from, __pyx_k_Cannot_read_image_from, sizeof(__pyx_k_Cannot_read_image_from), 0, 1, 0, 0},
+    {&__pyx_kp_u_Duration, __pyx_k_Duration, sizeof(__pyx_k_Duration), 0, 1, 0, 0},
+    {&__pyx_kp_u_Error_message, __pyx_k_Error_message, sizeof(__pyx_k_Error_message), 0, 1, 0, 0},
+    {&__pyx_kp_u_Error_occurred_for_image, __pyx_k_Error_occurred_for_image, sizeof(__pyx_k_Error_occurred_for_image), 0, 1, 0, 0},
     {&__pyx_kp_u_Error_occurred_while_executing_t, __pyx_k_Error_occurred_while_executing_t, sizeof(__pyx_k_Error_occurred_while_executing_t), 0, 1, 0, 0},
+    {&__pyx_kp_u_FPS, __pyx_k_FPS, sizeof(__pyx_k_FPS), 0, 1, 0, 0},
     {&__pyx_n_s_GaussianBlur, __pyx_k_GaussianBlur, sizeof(__pyx_k_GaussianBlur), 0, 0, 1, 1},
+    {&__pyx_kp_u_Height, __pyx_k_Height, sizeof(__pyx_k_Height), 0, 1, 0, 0},
     {&__pyx_n_s_INTER_LINEAR, __pyx_k_INTER_LINEAR, sizeof(__pyx_k_INTER_LINEAR), 0, 0, 1, 1},
+    {&__pyx_kp_u_Kch_thc_mi_sau_khi_phng_to, __pyx_k_Kch_thc_mi_sau_khi_phng_to, sizeof(__pyx_k_Kch_thc_mi_sau_khi_phng_to), 0, 1, 0, 0},
+    {&__pyx_kp_u_Kch_thc_nh_gc, __pyx_k_Kch_thc_nh_gc, sizeof(__pyx_k_Kch_thc_nh_gc), 0, 1, 0, 0},
     {&__pyx_kp_u_Khng_th_c_hnh_nh_t, __pyx_k_Khng_th_c_hnh_nh_t, sizeof(__pyx_k_Khng_th_c_hnh_nh_t), 0, 1, 0, 0},
     {&__pyx_kp_u_None, __pyx_k_None, sizeof(__pyx_k_None), 0, 1, 0, 0},
     {&__pyx_kp_u_Please_check_the_path, __pyx_k_Please_check_the_path, sizeof(__pyx_k_Please_check_the_path), 0, 1, 0, 0},
     {&__pyx_kp_u_Scrolling_direction, __pyx_k_Scrolling_direction, sizeof(__pyx_k_Scrolling_direction), 0, 1, 0, 0},
+    {&__pyx_kp_u_Selected_function, __pyx_k_Selected_function, sizeof(__pyx_k_Selected_function), 0, 1, 0, 0},
+    {&__pyx_kp_u_T_l_phng_to, __pyx_k_T_l_phng_to, sizeof(__pyx_k_T_l_phng_to), 0, 1, 0, 0},
     {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
     {&__pyx_n_s_VideoWriter, __pyx_k_VideoWriter, sizeof(__pyx_k_VideoWriter), 0, 0, 1, 1},
     {&__pyx_n_s_VideoWriter_fourcc, __pyx_k_VideoWriter_fourcc, sizeof(__pyx_k_VideoWriter_fourcc), 0, 0, 1, 1},
@@ -13402,9 +14161,13 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_kp_u_Video_created_successfully_at, __pyx_k_Video_created_successfully_at, sizeof(__pyx_k_Video_created_successfully_at), 0, 1, 0, 0},
     {&__pyx_kp_u_Video_zoom_out_c_to_thnh_cng_ti, __pyx_k_Video_zoom_out_c_to_thnh_cng_ti, sizeof(__pyx_k_Video_zoom_out_c_to_thnh_cng_ti), 0, 1, 0, 0},
     {&__pyx_kp_u_Vui_lng_kim_tra_li_ng_dn, __pyx_k_Vui_lng_kim_tra_li_ng_dn, sizeof(__pyx_k_Vui_lng_kim_tra_li_ng_dn), 0, 1, 0, 0},
+    {&__pyx_kp_u_Width, __pyx_k_Width, sizeof(__pyx_k_Width), 0, 1, 0, 0},
     {&__pyx_kp_u_Zoom_in_video_created_successful, __pyx_k_Zoom_in_video_created_successful, sizeof(__pyx_k_Zoom_in_video_created_successful), 0, 1, 0, 0},
-    {&__pyx_n_s__23, __pyx_k__23, sizeof(__pyx_k__23), 0, 0, 1, 1},
-    {&__pyx_n_s__3, __pyx_k__3, sizeof(__pyx_k__3), 0, 0, 1, 1},
+    {&__pyx_n_s__28, __pyx_k__28, sizeof(__pyx_k__28), 0, 0, 1, 1},
+    {&__pyx_kp_u__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 1, 0, 0},
+    {&__pyx_kp_u__7, __pyx_k__7, sizeof(__pyx_k__7), 0, 1, 0, 0},
+    {&__pyx_n_s__8, __pyx_k__8, sizeof(__pyx_k__8), 0, 0, 1, 1},
+    {&__pyx_n_u_a, __pyx_k_a, sizeof(__pyx_k_a), 0, 1, 0, 1},
     {&__pyx_n_s_asyncio_coroutines, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
     {&__pyx_n_s_blur_strength, __pyx_k_blur_strength, sizeof(__pyx_k_blur_strength), 0, 0, 1, 1},
     {&__pyx_n_s_blurred_background, __pyx_k_blurred_background, sizeof(__pyx_k_blurred_background), 0, 0, 1, 1},
@@ -13430,7 +14193,6 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_current_x_img, __pyx_k_current_x_img, sizeof(__pyx_k_current_x_img), 0, 0, 1, 1},
     {&__pyx_n_s_current_y, __pyx_k_current_y, sizeof(__pyx_k_current_y), 0, 0, 1, 1},
     {&__pyx_n_s_cv2, __pyx_k_cv2, sizeof(__pyx_k_cv2), 0, 0, 1, 1},
-    {&__pyx_n_s_destroyAllWindows, __pyx_k_destroyAllWindows, sizeof(__pyx_k_destroyAllWindows), 0, 0, 1, 1},
     {&__pyx_n_s_direction, __pyx_k_direction, sizeof(__pyx_k_direction), 0, 0, 1, 1},
     {&__pyx_n_u_down_up, __pyx_k_down_up, sizeof(__pyx_k_down_up), 0, 1, 0, 1},
     {&__pyx_n_s_duration, __pyx_k_duration, sizeof(__pyx_k_duration), 0, 0, 1, 1},
@@ -13438,6 +14200,10 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_end_scale, __pyx_k_end_scale, sizeof(__pyx_k_end_scale), 0, 0, 1, 1},
     {&__pyx_n_s_end_scale_bg, __pyx_k_end_scale_bg, sizeof(__pyx_k_end_scale_bg), 0, 0, 1, 1},
     {&__pyx_n_s_end_scale_img, __pyx_k_end_scale_img, sizeof(__pyx_k_end_scale_img), 0, 0, 1, 1},
+    {&__pyx_n_s_enter, __pyx_k_enter, sizeof(__pyx_k_enter), 0, 0, 1, 1},
+    {&__pyx_kp_u_error_log_txt, __pyx_k_error_log_txt, sizeof(__pyx_k_error_log_txt), 0, 1, 0, 0},
+    {&__pyx_n_s_exit, __pyx_k_exit, sizeof(__pyx_k_exit), 0, 0, 1, 1},
+    {&__pyx_n_s_f, __pyx_k_f, sizeof(__pyx_k_f), 0, 0, 1, 1},
     {&__pyx_n_s_float, __pyx_k_float, sizeof(__pyx_k_float), 0, 0, 1, 1},
     {&__pyx_n_s_fourcc, __pyx_k_fourcc, sizeof(__pyx_k_fourcc), 0, 0, 1, 1},
     {&__pyx_n_s_fps, __pyx_k_fps, sizeof(__pyx_k_fps), 0, 0, 1, 1},
@@ -13468,6 +14234,9 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
     {&__pyx_n_s_new_height, __pyx_k_new_height, sizeof(__pyx_k_new_height), 0, 0, 1, 1},
     {&__pyx_n_s_new_width, __pyx_k_new_width, sizeof(__pyx_k_new_width), 0, 0, 1, 1},
+    {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
+    {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
+    {&__pyx_n_s_open, __pyx_k_open, sizeof(__pyx_k_open), 0, 0, 1, 1},
     {&__pyx_n_s_orig_height, __pyx_k_orig_height, sizeof(__pyx_k_orig_height), 0, 0, 1, 1},
     {&__pyx_n_s_orig_width, __pyx_k_orig_width, sizeof(__pyx_k_orig_width), 0, 0, 1, 1},
     {&__pyx_n_s_out, __pyx_k_out, sizeof(__pyx_k_out), 0, 0, 1, 1},
@@ -13489,8 +14258,10 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_u_right_left, __pyx_k_right_left, sizeof(__pyx_k_right_left), 0, 1, 0, 1},
     {&__pyx_n_s_scale_bg, __pyx_k_scale_bg, sizeof(__pyx_k_scale_bg), 0, 0, 1, 1},
     {&__pyx_n_s_scale_factor, __pyx_k_scale_factor, sizeof(__pyx_k_scale_factor), 0, 0, 1, 1},
+    {&__pyx_n_s_scale_h, __pyx_k_scale_h, sizeof(__pyx_k_scale_h), 0, 0, 1, 1},
     {&__pyx_n_s_scale_height, __pyx_k_scale_height, sizeof(__pyx_k_scale_height), 0, 0, 1, 1},
     {&__pyx_n_s_scale_img, __pyx_k_scale_img, sizeof(__pyx_k_scale_img), 0, 0, 1, 1},
+    {&__pyx_n_s_scale_w, __pyx_k_scale_w, sizeof(__pyx_k_scale_w), 0, 0, 1, 1},
     {&__pyx_n_s_scale_width, __pyx_k_scale_width, sizeof(__pyx_k_scale_width), 0, 0, 1, 1},
     {&__pyx_n_s_selected_function, __pyx_k_selected_function, sizeof(__pyx_k_selected_function), 0, 0, 1, 1},
     {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
@@ -13505,6 +14276,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_start_y_bg, __pyx_k_start_y_bg, sizeof(__pyx_k_start_y_bg), 0, 0, 1, 1},
     {&__pyx_n_s_start_y_small, __pyx_k_start_y_small, sizeof(__pyx_k_start_y_small), 0, 0, 1, 1},
     {&__pyx_n_s_str, __pyx_k_str, sizeof(__pyx_k_str), 0, 0, 1, 1},
+    {&__pyx_kp_u_success_txt, __pyx_k_success_txt, sizeof(__pyx_k_success_txt), 0, 1, 0, 0},
     {&__pyx_n_s_target_height, __pyx_k_target_height, sizeof(__pyx_k_target_height), 0, 0, 1, 1},
     {&__pyx_n_s_target_width, __pyx_k_target_width, sizeof(__pyx_k_target_width), 0, 0, 1, 1},
     {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
@@ -13519,15 +14291,17 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_width_1, __pyx_k_width_1, sizeof(__pyx_k_width_1), 0, 0, 1, 1},
     {&__pyx_n_s_width_2, __pyx_k_width_2, sizeof(__pyx_k_width_2), 0, 0, 1, 1},
     {&__pyx_n_s_write, __pyx_k_write, sizeof(__pyx_k_write), 0, 0, 1, 1},
+    {&__pyx_n_u_x, __pyx_k_x, sizeof(__pyx_k_x), 0, 1, 0, 1},
     {0, 0, 0, 0, 0, 0, 0}
   };
   return __Pyx_InitStrings(__pyx_string_tab);
 }
 /* #### Code section: cached_builtins ### */
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 10, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 94, __pyx_L1_error)
-  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 106, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 572, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -13538,150 +14312,175 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "random_video_effect.pyx":78
+  /* "random_video_effect.pyx":13
+ *         raise ValueError(f"Khng th c hnh nh t {image_path}. Vui lng kim tra li ng dn.")
+ * 
+ *     orig_height, orig_width = image.shape[:2]             # <<<<<<<<<<<<<<
+ * 
+ *     print(f"Kch thc nh gc: {orig_width}x{orig_height}")
+ */
+  __pyx_slice_ = PySlice_New(Py_None, __pyx_int_2, Py_None); if (unlikely(!__pyx_slice_)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_slice_);
+  __Pyx_GIVEREF(__pyx_slice_);
+
+  /* "random_video_effect.pyx":90
  * 
  *     # Thm border cho nh nh
  *     image_2_with_border = cv2.copyMakeBorder(image_2, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=(255, 255, 255))             # <<<<<<<<<<<<<<
  * 
  *     # Kch thc ca nh ln v nh nh sau khi border
  */
-  __pyx_tuple_ = PyTuple_Pack(3, __pyx_int_255, __pyx_int_255, __pyx_int_255); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 78, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple_);
-  __Pyx_GIVEREF(__pyx_tuple_);
+  __pyx_tuple__2 = PyTuple_Pack(3, __pyx_int_255, __pyx_int_255, __pyx_int_255); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__2);
+  __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "random_video_effect.pyx":82
- *     # Kch thc ca nh ln v nh nh sau khi border
- *     cdef int height_1, width_1, height_2, width_2
- *     height_1, width_1 = blurred_background.shape[:2]             # <<<<<<<<<<<<<<
- *     height_2, width_2 = image_2_with_border.shape[:2]
+  /* "random_video_effect.pyx":572
+ *         selected_function = random.choice(functions)
  * 
+ *         with open("success.txt", "a") as f:             # <<<<<<<<<<<<<<
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Selected function: {output_path}\n")
  */
-  __pyx_slice__2 = PySlice_New(Py_None, __pyx_int_2, Py_None); if (unlikely(!__pyx_slice__2)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_slice__2);
-  __Pyx_GIVEREF(__pyx_slice__2);
+  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_kp_u_success_txt, __pyx_n_u_a); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 572, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__3);
+  __Pyx_GIVEREF(__pyx_tuple__3);
+  __pyx_tuple__5 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 572, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__5);
+  __Pyx_GIVEREF(__pyx_tuple__5);
+
+  /* "random_video_effect.pyx":582
+ *     except Exception as e:
+ *         print(f"Error occurred while executing the selected function: {e}")
+ *         with open("error_log.txt", "a") as f:             # <<<<<<<<<<<<<<
+ *             f.write(f"Error occurred for image: {image_path}\n")
+ *             f.write(f"Error message: {e}\n\n")
+ */
+  __pyx_tuple__6 = PyTuple_Pack(2, __pyx_kp_u_error_log_txt, __pyx_n_u_a); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 582, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
 
   /* "random_video_effect.pyx":6
- * from libc.stdlib cimport malloc, free
+ * import numpy as np  # Import numpy
  * 
  * def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
- *     cdef object image = cv2.imread(image_path)
- * 
+ *     # c nh
+ *     image = cv2.imread(image_path)
  */
-  __pyx_tuple__4 = PyTuple_Pack(13, __pyx_n_s_image_path, __pyx_n_s_target_width, __pyx_n_s_target_height, __pyx_n_s_image, __pyx_n_s_orig_height, __pyx_n_s_orig_width, __pyx_n_s_scale_factor, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_resized_image, __pyx_n_s_start_x, __pyx_n_s_start_y, __pyx_n_s_cropped_image); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__4);
-  __Pyx_GIVEREF(__pyx_tuple__4);
-  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_resize_and_crop, 6, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(15, __pyx_n_s_image_path, __pyx_n_s_target_width, __pyx_n_s_target_height, __pyx_n_s_image, __pyx_n_s_orig_height, __pyx_n_s_orig_width, __pyx_n_s_scale_w, __pyx_n_s_scale_h, __pyx_n_s_scale_factor, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_resized_image, __pyx_n_s_start_x, __pyx_n_s_start_y, __pyx_n_s_cropped_image); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_resize_and_crop, 6, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 6, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":31
+  /* "random_video_effect.pyx":43
  *     return cropped_image
  * 
  * def resize_and_limit(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     Thay i kch thc hnh nh sao cho mt trong hai cnh khng vt qu kch thc mc tiu.
  */
-  __pyx_tuple__6 = PyTuple_Pack(12, __pyx_n_s_image_path, __pyx_n_s_target_width, __pyx_n_s_target_height, __pyx_n_s_image, __pyx_n_s_orig_height, __pyx_n_s_orig_width, __pyx_n_s_scale_width, __pyx_n_s_scale_height, __pyx_n_s_scale_factor, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_resized_image); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 31, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_resize_and_limit, 31, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(12, __pyx_n_s_image_path, __pyx_n_s_target_width, __pyx_n_s_target_height, __pyx_n_s_image, __pyx_n_s_orig_height, __pyx_n_s_orig_width, __pyx_n_s_scale_width, __pyx_n_s_scale_height, __pyx_n_s_scale_factor, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_resized_image); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_resize_and_limit, 43, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 43, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":53
+  /* "random_video_effect.pyx":65
  *     return resized_image
  * 
  * def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     # Initialize frame variables
  *     cdef int total_frames = int(duration * fps)  # Tng s frame
  */
-  __pyx_tuple__8 = PyTuple_Pack(31, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_total_frames, __pyx_n_s_current_x_bg, __pyx_n_s_current_x_img, __pyx_n_s_total_1, __pyx_n_s_total_2, __pyx_n_s_cropped_background, __pyx_n_s_result, __pyx_n_s_image_1, __pyx_n_s_image_2, __pyx_n_s_move_per_frame_bg, __pyx_n_s_move_per_frame_img, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_scale_factor, __pyx_n_s_blur_strength, __pyx_n_s_image_resized, __pyx_n_s_blurred_background, __pyx_n_s_image_2_with_border, __pyx_n_s_height_1, __pyx_n_s_width_1, __pyx_n_s_height_2, __pyx_n_s_width_2, __pyx_n_s_total_move, __pyx_n_s_total_move_img, __pyx_n_s_frame); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 53, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 31, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_parallax_left_video, 53, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_tuple__13 = PyTuple_Pack(31, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_total_frames, __pyx_n_s_current_x_bg, __pyx_n_s_current_x_img, __pyx_n_s_total_1, __pyx_n_s_total_2, __pyx_n_s_cropped_background, __pyx_n_s_result, __pyx_n_s_image_1, __pyx_n_s_image_2, __pyx_n_s_move_per_frame_bg, __pyx_n_s_move_per_frame_img, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_scale_factor, __pyx_n_s_blur_strength, __pyx_n_s_image_resized, __pyx_n_s_blurred_background, __pyx_n_s_image_2_with_border, __pyx_n_s_height_1, __pyx_n_s_width_1, __pyx_n_s_height_2, __pyx_n_s_width_2, __pyx_n_s_total_move, __pyx_n_s_total_move_img, __pyx_n_s_frame); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
+  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 31, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_parallax_left_video, 65, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 65, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":120
+  /* "random_video_effect.pyx":131
  * 
  * 
  * def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     cdef int total_frames = int(duration * fps)  # Tng s frame
  *     cdef int current_x_bg, current_x_img  # Movement variables
  */
-  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 31, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_parallax_right_video, 120, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 31, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_parallax_right_video, 131, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 131, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":185
+  /* "random_video_effect.pyx":195
  * 
  * 
  * def create_scrolling_image_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     Creates a scrolling video from an image. The image will scroll in either horizontal or vertical direction
  */
-  __pyx_tuple__11 = PyTuple_Pack(25, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_total_frames, __pyx_n_s_orig_height, __pyx_n_s_orig_width, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_current_x, __pyx_n_s_current_y, __pyx_n_s_total_move, __pyx_n_s_scale_factor, __pyx_n_s_move_per_frame, __pyx_n_s_image, __pyx_n_s_resized_image, __pyx_n_s_cropped_image, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_direction, __pyx_n_s_target_width, __pyx_n_s_target_height, __pyx_n_s_frame); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 185, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_scrolling_image_video, 185, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(25, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_total_frames, __pyx_n_s_orig_height, __pyx_n_s_orig_width, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_current_x, __pyx_n_s_current_y, __pyx_n_s_total_move, __pyx_n_s_scale_factor, __pyx_n_s_move_per_frame, __pyx_n_s_image, __pyx_n_s_resized_image, __pyx_n_s_cropped_image, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_direction, __pyx_n_s_target_width, __pyx_n_s_target_height, __pyx_n_s_frame); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_scrolling_image_video, 195, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 195, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":275
+  /* "random_video_effect.pyx":285
  * 
  * 
  * def create_zoom_in_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     Creates a zoom-in video from an image.
  */
-  __pyx_tuple__13 = PyTuple_Pack(20, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_image, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_total_frames, __pyx_n_s_start_scale, __pyx_n_s_end_scale, __pyx_n_s_frame, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_start_x, __pyx_n_s_start_y, __pyx_n_s_current_scale, __pyx_n_s_resized_image, __pyx_n_s_cropped_image); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 275, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
-  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_in_video, 275, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(20, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_image, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_total_frames, __pyx_n_s_start_scale, __pyx_n_s_end_scale, __pyx_n_s_frame, __pyx_n_s_new_width, __pyx_n_s_new_height, __pyx_n_s_start_x, __pyx_n_s_start_y, __pyx_n_s_current_scale, __pyx_n_s_resized_image, __pyx_n_s_cropped_image); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_in_video, 285, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 285, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":332
+  /* "random_video_effect.pyx":342
  *     print(f"Zoom-in video created successfully at: {output_path}")
  * 
  * def create_zoom_out_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     cdef object image = resize_and_crop(image_path, target_width=width, target_height=height)
  * 
  */
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_out_video, 332, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_out_video, 342, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 342, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":379
+  /* "random_video_effect.pyx":389
  * 
  * # Hm to video vi hiu ng zoom v background
  * def create_zoom_in_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     To video vi hiu ng zoom cho nh nn v nh nh, di chuyn theo cc hiu ng ngc chiu.
  */
-  __pyx_tuple__16 = PyTuple_Pack(33, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_image_1, __pyx_n_s_image_2, __pyx_n_s_blurred_background, __pyx_n_s_image_2_with_border, __pyx_n_s_frame_result, __pyx_n_s_total_frames, __pyx_n_s_start_x_bg, __pyx_n_s_start_y_bg, __pyx_n_s_start_x_small, __pyx_n_s_start_y_small, __pyx_n_s_scale_bg, __pyx_n_s_scale_img, __pyx_n_s_blur_strength, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_start_scale_bg, __pyx_n_s_end_scale_bg, __pyx_n_s_start_scale_img, __pyx_n_s_end_scale_img, __pyx_n_s_height_1, __pyx_n_s_width_1, __pyx_n_s_height_2, __pyx_n_s_width_2, __pyx_n_s_frame, __pyx_n_s_resized_bg, __pyx_n_s_resized_small, __pyx_n_s_cropped_bg); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 379, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
-  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 33, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_in_video_with_backgr, 379, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(33, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_image_1, __pyx_n_s_image_2, __pyx_n_s_blurred_background, __pyx_n_s_image_2_with_border, __pyx_n_s_frame_result, __pyx_n_s_total_frames, __pyx_n_s_start_x_bg, __pyx_n_s_start_y_bg, __pyx_n_s_start_x_small, __pyx_n_s_start_y_small, __pyx_n_s_scale_bg, __pyx_n_s_scale_img, __pyx_n_s_blur_strength, __pyx_n_s_fourcc, __pyx_n_s_out, __pyx_n_s_start_scale_bg, __pyx_n_s_end_scale_bg, __pyx_n_s_start_scale_img, __pyx_n_s_end_scale_img, __pyx_n_s_height_1, __pyx_n_s_width_1, __pyx_n_s_height_2, __pyx_n_s_width_2, __pyx_n_s_frame, __pyx_n_s_resized_bg, __pyx_n_s_resized_small, __pyx_n_s_cropped_bg); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 389, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 33, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_in_video_with_backgr, 389, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 389, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":449
+  /* "random_video_effect.pyx":459
  * 
  * 
  * def create_zoom_out_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     To video vi hiu ng zoom cho nh nn v nh nh, di chuyn theo cc hiu ng ngc chiu.
  */
-  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 33, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_out_video_with_backg, 449, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 33, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_create_zoom_out_video_with_backg, 459, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 459, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":519
+  /* "random_video_effect.pyx":529
  * 
  * 
  * def check_image_ratio(image_path: str):             # <<<<<<<<<<<<<<
  *     """
  *     Kim tra t l nh v tr v True hoc False da trn cc iu kin:
  */
-  __pyx_tuple__19 = PyTuple_Pack(4, __pyx_n_s_image_path, __pyx_n_s_image, __pyx_n_s_height, __pyx_n_s_width); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 519, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_check_image_ratio, 519, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 519, __pyx_L1_error)
+  __pyx_tuple__24 = PyTuple_Pack(4, __pyx_n_s_image_path, __pyx_n_s_image, __pyx_n_s_height, __pyx_n_s_width); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 529, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_check_image_ratio, 529, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 529, __pyx_L1_error)
 
-  /* "random_video_effect.pyx":547
+  /* "random_video_effect.pyx":557
  *     return False
  * 
  * def random_video_effect_cython(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     # Danh sch cc hm cn chn
  *     functions = [
  */
-  __pyx_tuple__21 = PyTuple_Pack(9, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_functions, __pyx_n_s_selected_function, __pyx_n_s_e); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 547, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_random_video_effect_cython, 547, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __pyx_tuple__26 = PyTuple_Pack(10, __pyx_n_s_image_path, __pyx_n_s_output_path, __pyx_n_s_duration, __pyx_n_s_fps, __pyx_n_s_width, __pyx_n_s_height, __pyx_n_s_functions, __pyx_n_s_selected_function, __pyx_n_s_f, __pyx_n_s_e); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 557, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(6, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_random_video_effect_pyx, __pyx_n_s_random_video_effect_cython, 557, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -14070,7 +14869,7 @@ if (!__Pyx_RefNanny) {
  * import cv2
  * cimport cv2
  * import random             # <<<<<<<<<<<<<<
- * from libc.stdlib cimport malloc, free
+ * import numpy as np  # Import numpy
  * 
  */
   __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_random, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 3, __pyx_L1_error)
@@ -14078,19 +14877,31 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_random, __pyx_t_2) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
+  /* "random_video_effect.pyx":4
+ * cimport cv2
+ * import random
+ * import numpy as np  # Import numpy             # <<<<<<<<<<<<<<
+ * 
+ * def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):
+ */
+  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_numpy, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
   /* "random_video_effect.pyx":6
- * from libc.stdlib cimport malloc, free
+ * import numpy as np  # Import numpy
  * 
  * def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
- *     cdef object image = cv2.imread(image_path)
- * 
+ *     # c nh
+ *     image = cv2.imread(image_path)
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_target_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_1resize_and_crop, 0, __pyx_n_s_resize_and_crop, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__5)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_1resize_and_crop, 0, __pyx_n_s_resize_and_crop, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults), 2)) __PYX_ERR(0, 6, __pyx_L1_error)
   if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 6, __pyx_L1_error)
@@ -14107,338 +14918,338 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_resize_and_crop, __pyx_t_3) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":31
+  /* "random_video_effect.pyx":43
  *     return cropped_image
  * 
  * def resize_and_limit(image_path: str, target_width: int=1920, target_height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     Thay i kch thc hnh nh sao cho mt trong hai cnh khng vt qu kch thc mc tiu.
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_3resize_and_limit, 0, __pyx_n_s_resize_and_limit, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_target_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_3resize_and_limit, 0, __pyx_n_s_resize_and_limit, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults1), 2)) __PYX_ERR(0, 31, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults1), 2)) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_t_2)->__pyx_arg_target_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults1, __pyx_t_2)->__pyx_arg_target_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_2, __pyx_pf_19random_video_effect_24__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_resize_and_limit, __pyx_t_2) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_resize_and_limit, __pyx_t_2) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":53
+  /* "random_video_effect.pyx":65
  *     return resized_image
  * 
  * def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     # Initialize frame variables
  *     cdef int total_frames = int(duration * fps)  # Tng s frame
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_5create_parallax_left_video, 0, __pyx_n_s_create_parallax_left_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_5create_parallax_left_video, 0, __pyx_n_s_create_parallax_left_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults2), 3)) __PYX_ERR(0, 53, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults2), 3)) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_t_3)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_t_3)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults2, __pyx_t_3)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_3, __pyx_pf_19random_video_effect_26__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_parallax_left_video, __pyx_t_3) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_parallax_left_video, __pyx_t_3) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":120
+  /* "random_video_effect.pyx":131
  * 
  * 
  * def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     cdef int total_frames = int(duration * fps)  # Tng s frame
  *     cdef int current_x_bg, current_x_img  # Movement variables
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_7create_parallax_right_video, 0, __pyx_n_s_create_parallax_right_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_7create_parallax_right_video, 0, __pyx_n_s_create_parallax_right_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults3), 3)) __PYX_ERR(0, 120, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults3), 3)) __PYX_ERR(0, 131, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_t_2)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_t_2)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults3, __pyx_t_2)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_2, __pyx_pf_19random_video_effect_28__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_parallax_right_video, __pyx_t_2) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_parallax_right_video, __pyx_t_2) < 0) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":185
+  /* "random_video_effect.pyx":195
  * 
  * 
  * def create_scrolling_image_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     Creates a scrolling video from an image. The image will scroll in either horizontal or vertical direction
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_9create_scrolling_image_video, 0, __pyx_n_s_create_scrolling_image_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_9create_scrolling_image_video, 0, __pyx_n_s_create_scrolling_image_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults4), 3)) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults4), 3)) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_t_3)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_t_3)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults4, __pyx_t_3)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_3, __pyx_pf_19random_video_effect_30__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_scrolling_image_video, __pyx_t_3) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_scrolling_image_video, __pyx_t_3) < 0) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":275
+  /* "random_video_effect.pyx":285
  * 
  * 
  * def create_zoom_in_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     Creates a zoom-in video from an image.
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_11create_zoom_in_video, 0, __pyx_n_s_create_zoom_in_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_11create_zoom_in_video, 0, __pyx_n_s_create_zoom_in_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults5), 3)) __PYX_ERR(0, 275, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults5), 3)) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_t_2)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_t_2)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults5, __pyx_t_2)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_2, __pyx_pf_19random_video_effect_32__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_in_video, __pyx_t_2) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_in_video, __pyx_t_2) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":332
+  /* "random_video_effect.pyx":342
  *     print(f"Zoom-in video created successfully at: {output_path}")
  * 
  * def create_zoom_out_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     cdef object image = resize_and_crop(image_path, target_width=width, target_height=height)
  * 
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_13create_zoom_out_video, 0, __pyx_n_s_create_zoom_out_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_13create_zoom_out_video, 0, __pyx_n_s_create_zoom_out_video, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__20)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults6), 3)) __PYX_ERR(0, 332, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults6), 3)) __PYX_ERR(0, 342, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_t_3)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_t_3)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults6, __pyx_t_3)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_3, __pyx_pf_19random_video_effect_34__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_out_video, __pyx_t_3) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_out_video, __pyx_t_3) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":379
+  /* "random_video_effect.pyx":389
  * 
  * # Hm to video vi hiu ng zoom v background
  * def create_zoom_in_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     To video vi hiu ng zoom cho nh nn v nh nh, di chuyn theo cc hiu ng ngc chiu.
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_15create_zoom_in_video_with_background, 0, __pyx_n_s_create_zoom_in_video_with_backgr, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_15create_zoom_in_video_with_background, 0, __pyx_n_s_create_zoom_in_video_with_backgr, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults7), 3)) __PYX_ERR(0, 379, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_2, sizeof(__pyx_defaults7), 3)) __PYX_ERR(0, 389, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_t_2)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_t_2)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults7, __pyx_t_2)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_2, __pyx_pf_19random_video_effect_36__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_in_video_with_backgr, __pyx_t_2) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_in_video_with_backgr, __pyx_t_2) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":449
+  /* "random_video_effect.pyx":459
  * 
  * 
  * def create_zoom_out_video_with_background(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     """
  *     To video vi hiu ng zoom cho nh nn v nh nh, di chuyn theo cc hiu ng ngc chiu.
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_17create_zoom_out_video_with_background, 0, __pyx_n_s_create_zoom_out_video_with_backg, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__18)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 449, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_17create_zoom_out_video_with_background, 0, __pyx_n_s_create_zoom_out_video_with_backg, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults8), 3)) __PYX_ERR(0, 449, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 449, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults8), 3)) __PYX_ERR(0, 459, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_t_3)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 449, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_t_3)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 449, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults8, __pyx_t_3)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_3, __pyx_pf_19random_video_effect_38__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_out_video_with_backg, __pyx_t_3) < 0) __PYX_ERR(0, 449, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_create_zoom_out_video_with_backg, __pyx_t_3) < 0) __PYX_ERR(0, 459, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "random_video_effect.pyx":519
+  /* "random_video_effect.pyx":529
  * 
  * 
  * def check_image_ratio(image_path: str):             # <<<<<<<<<<<<<<
  *     """
  *     Kim tra t l nh v tr v True hoc False da trn cc iu kin:
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 519, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 529, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 519, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_19check_image_ratio, 0, __pyx_n_s_check_image_ratio, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__20)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 519, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 529, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_19check_image_ratio, 0, __pyx_n_s_check_image_ratio, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 529, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_3);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_image_ratio, __pyx_t_2) < 0) __PYX_ERR(0, 519, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_check_image_ratio, __pyx_t_2) < 0) __PYX_ERR(0, 529, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "random_video_effect.pyx":547
+  /* "random_video_effect.pyx":557
  *     return False
  * 
  * def random_video_effect_cython(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):             # <<<<<<<<<<<<<<
  *     # Danh sch cc hm cn chn
  *     functions = [
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 547, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_21random_video_effect_cython, 0, __pyx_n_s_random_video_effect_cython, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 547, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_image_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_output_path, __pyx_n_s_str) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_duration, __pyx_n_s_float) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_fps, __pyx_n_s_int) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_width, __pyx_n_s_int) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_height, __pyx_n_s_int) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_19random_video_effect_21random_video_effect_cython, 0, __pyx_n_s_random_video_effect_cython, NULL, __pyx_n_s_random_video_effect, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults9), 3)) __PYX_ERR(0, 547, __pyx_L1_error)
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 547, __pyx_L1_error)
+  if (!__Pyx_CyFunction_InitDefaults(__pyx_t_3, sizeof(__pyx_defaults9), 3)) __PYX_ERR(0, 557, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_30)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_30))) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_30);
   __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_t_3)->__pyx_arg_fps = ((PyObject*)__pyx_int_30);
   __Pyx_GIVEREF(__pyx_int_30);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 547, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1920)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1920))) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1920);
   __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_t_3)->__pyx_arg_width = ((PyObject*)__pyx_int_1920);
   __Pyx_GIVEREF(__pyx_int_1920);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 547, __pyx_L1_error)
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_int_1080)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_int_1080))) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_INCREF(__pyx_int_1080);
   __Pyx_CyFunction_Defaults(__pyx_defaults9, __pyx_t_3)->__pyx_arg_height = ((PyObject*)__pyx_int_1080);
   __Pyx_GIVEREF(__pyx_int_1080);
   __Pyx_CyFunction_SetDefaultsGetter(__pyx_t_3, __pyx_pf_19random_video_effect_40__defaults__);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_3, __pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_random_video_effect_cython, __pyx_t_3) < 0) __PYX_ERR(0, 547, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_random_video_effect_cython, __pyx_t_3) < 0) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "random_video_effect.pyx":1
@@ -15683,288 +16494,6 @@ bad:
 }
 #endif
 
-/* GetItemInt */
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
-    PyObject *r;
-    if (unlikely(!j)) return NULL;
-    r = PyObject_GetItem(o, j);
-    Py_DECREF(j);
-    return r;
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyList_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyList_GET_SIZE(o)))) {
-        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyTuple_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyTuple_GET_SIZE(o)))) {
-        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
-                                                     CYTHON_NCP_UNUSED int wraparound,
-                                                     CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
-    if (is_list || PyList_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
-        if ((!boundscheck) || (likely(__Pyx_is_valid_index(n, PyList_GET_SIZE(o))))) {
-            PyObject *r = PyList_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    }
-    else if (PyTuple_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
-        if ((!boundscheck) || likely(__Pyx_is_valid_index(n, PyTuple_GET_SIZE(o)))) {
-            PyObject *r = PyTuple_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    } else {
-        PyMappingMethods *mm = Py_TYPE(o)->tp_as_mapping;
-        PySequenceMethods *sm = Py_TYPE(o)->tp_as_sequence;
-        if (mm && mm->mp_subscript) {
-            PyObject *r, *key = PyInt_FromSsize_t(i);
-            if (unlikely(!key)) return NULL;
-            r = mm->mp_subscript(o, key);
-            Py_DECREF(key);
-            return r;
-        }
-        if (likely(sm && sm->sq_item)) {
-            if (wraparound && unlikely(i < 0) && likely(sm->sq_length)) {
-                Py_ssize_t l = sm->sq_length(o);
-                if (likely(l >= 0)) {
-                    i += l;
-                } else {
-                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
-                        return NULL;
-                    PyErr_Clear();
-                }
-            }
-            return sm->sq_item(o, i);
-        }
-    }
-#else
-    if (is_list || !PyMapping_Check(o)) {
-        return PySequence_GetItem(o, i);
-    }
-#endif
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-}
-
-/* PyIntBinop */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_FloorDivideObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check) {
-    CYTHON_MAYBE_UNUSED_VAR(intval);
-    CYTHON_MAYBE_UNUSED_VAR(inplace);
-    CYTHON_UNUSED_VAR(zerodivision_check);
-    #if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_CheckExact(op1))) {
-        const long b = intval;
-        long x;
-        long a = PyInt_AS_LONG(op1);
-        
-            if (unlikely(b == -1 && ((unsigned long)a) == 0-(unsigned long)a))
-                return PyInt_Type.tp_as_number->nb_floor_divide(op1, op2);
-            else {
-                long q, r;
-                q = a / b;
-                r = a - q*b;
-                q -= ((r != 0) & ((r ^ b) < 0));
-                x = q;
-            }
-            return PyInt_FromLong(x);
-    }
-    #endif
-    #if CYTHON_USE_PYLONG_INTERNALS
-    if (likely(PyLong_CheckExact(op1))) {
-        const long b = intval;
-        long a, x;
-#ifdef HAVE_LONG_LONG
-        const PY_LONG_LONG llb = intval;
-        PY_LONG_LONG lla, llx;
-#endif
-        if (unlikely(__Pyx_PyLong_IsZero(op1))) {
-            return __Pyx_NewRef(op1);
-        }
-        if (likely(__Pyx_PyLong_IsCompact(op1))) {
-            a = __Pyx_PyLong_CompactValue(op1);
-        } else {
-            const digit* digits = __Pyx_PyLong_Digits(op1);
-            const Py_ssize_t size = __Pyx_PyLong_SignedDigitCount(op1);
-            switch (size) {
-                case -2:
-                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
-                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-                    #ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-                    #endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 2:
-                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
-                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-                    #ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-                    #endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case -3:
-                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
-                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-                    #ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-                    #endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 3:
-                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
-                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-                    #ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-                    #endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case -4:
-                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
-                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-                    #ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-                    #endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 4:
-                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
-                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-                    #ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-                    #endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                default: return PyLong_Type.tp_as_number->nb_floor_divide(op1, op2);
-            }
-        }
-                {
-                    long q, r;
-                    q = a / b;
-                    r = a - q*b;
-                    q -= ((r != 0) & ((r ^ b) < 0));
-                    x = q;
-                }
-            return PyLong_FromLong(x);
-#ifdef HAVE_LONG_LONG
-        long_long:
-                {
-                    PY_LONG_LONG q, r;
-                    q = lla / llb;
-                    r = lla - q*llb;
-                    q -= ((r != 0) & ((r ^ llb) < 0));
-                    llx = q;
-                }
-            return PyLong_FromLongLong(llx);
-#endif
-        
-        
-    }
-    #endif
-    return (inplace ? PyNumber_InPlaceFloorDivide : PyNumber_FloorDivide)(op1, op2);
-}
-#endif
-
-/* ObjectGetItem */
-#if CYTHON_USE_TYPE_SLOTS
-static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject *index) {
-    PyObject *runerr = NULL;
-    Py_ssize_t key_value;
-    key_value = __Pyx_PyIndex_AsSsize_t(index);
-    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
-        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
-    }
-    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
-        __Pyx_TypeName index_type_name = __Pyx_PyType_GetName(Py_TYPE(index));
-        PyErr_Clear();
-        PyErr_Format(PyExc_IndexError,
-            "cannot fit '" __Pyx_FMT_TYPENAME "' into an index-sized integer", index_type_name);
-        __Pyx_DECREF_TypeName(index_type_name);
-    }
-    return NULL;
-}
-static PyObject *__Pyx_PyObject_GetItem_Slow(PyObject *obj, PyObject *key) {
-    __Pyx_TypeName obj_type_name;
-    if (likely(PyType_Check(obj))) {
-        PyObject *meth = __Pyx_PyObject_GetAttrStrNoError(obj, __pyx_n_s_class_getitem);
-        if (!meth) {
-            PyErr_Clear();
-        } else {
-            PyObject *result = __Pyx_PyObject_CallOneArg(meth, key);
-            Py_DECREF(meth);
-            return result;
-        }
-    }
-    obj_type_name = __Pyx_PyType_GetName(Py_TYPE(obj));
-    PyErr_Format(PyExc_TypeError,
-        "'" __Pyx_FMT_TYPENAME "' object is not subscriptable", obj_type_name);
-    __Pyx_DECREF_TypeName(obj_type_name);
-    return NULL;
-}
-static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject *key) {
-    PyTypeObject *tp = Py_TYPE(obj);
-    PyMappingMethods *mm = tp->tp_as_mapping;
-    PySequenceMethods *sm = tp->tp_as_sequence;
-    if (likely(mm && mm->mp_subscript)) {
-        return mm->mp_subscript(obj, key);
-    }
-    if (likely(sm && sm->sq_item)) {
-        return __Pyx_PyObject_GetIndex(obj, key);
-    }
-    return __Pyx_PyObject_GetItem_Slow(obj, key);
-}
-#endif
-
 /* SliceObject */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(PyObject* obj,
         Py_ssize_t cstart, Py_ssize_t cstop,
@@ -16107,6 +16636,288 @@ static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected) {
     return __Pyx_IterFinish();
 }
 
+/* PyIntBinop */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_FloorDivideObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check) {
+    CYTHON_MAYBE_UNUSED_VAR(intval);
+    CYTHON_MAYBE_UNUSED_VAR(inplace);
+    CYTHON_UNUSED_VAR(zerodivision_check);
+    #if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(op1))) {
+        const long b = intval;
+        long x;
+        long a = PyInt_AS_LONG(op1);
+        
+            if (unlikely(b == -1 && ((unsigned long)a) == 0-(unsigned long)a))
+                return PyInt_Type.tp_as_number->nb_floor_divide(op1, op2);
+            else {
+                long q, r;
+                q = a / b;
+                r = a - q*b;
+                q -= ((r != 0) & ((r ^ b) < 0));
+                x = q;
+            }
+            return PyInt_FromLong(x);
+    }
+    #endif
+    #if CYTHON_USE_PYLONG_INTERNALS
+    if (likely(PyLong_CheckExact(op1))) {
+        const long b = intval;
+        long a, x;
+#ifdef HAVE_LONG_LONG
+        const PY_LONG_LONG llb = intval;
+        PY_LONG_LONG lla, llx;
+#endif
+        if (unlikely(__Pyx_PyLong_IsZero(op1))) {
+            return __Pyx_NewRef(op1);
+        }
+        if (likely(__Pyx_PyLong_IsCompact(op1))) {
+            a = __Pyx_PyLong_CompactValue(op1);
+        } else {
+            const digit* digits = __Pyx_PyLong_Digits(op1);
+            const Py_ssize_t size = __Pyx_PyLong_SignedDigitCount(op1);
+            switch (size) {
+                case -2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+                    #ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+                    #endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+                    #ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+                    #endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+                    #ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+                    #endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+                    #ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+                    #endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+                    #ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+                    #endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+                    #ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+                    #endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                default: return PyLong_Type.tp_as_number->nb_floor_divide(op1, op2);
+            }
+        }
+                {
+                    long q, r;
+                    q = a / b;
+                    r = a - q*b;
+                    q -= ((r != 0) & ((r ^ b) < 0));
+                    x = q;
+                }
+            return PyLong_FromLong(x);
+#ifdef HAVE_LONG_LONG
+        long_long:
+                {
+                    PY_LONG_LONG q, r;
+                    q = lla / llb;
+                    r = lla - q*llb;
+                    q -= ((r != 0) & ((r ^ llb) < 0));
+                    llx = q;
+                }
+            return PyLong_FromLongLong(llx);
+#endif
+        
+        
+    }
+    #endif
+    return (inplace ? PyNumber_InPlaceFloorDivide : PyNumber_FloorDivide)(op1, op2);
+}
+#endif
+
+/* GetItemInt */
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
+    PyObject *r;
+    if (unlikely(!j)) return NULL;
+    r = PyObject_GetItem(o, j);
+    Py_DECREF(j);
+    return r;
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyList_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyList_GET_SIZE(o)))) {
+        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyTuple_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyTuple_GET_SIZE(o)))) {
+        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
+                                                     CYTHON_NCP_UNUSED int wraparound,
+                                                     CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
+    if (is_list || PyList_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
+        if ((!boundscheck) || (likely(__Pyx_is_valid_index(n, PyList_GET_SIZE(o))))) {
+            PyObject *r = PyList_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    }
+    else if (PyTuple_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
+        if ((!boundscheck) || likely(__Pyx_is_valid_index(n, PyTuple_GET_SIZE(o)))) {
+            PyObject *r = PyTuple_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    } else {
+        PyMappingMethods *mm = Py_TYPE(o)->tp_as_mapping;
+        PySequenceMethods *sm = Py_TYPE(o)->tp_as_sequence;
+        if (mm && mm->mp_subscript) {
+            PyObject *r, *key = PyInt_FromSsize_t(i);
+            if (unlikely(!key)) return NULL;
+            r = mm->mp_subscript(o, key);
+            Py_DECREF(key);
+            return r;
+        }
+        if (likely(sm && sm->sq_item)) {
+            if (wraparound && unlikely(i < 0) && likely(sm->sq_length)) {
+                Py_ssize_t l = sm->sq_length(o);
+                if (likely(l >= 0)) {
+                    i += l;
+                } else {
+                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
+                        return NULL;
+                    PyErr_Clear();
+                }
+            }
+            return sm->sq_item(o, i);
+        }
+    }
+#else
+    if (is_list || !PyMapping_Check(o)) {
+        return PySequence_GetItem(o, i);
+    }
+#endif
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+}
+
+/* ObjectGetItem */
+#if CYTHON_USE_TYPE_SLOTS
+static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject *index) {
+    PyObject *runerr = NULL;
+    Py_ssize_t key_value;
+    key_value = __Pyx_PyIndex_AsSsize_t(index);
+    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
+        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
+    }
+    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
+        __Pyx_TypeName index_type_name = __Pyx_PyType_GetName(Py_TYPE(index));
+        PyErr_Clear();
+        PyErr_Format(PyExc_IndexError,
+            "cannot fit '" __Pyx_FMT_TYPENAME "' into an index-sized integer", index_type_name);
+        __Pyx_DECREF_TypeName(index_type_name);
+    }
+    return NULL;
+}
+static PyObject *__Pyx_PyObject_GetItem_Slow(PyObject *obj, PyObject *key) {
+    __Pyx_TypeName obj_type_name;
+    if (likely(PyType_Check(obj))) {
+        PyObject *meth = __Pyx_PyObject_GetAttrStrNoError(obj, __pyx_n_s_class_getitem);
+        if (!meth) {
+            PyErr_Clear();
+        } else {
+            PyObject *result = __Pyx_PyObject_CallOneArg(meth, key);
+            Py_DECREF(meth);
+            return result;
+        }
+    }
+    obj_type_name = __Pyx_PyType_GetName(Py_TYPE(obj));
+    PyErr_Format(PyExc_TypeError,
+        "'" __Pyx_FMT_TYPENAME "' object is not subscriptable", obj_type_name);
+    __Pyx_DECREF_TypeName(obj_type_name);
+    return NULL;
+}
+static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject *key) {
+    PyTypeObject *tp = Py_TYPE(obj);
+    PyMappingMethods *mm = tp->tp_as_mapping;
+    PySequenceMethods *sm = tp->tp_as_sequence;
+    if (likely(mm && mm->mp_subscript)) {
+        return mm->mp_subscript(obj, key);
+    }
+    if (likely(sm && sm->sq_item)) {
+        return __Pyx_PyObject_GetIndex(obj, key);
+    }
+    return __Pyx_PyObject_GetItem_Slow(obj, key);
+}
+#endif
+
 /* RaiseUnexpectedTypeError */
 static int
 __Pyx_RaiseUnexpectedTypeError(const char *expected, PyObject *obj)
@@ -16132,6 +16943,30 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_FromDouble(double value) {
         return PyInt_FromLong((long)value);
     }
     return PyLong_FromDouble(value);
+}
+#endif
+
+/* PyObjectLookupSpecial */
+#if CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject* __Pyx__PyObject_LookupSpecial(PyObject* obj, PyObject* attr_name, int with_error) {
+    PyObject *res;
+    PyTypeObject *tp = Py_TYPE(obj);
+#if PY_MAJOR_VERSION < 3
+    if (unlikely(PyInstance_Check(obj)))
+        return with_error ? __Pyx_PyObject_GetAttrStr(obj, attr_name) : __Pyx_PyObject_GetAttrStrNoError(obj, attr_name);
+#endif
+    res = _PyType_Lookup(tp, attr_name);
+    if (likely(res)) {
+        descrgetfunc f = Py_TYPE(res)->tp_descr_get;
+        if (!f) {
+            Py_INCREF(res);
+        } else {
+            res = f(res, obj, (PyObject *)tp);
+        }
+    } else if (with_error) {
+        PyErr_SetObject(PyExc_AttributeError, attr_name);
+    }
+    return res;
 }
 #endif
 
@@ -16502,7 +17337,7 @@ static PyObject *__Pyx_ImportDottedModule_WalkParts(PyObject *module, PyObject *
 #endif
 static PyObject *__Pyx__ImportDottedModule(PyObject *name, PyObject *parts_tuple) {
 #if PY_MAJOR_VERSION < 3
-    PyObject *module, *from_list, *star = __pyx_n_s__3;
+    PyObject *module, *from_list, *star = __pyx_n_s__8;
     CYTHON_UNUSED_VAR(parts_tuple);
     from_list = PyList_New(1);
     if (unlikely(!from_list))
@@ -18563,7 +19398,7 @@ __Pyx_PyType_GetName(PyTypeObject* tp)
     if (unlikely(name == NULL) || unlikely(!PyUnicode_Check(name))) {
         PyErr_Clear();
         Py_XDECREF(name);
-        name = __Pyx_NewRef(__pyx_n_s__23);
+        name = __Pyx_NewRef(__pyx_n_s__28);
     }
     return name;
 }

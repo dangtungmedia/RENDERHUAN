@@ -113,7 +113,6 @@ def render_video(self, data):
         # Tải xuống âm thanh oki
         success = download_audio(data, task_id, worker_id)
         if not success:
-            
             shutil.rmtree(f'media/{video_id}')
             return
         update_status_video("Đang Render : Tải xuống âm thanh thành công", data['video_id'], task_id, worker_id)
@@ -130,25 +129,27 @@ def render_video(self, data):
     # Tạo video
     success = create_video_lines(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         return
    
     # Tạo phụ đề cho video
     success = create_subtitles(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         return
     
     # Tạo file
     success = create_video_file(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         return
 
     success = upload_video(data, task_id, worker_id)
     if not success:
         update_status_video("Render Lỗi : Không thể upload video", data['video_id'], task_id, worker_id)
         return
+    
+    # shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
 @shared_task(bind=True, priority=10,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
@@ -514,7 +515,6 @@ def upload_video(data, task_id, worker_id):
         if response.status_code == 200:
             print("\nUpload successful!")
             print("Response:", response.json())  # Print the response JSON for confirmation
-            shutil.rmtree(f'media/{video_id}')
             return True
         else:
             print(f"\nUpload failed with status code: {response.status_code}")
@@ -553,19 +553,20 @@ def create_video_file(data, task_id, worker_id):
         print(f"Audio file not found: {audio_file}")
         return False
     ffmpeg_command = [
-            'ffmpeg',
-            '-f', 'concat',
-            '-safe', '0',
-            '-i', input_files_video_path,
-            '-i', audio_file,
-            '-vf', f"subtitles={ass_file_path}",
-            '-c:v', 'libx264',
-            '-map', '0:v',
-            '-map', '1:a',
-            '-y',
-            f"media/{video_id}/{name_video}.mp4"
-        ]
-    
+                'ffmpeg',
+                '-f', 'concat',
+                '-safe', '0',
+                '-i', input_files_video_path,  # Đọc danh sách video từ file text
+                '-i', audio_file,  # Đưa vào file âm thanh
+                '-vf', f"subtitles={ass_file_path}",  # Thêm phụ đề
+                '-c:v', 'libx264',  # Sử dụng codec video x264
+                '-c:a', 'aac',  # Sử dụng codec âm thanh AAC
+                '-strict', 'experimental',  # Cung cấp tính năng âm thanh nâng cao nếu cần
+                '-map', '0:v',  # Chỉ định luồng video từ các video đầu vào
+                '-map', '1:a',  # Chỉ định luồng âm thanh từ file âm thanh
+                '-y', f"media/{video_id}/{name_video}.mp4"  # Đặt tên file đầu ra
+            ]
+                
     with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:
         for line in process.stderr:
             if "time=" in line:
@@ -1080,8 +1081,27 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
                             "-y", out_file  
                         ]  
                     subprocess.run(cmd, check=True)    
+
                 else:
-                    os.rename(cache_file, out_file)
+                    cmd = [
+                        "ffmpeg",
+                        "-i", cache_file,
+                        "-t", str(duration),     # Thời gian video cần cắt
+                        "-r", "24",              # Tốc độ khung hình đầu ra
+                        "-c:v", "libx264",       # Codec video
+                        "-crf", "18",            # Chất lượng video
+                        "-preset", "medium",     # Tốc độ mã hóa
+                        "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
+                        "-vsync", "1",           # Đồng bộ hóa video
+                        "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
+                        "-y",                    # Ghi đè file đầu ra nếu đã tồn tại
+                        out_file
+                    ]
+                try:
+                    # Chạy lệnh FFmpeg
+                    subprocess.run(cmd, check=True)
+                except subprocess.CalledProcessError as e:
+                    return False
         return True
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
@@ -1457,7 +1477,6 @@ def download_audio(data, task_id, worker_id):
                 executor.submit(process_voice_entry, data, text_entry, video_id, task_id, worker_id, language): idx
                 for idx, text_entry in enumerate(text_entries)
             }
-
             # Mở file để ghi các đường dẫn tệp âm thanh theo thứ tự
             with open(f'media/{video_id}/input_files.txt', 'w') as file:
                 for future in as_completed(futures):
@@ -1490,7 +1509,6 @@ def download_audio(data, task_id, worker_id):
                             f.cancel()
                         update_status_video("Render Lỗi : Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
                         return False  # Dừng toàn bộ nếu gặp lỗi
-
                 # Ghi vào input_files.txt theo đúng thứ tự ban đầu của text_entries
                 for file_name in result_files:
                     if file_name:
