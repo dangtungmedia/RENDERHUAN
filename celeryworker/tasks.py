@@ -1525,9 +1525,6 @@ def get_voice_japanese(data, text, file_name):
                             f'http://voicevox:50021/audio_query?speaker={voice_id}',  # API để tạo audio_query
                             params={'text': text}  # Gửi văn bản cần chuyển thành giọng nói
                         )
-                                    
-            
-            
             # Yêu cầu tạo âm thanh
             url_synthesis = f"http://voicevox:50021/synthesis?speaker={voice_id}"
             response_synthesis = requests.post(url_synthesis,data=json.dumps(response_query.json()))
