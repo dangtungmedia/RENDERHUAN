@@ -40,28 +40,6 @@ def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=
     
     return cropped_image
 
-def resize_and_limit(image_path: str, target_width: int=1920, target_height: int=1080):
-    """
-    Thay đổi kích thước hình ảnh sao cho một trong hai cạnh không vượt quá kích thước mục tiêu.
-    """
-    cdef object image = cv2.imread(image_path)
-    
-    if image is None:
-        raise ValueError(f"Không thể đọc hình ảnh từ {image_path}. Vui lòng kiểm tra lại đường dẫn.")
-    
-    cdef int orig_height = image.shape[0], orig_width = image.shape[1]
-    
-    cdef float scale_width = target_width / orig_width
-    cdef float scale_height = target_height / orig_height
-    cdef float scale_factor = min(scale_width, scale_height)  # Chọn tỷ lệ nhỏ nhất để không vượt quá kích thước
-
-    cdef int new_width = int(orig_width * scale_factor)
-    cdef int new_height = int(orig_height * scale_factor)
-    
-    cdef object resized_image = cv2.resize(image, (new_width, new_height))
-
-    return resized_image
-
 def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
     # Initialize frame variables
     cdef int total_frames = int(duration * fps)  # Tổng số frame
@@ -77,7 +55,7 @@ def create_parallax_left_video(image_path: str, output_path: str, duration: floa
     
     # Call functions to resize images
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh lớn (resize cho phù hợp với video)
-    image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # Ảnh nhỏ
+    image_2 = image_1.copy()
     
     scale_factor = 1.4  # Tỷ lệ phóng to cho ảnh nền, điều này có thể thay đổi để điều chỉnh hiệu ứng
     blur_strength = 41  # Độ mạnh của Gaussian blur
@@ -143,7 +121,7 @@ def create_parallax_right_video(image_path: str, output_path: str, duration: flo
     
     # Giả sử bạn có hàm resize_and_crop và resize_and_limit đã được định nghĩa
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh lớn (resize cho phù hợp với video)
-    image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # Ảnh nhỏ
+    image_2 = image_1.copy()
     
     scale_factor = 1.4  # Tỷ lệ phóng to cho ảnh nền, điều này có thể thay đổi để điều chỉnh hiệu ứng
     blur_strength = 41  # Độ mạnh của Gaussian blur
@@ -397,7 +375,7 @@ def create_zoom_in_video_with_background(image_path: str, output_path: str, dura
     
     # Resize ảnh lớn và ảnh nhỏ
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nền
-    image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nhỏ
+    image_2 = image_1.copy()  # Ảnh nhỏ
     
     # Thiết lập codec và đối tượng VideoWriter
     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -467,7 +445,7 @@ def create_zoom_out_video_with_background(image_path: str, output_path: str, dur
     
     # Resize ảnh lớn và ảnh nhỏ
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nền
-    image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nhỏ
+    image_2 = image_1.copy()  # Ảnh nhỏ
     
     # Thiết lập codec và đối tượng VideoWriter
     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
