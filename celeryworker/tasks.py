@@ -1180,7 +1180,7 @@ def get_voice_super_voice(data, text, file_name):
             if not final_url:
                 return False
             
-            response = requests.get(final_url)
+            response = requests.get(final_url, stream=True, timeout=200)
             if response.status_code == 200:
                 with open(file_name, 'wb') as f:
                     f.write(response.content)
@@ -1472,7 +1472,7 @@ def download_audio(data, task_id, worker_id):
         processed_entries = 0
 
         # Khởi tạo luồng xử lý tối đa 20 luồng
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=15) as executor:
             futures = {
                 executor.submit(process_voice_entry, data, text_entry, video_id, task_id, worker_id, language): idx
                 for idx, text_entry in enumerate(text_entries)
@@ -1805,7 +1805,7 @@ def download_single_image(url, local_directory):
     print(f"Đang tải xuống hình ảnh từ: {url}")
     for attempt in range(30):  # Thử tải lại 30 lần nếu thất bại
         try:
-            response = requests.get(url, stream=True, timeout=10)
+            response = requests.get(url, stream=True, timeout=200)
             if response.status_code == 200:
                 file_path = os.path.join(local_directory, get_filename_from_url(url))
                 with open(file_path, 'wb') as file:
@@ -1820,7 +1820,7 @@ def download_single_image(url, local_directory):
         except Exception as e:
             print(f"Lỗi không xác định khi tải xuống {url}: {e}")
         
-        time.sleep(1)  # Đợi 1 giây trước khi thử lại
+        time.sleep(4)  # Đợi 1 giây trước khi thử lại
     return False  # Trả về False nếu không thể tải xuống
 
 def download_image(data, task_id, worker_id):
@@ -1852,7 +1852,7 @@ def download_image(data, task_id, worker_id):
 
     downloaded_images = 0  # Số hình ảnh đã tải xuống thành công
 
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_url = {
             executor.submit(download_single_image, image, local_directory): image
             for image in images
