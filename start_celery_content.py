@@ -34,6 +34,6 @@ if __name__ == "__main__":
         worker_count = (physical_cores // 2) + (1 if physical_cores % 2 != 0 else 0)
 
         # Chạy Celery worker với số lượng worker tính được
-        os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}-Content --concurrency={worker_count} -Q render_video_content")
+        os.system(f"celery -A celeryworker worker -l INFO --hostname={ip_address}-Content --concurrency=2 -Q render_video_content")
     else:
         print("Không thể lấy địa chỉ IP public.")
