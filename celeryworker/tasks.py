@@ -34,6 +34,7 @@ from dotenv import load_dotenv
 
 from .random_video_effect  import random_video_effect_cython
 
+# render 
 # Nạp biến môi trường từ file .env
 load_dotenv()
 
