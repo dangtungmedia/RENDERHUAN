@@ -1,44 +1,67 @@
 import cv2
 cimport cv2
 import random
-import numpy as np  # Import numpy
+
+import cv2
+import numpy as np
+
+import cv2
+import numpy as np
 
 def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):
-    # Đọc ảnh
+    # Đọc ảnh từ đường dẫn
     image = cv2.imread(image_path)
+    print(f"Đang đọc ảnh từ: {image_path}")
     
+    # Kiểm tra nếu ảnh không tồn tại
     if image is None:
         raise ValueError(f"Không thể đọc hình ảnh từ {image_path}. Vui lòng kiểm tra lại đường dẫn.")
     
-    orig_height, orig_width = image.shape[:2]
-    
-    print(f"Kích thước ảnh gốc: {orig_width}x{orig_height}")
-    
-    # Tính tỷ lệ phóng to sao cho một trong các cạnh bằng target_width hoặc target_height
-    scale_w = target_width / orig_width
-    scale_h = target_height / orig_height
-    
-    # Chọn tỷ lệ phóng to lớn nhất để phóng to ảnh mà không bị thiếu
-    scale_factor = max(scale_w, scale_h)
-    
-    # Tính kích thước mới sau khi phóng to
-    new_width = int(orig_width * scale_factor)
-    new_height = int(orig_height * scale_factor)
-    
-    print(f"Tỷ lệ phóng to: {scale_factor}")
-    print(f"Kích thước mới sau khi phóng to: {new_width}x{new_height}")
-    
-    # Thay đổi kích thước ảnh
-    resized_image = cv2.resize(image, (new_width, new_height))
-    
-    # Cắt căn giữa nếu ảnh sau khi phóng to vượt quá kích thước mục tiêu
-    start_x = (new_width - target_width) // 2
-    start_y = (new_height - target_height) // 2
-    
-    # Cắt ảnh để có kích thước target_width x target_height
-    cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
-    
-    return cropped_image
+    try:
+        # Lấy kích thước gốc của ảnh
+        original_height, original_width = image.shape[:2]
+        print(f"Kích thước gốc: {original_width} x {original_height}")
+
+        # Tính tỷ lệ resize sao cho một chiều đạt kích thước mục tiêu
+        scale_width = target_width / float(original_width)
+        scale_height = target_height / float(original_height)
+
+        # Làm tròn tỷ lệ lên để đảm bảo ảnh đủ lớn
+        scale_width = np.ceil(scale_width)  # Làm tròn lên tỷ lệ chiều rộng
+        scale_height = np.ceil(scale_height)  # Làm tròn lên tỷ lệ chiều cao
+
+        # Chọn tỷ lệ phóng to lớn hơn (đảm bảo ảnh không thiếu pixel)
+        scale = max(scale_width, scale_height)
+
+        # Phóng to ảnh theo tỷ lệ đã làm tròn
+        new_width = int(original_width * scale)
+        new_height = int(original_height * scale)
+
+        # Resize ảnh
+        resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+        print(f"Kích thước sau khi thay đổi: {new_width} x {new_height}")
+
+        # Tính toán crop (canh giữa)
+        left = (new_width - target_width) // 2
+        top = (new_height - target_height) // 2
+        right = left + target_width
+        bottom = top + target_height
+
+        # Đảm bảo crop không vượt quá kích thước ảnh
+        left = max(0, left)
+        top = max(0, top)
+        right = min(new_width, right)
+        bottom = min(new_height, bottom)
+
+        cropped_image = resized_image[top:bottom, left:right]
+        print(f"Kích thước sau khi crop: {cropped_image.shape[1]} x {cropped_image.shape[0]}")
+
+        return cropped_image
+
+    except Exception as e:
+        print(f"Lỗi xảy ra trong quá trình thay đổi kích thước và crop ảnh: {e}")
+
+
 
 def create_parallax_left_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
     # Initialize frame variables
@@ -48,14 +71,13 @@ def create_parallax_left_video(image_path: str, output_path: str, duration: floa
     cdef object cropped_background, result  # Frame objects
     cdef object image_1, image_2  # Resized images
     cdef float move_per_frame_bg, move_per_frame_img,  # Movement rates for background and image
-    
     # Video writing setup
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Định dạng video MP4
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))  # Video output
     
     # Call functions to resize images
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh lớn (resize cho phù hợp với video)
-    image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))
+    image_2 = resize_and_crop(image_path, target_width=int(width * 0.6), target_height=int(height * 0.6))  # Ảnh nhỏ
     
     scale_factor = 1.4  # Tỷ lệ phóng to cho ảnh nền, điều này có thể thay đổi để điều chỉnh hiệu ứng
     blur_strength = 41  # Độ mạnh của Gaussian blur
@@ -104,6 +126,7 @@ def create_parallax_left_video(image_path: str, output_path: str, duration: floa
     
     # Giải phóng video writer và đóng cửa sổ OpenCV
     out.release()
+    cv2.destroyAllWindows()
 
 
 def create_parallax_right_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
@@ -168,8 +191,9 @@ def create_parallax_right_video(image_path: str, output_path: str, duration: flo
     
     # Giải phóng video writer và đóng cửa sổ OpenCV
     out.release()
+    cv2.destroyAllWindows()
 
-
+#trượt ảnh
 def create_scrolling_image_video(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
     """
     Creates a scrolling video from an image. The image will scroll in either horizontal or vertical direction
@@ -375,7 +399,7 @@ def create_zoom_in_video_with_background(image_path: str, output_path: str, dura
     
     # Resize ảnh lớn và ảnh nhỏ
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nền
-    image_2 = image_1.copy()  # Ảnh nhỏ
+    image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nhỏ
     
     # Thiết lập codec và đối tượng VideoWriter
     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -445,7 +469,7 @@ def create_zoom_out_video_with_background(image_path: str, output_path: str, dur
     
     # Resize ảnh lớn và ảnh nhỏ
     image_1 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nền
-    image_2 = image_1.copy()  # Ảnh nhỏ
+    image_2 = resize_and_crop(image_path, target_width=width, target_height=height)  # Ảnh nhỏ
     
     # Thiết lập codec và đối tượng VideoWriter
     cdef object fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -504,6 +528,34 @@ def create_zoom_out_video_with_background(image_path: str, output_path: str, dur
     print(f"Video đã được tạo thành công tại: {output_path}")
 
 
+def check_image_ratio(image_path: str):
+    """
+    Kiểm tra tỷ lệ ảnh và trả về True hoặc False dựa trên các điều kiện:
+    - Ảnh dọc sẽ luôn trả về True.
+    - Ảnh ngang sẽ chỉ trả về True nếu chiều rộng ít nhất là 1.3 lần chiều cao.
+
+    :param image_path: Đường dẫn tới ảnh cần kiểm tra.
+    :return: True nếu thỏa mãn điều kiện, False nếu không.
+    """
+    # Đọc ảnh
+    image = cv2.imread(image_path)
+
+    if image is None:
+        raise ValueError(f"Không thể đọc hình ảnh từ {image_path}. Vui lòng kiểm tra lại đường dẫn.")
+    
+    # Lấy kích thước của ảnh
+    height, width = image.shape[:2]
+    
+    # Kiểm tra điều kiện ảnh dọc
+    if height > width:
+        return True
+    
+    # Kiểm tra điều kiện ảnh ngang (chiều rộng phải ít nhất lớn hơn 1.3 lần chiều cao)
+    if width >= height * 1.3:
+        return True
+    
+    return False
+
 def random_video_effect_cython(image_path: str, output_path: str, duration: float=10, fps: int=30, width: int=1920, height: int=1080):
     # Danh sách các hàm cần chọn
     functions = [
@@ -517,12 +569,10 @@ def random_video_effect_cython(image_path: str, output_path: str, duration: floa
     try:
         # Chọn ngẫu nhiên một hàm từ danh sách
         selected_function = random.choice(functions)
+    
         # Gọi hàm được chọn ngẫu nhiên với các tham số đã định nghĩa
         selected_function(image_path, output_path, duration, fps, width, height)
         return True
     except Exception as e:
         print(f"Error occurred while executing the selected function: {e}")
-        with open("error_log.txt", "a") as f:
-            f.write(f"Error occurred for image: {image_path}\n")
-            f.write(f"Error message: {e}\n\n")
         return False

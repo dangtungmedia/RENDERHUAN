@@ -51,7 +51,7 @@ def delete_directory(video_id):
         if not os.listdir(directory_path):
             try:
                 # Nếu thư mục trống, dùng os.rmdir để xóa
-                os.rmdir(directory_path)
+                # os.rmdir(directory_path)
                 print(f"Đã xóa thư mục trống: {directory_path}")
             except Exception as e:
                 print(f"Lỗi khi xóa thư mục {directory_path}: {e}")
@@ -70,7 +70,7 @@ def delete_directory(video_id):
 def task_failure_handler(sender, task_id, exception, args, kwargs, traceback, einfo, **kw):
     video_id = args[0].get('video_id')
     worker_id = "None"
-    update_status_video("Render Lỗi : Quá Thời gian render videos", video_id, task_id, worker_id)
+    update_status_video("Render Lỗi : Xử Lý Video Không Thành Công!", video_id, task_id, worker_id)
     delete_directory(video_id)
     
 # Xử lý khi task bị hủy
@@ -85,7 +85,6 @@ def clean_up_on_revoke(sender, request, terminated, signum, expired, **kw):
     else:
         print(f"Không thể tìm thấy video_id cho task {task_id} vì không có args.")
 
-
 @shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content')
 def render_video(self, data):
     task_id = render_video.request.id
@@ -96,7 +95,7 @@ def render_video(self, data):
     success = create_or_reset_directory(f'media/{video_id}')
 
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể tạo thư mục", data['video_id'], task_id, worker_id)
         return
     update_status_video("Đang Render : Tạo thư mục thành công", data['video_id'], task_id, worker_id)
@@ -104,7 +103,7 @@ def render_video(self, data):
     # Tải xuống hình ảnh
     success = download_image(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể tải xuống hình ảnh", data['video_id'], task_id, worker_id)
         return
     update_status_video("Đang Render : Tải xuống hình ảnh thành công", data['video_id'], task_id, worker_id)
@@ -113,14 +112,14 @@ def render_video(self, data):
         # Tải xuống âm thanh oki
         success = download_audio(data, task_id, worker_id)
         if not success:
-            shutil.rmtree(f'media/{video_id}')
+            # shutil.rmtree(f'media/{video_id}')
             return
         update_status_video("Đang Render : Tải xuống âm thanh thành công", data['video_id'], task_id, worker_id)
 
     #nối giọng đọc và chèn nhạc nền
     success = merge_audio_video(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể nối giọng đọc và chèn nhạc nền", data['video_id'], task_id, worker_id)
         return
     
@@ -129,19 +128,19 @@ def render_video(self, data):
     # Tạo video
     success = create_video_lines(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         return
    
     # Tạo phụ đề cho video
     success = create_subtitles(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         return
     
     # Tạo file
     success = create_video_file(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
+        # shutil.rmtree(f'media/{video_id}')
         return
 
     success = upload_video(data, task_id, worker_id)
@@ -149,7 +148,7 @@ def render_video(self, data):
         update_status_video("Render Lỗi : Không thể upload video", data['video_id'], task_id, worker_id)
         return
     
-    shutil.rmtree(f'media/{video_id}')
+    # shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
 @shared_task(bind=True, priority=10,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
@@ -191,7 +190,6 @@ def render_video_reupload(self, data):
         
     success = upload_video(data, task_id, worker_id)
     if not success:
-        shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể upload video", data['video_id'], task_id, worker_id)
         return
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
@@ -515,6 +513,7 @@ def upload_video(data, task_id, worker_id):
         if response.status_code == 200:
             print("\nUpload successful!")
             print("Response:", response.json())  # Print the response JSON for confirmation
+            shutil.rmtree(f'media/{video_id}')
             return True
         else:
             print(f"\nUpload failed with status code: {response.status_code}")
@@ -527,6 +526,7 @@ def upload_video(data, task_id, worker_id):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return False
+
 
 def create_video_file(data, task_id, worker_id):
     video_id = data.get('video_id')
@@ -553,20 +553,19 @@ def create_video_file(data, task_id, worker_id):
         print(f"Audio file not found: {audio_file}")
         return False
     ffmpeg_command = [
-            'ffmpeg',  # Sử dụng lệnh ffmpeg
-            '-f', 'concat',  # Đọc video từ file text với định dạng concat
-            '-safe', '0',  # Cho phép sử dụng các file ngoài thư mục gốc
-            '-i', input_files_video_path,  # Đọc danh sách video từ file text
-            '-i', audio_file,  # Đưa vào file âm thanh
-            '-vf', f"subtitles={ass_file_path}",  # Thêm phụ đề từ file ASS
-            '-c:v', 'copy',  # Giữ nguyên codec video, không mã hóa lại
-            '-c:a', 'copy',  # Giữ nguyên codec âm thanh, không mã hóa lại
-            '-strict', 'experimental',  # Cung cấp tính năng âm thanh nâng cao nếu cần
-            '-map', '0:v',  # Chỉ định luồng video từ các video đầu vào (input 0)
-            '-map', '1:a',  # Chỉ định luồng âm thanh từ file âm thanh (input 1)
-            '-y', f"media/{video_id}/{name_video}.mp4"  # Đặt tên và đường dẫn cho file video đầu ra
+            'ffmpeg',
+            '-f', 'concat',
+            '-safe', '0',
+            '-i', input_files_video_path,
+            '-i', audio_file,
+            '-vf', f"subtitles={ass_file_path}",
+            '-c:v', 'libx264',
+            '-map', '0:v',
+            '-map', '1:a',
+            '-y',
+            f"media/{video_id}/{name_video}.mp4"
         ]
-                
+    
     with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:
         for line in process.stderr:
             if "time=" in line:
@@ -594,7 +593,7 @@ def create_video_file(data, task_id, worker_id):
         print("Lồng nhạc nền thành công.")
         update_status_video(f"Đang Render: Đã xuất video và chèn nhạc nền thành công , chuẩn bị upload lên sever", video_id, task_id, worker_id)
         return True
-          
+    
 def find_font_file(font_name, font_dir, extensions=[".ttf", ".otf", ".woff", ".woff2"]):
     print(f"Searching for font '{font_name}' in directory '{font_dir}' with extensions {extensions}")
     for root, dirs, files in os.walk(font_dir):
@@ -611,7 +610,7 @@ def get_text_lines(data, text,width=1920):
     current_line = ""
     wrapped_text = ""
     font = data['font_name']
-    font_text = find_font_file(font, r'fonts')
+    # font_text = find_font_file(font, r'fonts')
 
     font_size = data.get('font_size')
 
@@ -1165,7 +1164,7 @@ def get_random_video_from_directory(directory_path):
 def get_voice_super_voice(data, text, file_name):     
     success = False
     attempt = 0
-    while not success and attempt < 10:
+    while not success and attempt < 20:
         try:
             url_voice_text = get_voice_text(text, data)
             if not url_voice_text:
@@ -1200,7 +1199,7 @@ def get_voice_super_voice(data, text, file_name):
             
         attempt += 1
         if not success:
-            time.sleep(1)
+            time.sleep(4)
     if not success:
         print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
     return success
@@ -1472,7 +1471,7 @@ def download_audio(data, task_id, worker_id):
         processed_entries = 0
 
         # Khởi tạo luồng xử lý tối đa 20 luồng
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {
                 executor.submit(process_voice_entry, data, text_entry, video_id, task_id, worker_id, language): idx
                 for idx, text_entry in enumerate(text_entries)
@@ -1554,6 +1553,7 @@ def get_voice_japanese(data, text, file_name):
             if duration > 0:  # Đảm bảo rằng âm thanh có độ dài hợp lý
                 success = True
                 print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+                break  
             else:
                 print(f"Lỗi: Tệp âm thanh {file_name} không hợp lệ.")
         
@@ -1598,6 +1598,7 @@ def get_voice_korea(data, text, file_name):
             if duration > 0:  # Đảm bảo rằng âm thanh có độ dài hợp lý
                 success = True
                 print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+                break
             else:
                 if os.path.exists(file_name):
                     os.remove(file_name)  # Xóa tệp nếu không hợp lệ
@@ -1612,6 +1613,7 @@ def get_voice_korea(data, text, file_name):
     if not success:
         print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
         return False
+    return True
 
 def get_voice_chat_gpt(data, text, file_name):
     directory = os.path.dirname(file_name)
@@ -1644,6 +1646,7 @@ def get_voice_chat_gpt(data, text, file_name):
                 if duration and duration > 0:
                     success = True
                     print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+                    break
                 else:
                     if os.path.exists(file_name):
                         os.remove(file_name)  # Xóa tệp nếu không hợp lệ
@@ -1711,6 +1714,7 @@ def get_voice_chat_ai_human(data, text, file_name):
             if duration > 0:
                 success = True
                 print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+                break  
             else:
                 if os.path.exists(file_name):
                     os.remove(file_name)  # Xóa tệp nếu không hợp lệ
@@ -1774,6 +1778,7 @@ def get_voice_ondoku3(data, text, file_name):
             if duration > 0:
                 success = True
                 print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+                break  
             else:
                 if os.path.exists(file_name):
                     os.remove(file_name)  # Xóa tệp nếu không hợp lệ
@@ -1802,12 +1807,19 @@ def get_filename_from_url(url):
 
 def download_single_image(url, local_directory):
     """Hàm tải xuống một hình ảnh từ URL và lưu vào thư mục đích."""
+    filename = get_filename_from_url(url)
+    file_path = os.path.join(local_directory, filename)
+
+    # Kiểm tra xem tệp đã tồn tại trong thư mục hay chưa
+    if os.path.exists(file_path):
+        print(f"Tệp {filename} đã tồn tại. Không cần tải lại.")
+        return True  # Trả về True nếu tệp đã tồn tại
+
     print(f"Đang tải xuống hình ảnh từ: {url}")
     for attempt in range(30):  # Thử tải lại 30 lần nếu thất bại
         try:
             response = requests.get(url, stream=True, timeout=200)
             if response.status_code == 200:
-                file_path = os.path.join(local_directory, get_filename_from_url(url))
                 with open(file_path, 'wb') as file:
                     for chunk in response.iter_content(1024):
                         file.write(chunk)
