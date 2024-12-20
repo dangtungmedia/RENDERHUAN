@@ -7,6 +7,8 @@ async-timeout==4.0.3
 attrs==24.2.0
 audioread==3.0.1
 billiard==4.2.1
+boto3==1.35.81
+botocore==1.35.81
 Brotli==1.1.0
 celery==5.4.0
 certifi==2024.8.30
@@ -34,6 +36,7 @@ httpcore==0.9.1
 httpx==0.13.3
 hyperframe==5.2.0
 idna==2.10
+jmespath==1.0.1
 joblib==1.4.2
 kombu==5.4.2
 lazy_loader==0.4
@@ -45,11 +48,14 @@ mutagen==1.47.0
 nltk==3.9.1
 numba==0.60.0
 numpy==2.0.2
+opencv-python==4.10.0.84
 packaging==24.1
 pillow==10.4.0
 platformdirs==4.3.6
 pooch==1.8.2
+proglog==0.1.9
 prompt_toolkit==3.0.47
+psutil==6.1.0
 pycparser==2.22
 pycryptodomex==3.20.0
 pydub==0.25.1
@@ -60,6 +66,7 @@ regex==2024.9.11
 requests==2.32.3
 requests-toolbelt==1.0.0
 rfc3986==1.5.0
+s3transfer==0.10.4
 scikit-learn==1.5.2
 scipy==1.14.1
 six==1.16.0
@@ -78,6 +85,3 @@ websockets==13.1
 whisper==1.1.10
 yarl==1.11.1
 yt-dlp==2024.8.6
-proglog==0.1.9
-psutil==6.1.0
-opencv-python==4.10.0.84
