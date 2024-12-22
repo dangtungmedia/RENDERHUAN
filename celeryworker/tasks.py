@@ -486,12 +486,12 @@ def upload_video(data, task_id, worker_id):
                 # Format size thành MB
                 total_mb = self._size / (1024 * 1024)
                 uploaded_mb = self._seen_so_far / (1024 * 1024)
-                update_status_video(
-                    f"Đang Render : Đang Upload File Lên Server ({percentage:.1f}%) - {uploaded_mb:.1f}MB/{total_mb:.1f}MB", 
-                    video_id, 
-                    task_id, 
-                    worker_id
-                )
+                # update_status_video(
+                #     f"Đang Render : Đang Upload File Lên Server ({percentage:.1f}%) - {uploaded_mb:.1f}MB/{total_mb:.1f}MB", 
+                #     video_id, 
+                #     task_id, 
+                #     worker_id
+                # )
     
     try:
         s3 = boto3.client(
