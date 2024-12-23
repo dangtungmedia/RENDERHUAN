@@ -3,6 +3,7 @@ from celery import shared_task, Celery
 import os, shutil, urllib
 import time
 import requests
+import websocket
 import json
 from PIL import Image, ImageDraw, ImageFont
 import asyncio
@@ -157,25 +158,23 @@ def render_video_reupload(self, data):
     video_id = data.get('video_id')
     update_status_video("Đang Render : Đang lấy thông tin video render", data['video_id'], task_id, worker_id)
     
-    success = update_info_video(data, task_id, worker_id)
-    if not success:
-        update_status_video("Render Lỗi : Không thể cập nhật thông tin video", data['video_id'], task_id, worker_id)
-        return
-    update_status_video("Đang Render : Cập nhật thông tin video thành công", data['video_id'], task_id, worker_id)
-    
-    
     success = create_or_reset_directory(f'media/{video_id}')
     if not success:
         shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể tạo thư mục", data['video_id'], task_id, worker_id)
         return
-
-    if data.get('url_reupload'):
-        success = downdload_video_reup(data, task_id, worker_id)
-        if not success:
-            shutil.rmtree(f'media/{video_id}')
-            return
-    update_status_video("Đang Render : Tải xuống video thành công", data['video_id'], task_id, worker_id)
+    
+    success = update_info_video(data, task_id, worker_id)
+    if not success:
+        shutil.rmtree(f'media/{video_id}')
+        update_status_video("Render Lỗi : Không thể xử lý url video liên hệ admin", data['video_id'], task_id, worker_id)
+        return
+    # if data.get('url_reupload'):
+    #     success = downdload_video_reup(data, task_id, worker_id)
+    #     if not success:
+    #         shutil.rmtree(f'media/{video_id}')
+    #         return
+    # update_status_video("Đang Render : Tải xuống video thành công", data['video_id'], task_id, worker_id)
     
     success = cread_test_reup(data, task_id, worker_id)
     if not success:
@@ -189,8 +188,10 @@ def render_video_reupload(self, data):
         
     success = upload_video(data, task_id, worker_id)
     if not success:
+        shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể upload video", data['video_id'], task_id, worker_id)
         return
+    shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
 def convert_video(input_path, output_path, target_resolution="1280x720", target_fps=24):
@@ -486,12 +487,12 @@ def upload_video(data, task_id, worker_id):
                 # Format size thành MB
                 total_mb = self._size / (1024 * 1024)
                 uploaded_mb = self._seen_so_far / (1024 * 1024)
-                # update_status_video(
-                #     f"Đang Render : Đang Upload File Lên Server ({percentage:.1f}%) - {uploaded_mb:.1f}MB/{total_mb:.1f}MB", 
-                #     video_id, 
-                #     task_id, 
-                #     worker_id
-                # )
+                update_status_video(
+                    f"Đang Render : Đang Upload File Lên Server ({percentage:.1f}%) - {uploaded_mb:.1f}MB/{total_mb:.1f}MB", 
+                    video_id, 
+                    task_id, 
+                    worker_id
+                )
     
     try:
         s3 = boto3.client(
@@ -1113,8 +1114,8 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
                         "-t", str(duration),     # Thời gian video cần cắt
                         "-r", "24",              # Tốc độ khung hình đầu ra
                         "-c:v", "libx264",       # Codec video
-                        "-crf", "18",            # Chất lượng video
-                        "-preset", "medium",     # Tốc độ mã hóa
+                        "-crf", "23",            # Chất lượng video
+                        "-preset", "ultrafast",     # Tốc độ mã hóa
                         "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
                         "-vsync", "1",           # Đồng bộ hóa video
                         "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
@@ -1987,7 +1988,7 @@ def downdload_video_reup(data, task_id, worker_id):
 
     # Cấu hình yt-dlp
     ydl_opts = {
-        # 'proxy': proxy_url,  # Cấu hình proxy
+        'proxy': proxy_url,  # Cấu hình proxy
         'format': 'bestvideo[height=720]+bestaudio/best',
         'outtmpl': f"{output_file}",
         'merge_output_format': 'mp4',  # Hợp nhất video và âm thanh thành định dạng MP4
@@ -2083,128 +2084,135 @@ def calculate_new_position(crop_data, original_resolution=(640, 360), target_res
 
     return round(new_left), round(new_top), round(new_width), round(new_height)
 
-def process_video_ffmpeg(input_video, output_video, width, height, fps=24, preset="medium",text='',video_id='', task_id='', worker_id=''):
-    """
-    Hàm sử dụng FFmpeg để xử lý video với các tùy chọn về độ phân giải, tốc độ khung hình và nén video.
-    
-    :param input_video: Đường dẫn video đầu vào.
-    :param output_video: Đường dẫn video đầu ra (sau khi xử lý).
-    :param width: Chiều rộng video đầu ra.
-    :param height: Chiều cao video đầu ra.
-    :param fps: Tốc độ khung hình (mặc định là 24).
-    :param crf: Constant Rate Factor (CRF) cho chất lượng video (mặc định là 18, càng thấp thì chất lượng càng cao).
-    :param preset: FFmpeg preset (mặc định là "medium").
-    :return: Kết quả quá trình xử lý, True nếu thành công, False nếu có lỗi.
-    """
-    command = [
-        "ffmpeg",
-        "-i", input_video,
-        "-vf", f"minterpolate=fps={fps},scale={width}:{height}",
-        "-c:v", "libx264",
-        "-preset", preset,
-        "-c:a", "copy",
-        "-y",  # Ghi đè file đầu ra nếu tồn tại
-        output_video
-    ]
-    
-    try:    
-        with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:
-            total_duration = None
-            progress_bar = None
-
-            for line in process.stderr:
-                if "Duration" in line:
-                    duration_str = line.split(",")[0].split("Duration:")[1].strip()
-                    h, m, s = map(float, duration_str.split(":"))
-                    total_duration = int(h * 3600 + m * 60 + s)
-                    progress_bar = tqdm(total=total_duration, desc="Rendering", unit="s")
-
-                if "time=" in line and progress_bar:
-                    time_str = line.split("time=")[1].split(" ")[0].strip()
-                    h, m, s = map(float, time_str.split(":"))
-                    current_time = int(h * 3600 + m * 60 + s)
-                    progress_bar.n = current_time
-                    progress_bar.refresh()
-                    percentage = int((current_time / total_duration) * 100)
-                    if percentage <= 100:
-                        update_status_video(f"{text}--{percentage}% ",video_id, task_id, worker_id)
-            process.wait()
-        return True
-    except Exception as e:
-        print(f"Lỗi khi chạy lệnh FFmpeg: {e}")
-        return False
- 
-def get_video_info(url):
-    # Thiết lập các tùy chọn yt_dlp để chỉ tải thông tin metadata
-    ydl_opts = {
-        'proxy': os.environ.get('PROXY_URL'), # Thêm proxy
-        'quiet': True,
-        'skip_download': True,
-        'force_generic_extractor': False,
-    }
+def get_video_info(video_url):
+    api_url = "https://iloveyt.net/proxy.php"
+    form_data = {"url": video_url}
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # Lấy thông tin video
-            info_dict = ydl.extract_info(url, download=False)
-            # Truy xuất tiêu đề và thumbnail
-            title = info_dict.get('title', 'No title found')
-            thumbnail = info_dict.get('thumbnail', 'No thumbnail found')
-            return title, thumbnail
+        response = requests.post(api_url, data=form_data, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        if "api" not in data or "mediaItems" not in data["api"]:
+            raise ValueError("Invalid API response format")
+        title = data["api"]["title"]
+        mediaPreviewUrl = data["api"]["previewUrl"]
+        mediaThumbnail = data["api"]["imagePreviewUrl"]
+        return {
+            "title": title,
+            "preview_url": mediaPreviewUrl,
+            "thumbnail_url": mediaThumbnail
+        }
+            
+    except requests.RequestException as e:
+        print(f"Network error: {e}")
+        return None
+    except ValueError as e:
+        print(f"Data error: {e}")
+        return None
     except Exception as e:
-        print(f"Error occurred: {e}")
-        return None, None
+        print(f"Unexpected error: {e}")
+        return None
+    
 
 def update_info_video(data, task_id, worker_id):
-
-    video_url  = data.get('url_video_youtube')
     try:
-        title, thumbnail_url = get_video_info(video_url)
+        video_url = data.get('url_video_youtube')
+        video_id = data.get('video_id')
         
-        # Kiểm tra nếu không lấy được thông tin
-        if title is None or thumbnail_url is None:
-            update_status_video(f"Render Lỗi: không thể lấy thông tin video từ {video_url}", data.get('video_id'), task_id, worker_id)
-            return False
+        if not video_url or not video_id:
+            raise ValueError("Missing video URL or video ID")
 
-    except Exception as e:
-        print(f"Error getting video info: {e}")
-        update_status_video(f"Render Lỗi: lỗi lấy thông tin video", data.get('video_id'), task_id, worker_id)
-        return False
- 
-    video_id = data.get('video_id')
-    url = f'{SERVER}/api/'
-    update_status_video(f"Đang Render : Đang lấy thông tin video", video_id, task_id, worker_id)
-    
-    payload = {
-        'video_id': str(video_id),
-        'action': 'update-info-video',
-        'secret_key': SECRET_KEY,
-        'title': title,
-        'thumbnail_url': thumbnail_url,  # Tên trường khác
-    }
+        result = get_video_info(video_url)
+        if not result:
+            raise ValueError(f"Failed to get video info from {video_url}")
 
-    response = requests.post(url, json=payload)
+        update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
+                          video_id, task_id, worker_id)
 
-    if response.status_code == 200:
-        print("Thông tin video đã được cập nhật thành công.")
+        # Cập nhật thông tin video lên server
+        url = f'{SERVER}/api/'
+        payload = {
+            'video_id': str(video_id),
+            'action': 'update-info-video',
+            'secret_key': SECRET_KEY,
+            'title': result["title"],
+            'thumbnail_url': result["thumbnail_url"],
+        }
+
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+
+        update_status_video("Đang Render : Đã cập nhập thành công video youtube chuẩn bị tải video youtube", 
+                          video_id, task_id, worker_id)
+
+        # Tải video
+        download_url = result["preview_url"]
+        if not download_url:
+            success = downdload_video_reup(data, task_id, worker_id)
+            if success:
+                return  True
+            else:
+                return False
+        response = requests.get(download_url, stream=True)
+        response.raise_for_status()
+        output_file = f'media/{video_id}/cache.mp4'    
+        total_size = int(response.headers.get('content-length', 0))
+        downloaded_size = 0  # Kích thước đã tải
+        with open(output_file, "wb") as file:
+            for chunk in response.iter_content(chunk_size=1024):  # Tải từng chunk
+                if chunk:  # Nếu chunk không rỗng
+                    file.write(chunk)
+                    downloaded_size += len(chunk)
+                    percent_done = (downloaded_size / total_size) * 100
+                    update_status_video(f"Đang Render : Đã tải {percent_done:.2f}%", 
+                          video_id, task_id, worker_id)
+        update_status_video("Đang Render : Đã tải xong video youtube", 
+                          video_id, task_id, worker_id)
         return True
-    else:
-        print(f"Lỗi cập nhật thông tin video: {response.status_code}")
-        return False
 
-def update_status_video(status_video,video_id,task_id,worker_id,url_video=None):
-    data = {
-        'secret_key': SECRET_KEY,
-        'action': 'update_status',
-        'video_id': video_id,
-        'status': status_video,
-        'task_id': task_id,
-        'worker_id': worker_id,
-        'url_video': url_video,
-    }
-    url = f'{SERVER}/api/'
-    response = requests.post(url, json=data)
-    if response.status_code == 200:
-        print("Trạng thái video đã được cập nhật thành công.")
-    else:
-        print(f"Lỗi cập nhật trạng thái video: {response.status_code}")
+    except requests.RequestException as e:
+        print(f"Network error: {e}")
+        update_status_video(f"Render Lỗi: Lỗi kết nối - {str(e)}", 
+                          data.get('video_id'), task_id, worker_id)
+        return False
+        
+    except ValueError as e:
+        print(f"Value error: {e}")
+        update_status_video(f"Render Lỗi: {str(e)}", 
+                          data.get('video_id'), task_id, worker_id)
+        return False
+        
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        update_status_video(f"Render Lỗi: Lỗi không xác định - {str(e)}", 
+                          data.get('video_id'), task_id, worker_id)
+        return False
+    
+def update_status_video(status_video, video_id, task_id, worker_id, url_video=None):
+    try:
+        # Kết nối WebSocket
+        ws = websocket.WebSocket()
+        ws.connect(f"wss://hrmedia89.com/ws/update_status/")
+        data = {
+            'type':'update-status',
+            'video_id': video_id,
+            'status': status_video,
+            'task_id': task_id,
+            'worker_id': worker_id,
+            'url_video': url_video,
+        }
+        # Kiểm tra trạng thái kết nối
+        if ws.connected:
+            ws.send(json.dumps(data))
+        else:
+            print("WebSocket connection failed.")
+    except websocket.WebSocketException as e:
+        print(f"WebSocket error: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+    finally:
+        # Đảm bảo đóng kết nối
+        if ws.connected:
+            ws.close()
+
