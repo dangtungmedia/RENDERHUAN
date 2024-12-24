@@ -1549,11 +1549,11 @@ def get_voice_japanese(data, text, file_name):
         try:
             # Tạo audio query với VoiceVox
             response_query = requests.post(
-                            f'http://localhost:50021/audio_query?speaker={voice_id}',  # API để tạo audio_query
+                            f'http://127.0.0.1:50021/audio_query?speaker={voice_id}',  # API để tạo audio_query
                             params={'text': text}  # Gửi văn bản cần chuyển thành giọng nói
                         )
             # Yêu cầu tạo âm thanh
-            url_synthesis = f"http://localhost:50021/synthesis?speaker={voice_id}"
+            url_synthesis = f"http://127.0.0.1:50021/synthesis?speaker={voice_id}"
             response_synthesis = requests.post(url_synthesis,data=json.dumps(response_query.json()))
             # Ghi nội dung phản hồi vào tệp
             with open(file_name, 'wb') as f:
@@ -2162,7 +2162,7 @@ def update_status_video(status_video, video_id, task_id, worker_id, url_video=No
     try:
         # Kết nối WebSocket
         ws = websocket.WebSocket()
-        ws.connect(f"wss://autospamnews.com/ws/update_status/")
+        ws.connect(f"wss://hrmedia89.com/ws/update_status/")
         data = {
             'type':'update-status',
             'video_id': video_id,
