@@ -10,8 +10,8 @@ services:
   voicevox_render:
     container_name: voicevox_render
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
-    restart: always
     ports:
-      - "50025:50025"
+      - "127.0.0.1:50025:50025"
+    restart: always
     volumes:
       - .:/app
