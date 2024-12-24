@@ -1,6 +1,7 @@
 import os
 import requests
 import socket
+import netifaces
 
 def get_public_ip():
    try:
@@ -15,15 +16,20 @@ def get_public_ip():
        return None
 
 def get_local_ip():
-   try:
-       # Lấy hostname
-       hostname = socket.gethostname()
-       # Lấy địa chỉ IP local
-       local_ip = socket.gethostbyname(hostname)
-       return local_ip
-   except Exception as e:
-       print(f"Error getting local IP: {e}")
-       return None
+    try:
+        for interface in netifaces.interfaces():
+            addresses = netifaces.ifaddresses(interface)
+            # Lấy IPv4 của interface
+            if netifaces.AF_INET in addresses:
+                for addr in addresses[netifaces.AF_INET]:
+                    ip = addr.get('addr')
+                    # Kiểm tra nếu IP thuộc dải 192.168.x.x
+                    if ip.startswith('192.168.'):
+                        return ip
+        return None
+    except Exception as e:
+        print(f"Error getting local IP: {e}")
+        return None
 
 if __name__ == "__main__":
    # Lấy địa chỉ IP public
