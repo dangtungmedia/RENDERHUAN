@@ -15,15 +15,54 @@ height = 1080  # Video height
 # create_zoom_out_video_with_background(image_path, out_path, duration, fps, width, height)
 # random_video_effect_cython(image_path, out_path, duration, fps, width, height)
 
-list_image = os.listdir("image")
+# list_image = os.listdir("image")
 
-for index, image in enumerate(list_image):  # Sử dụng enumerate để lấy cả chỉ số và tên tệp
-    if image.endswith(('.jpg', '.jpeg', '.png', '.gif')):  # Kiểm tra xem tệp có phải là ảnh không
-        image_path = f"image/{image}"  # Đường dẫn đến ảnh
-        out_path = f"video/{index}.mp4"  # Đường dẫn video đầu ra, sử dụng chỉ số cho tên file
+# for index, image in enumerate(list_image):  # Sử dụng enumerate để lấy cả chỉ số và tên tệp
+#     if image.endswith(('.jpg', '.jpeg', '.png', '.gif')):  # Kiểm tra xem tệp có phải là ảnh không
+#         image_path = f"image/{image}"  # Đường dẫn đến ảnh
+#         out_path = f"video/{index}.mp4"  # Đường dẫn video đầu ra, sử dụng chỉ số cho tên file
 
-        # Gọi hàm random_video_effect_cython để xử lý video
-        random_video_effect_cython(image_path, out_path, duration, fps, width, height)
-        print(f"Đã tạo video: {out_path}")
+#         # Gọi hàm random_video_effect_cython để xử lý video
+#         random_video_effect_cython(image_path, out_path, duration, fps, width, height)
+#         print(f"Đã tạo video: {out_path}")
+#     else:
+#         print(f"Bỏ qua tệp không phải ảnh: {image}")
+
+import subprocess
+import json
+
+def get_docker_network_subnet(network_name):
+    """
+    Lấy dải IP của một mạng Docker cụ thể.
+    :param network_name: Tên mạng Docker (vd: 'bridge', 'custom-net').
+    :return: Dải IP (Subnet) hoặc None nếu không tìm thấy.
+    """
+    try:
+        # Chạy lệnh `docker network inspect` để lấy thông tin mạng Docker
+        result = subprocess.check_output(["docker", "network", "inspect", network_name], text=True)
+        network_data = json.loads(result)
+        
+        # Kiểm tra và trả về dải IP (Subnet) nếu có
+        if network_data and "IPAM" in network_data[0] and "Config" in network_data[0]["IPAM"]:
+            subnet = network_data[0]["IPAM"]["Config"][0].get("Subnet")
+            return subnet
+        else:
+            return None
+    except subprocess.CalledProcessError as e:
+        print(f"Command error: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
+
+if __name__ == "__main__":
+    # Tên mạng Docker cần lấy dải IP (vd: 'bridge')
+    network_name = "bridge"
+    
+    # Lấy dải IP
+    subnet = get_docker_network_subnet(network_name)
+    
+    if subnet:
+        print(f"Dải IP của mạng Docker '{network_name}': {subnet}")
     else:
-        print(f"Bỏ qua tệp không phải ảnh: {image}")
+        print(f"Không tìm thấy dải IP của mạng Docker '{network_name}' hoặc mạng không tồn tại.")

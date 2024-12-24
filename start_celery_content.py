@@ -1,6 +1,7 @@
 import os
 import requests
 import socket
+import netifaces
 
 def get_public_ip():
    try:
@@ -15,24 +16,31 @@ def get_public_ip():
        return None
 
 def get_local_ip():
-   try:
-       # Lấy hostname
-       hostname = socket.gethostname()
-       # Lấy địa chỉ IP local
-       local_ip = socket.gethostbyname(hostname)
-       return local_ip
-   except Exception as e:
-       print(f"Error getting local IP: {e}")
-       return None
+    try:
+        for interface in netifaces.interfaces():
+            addresses = netifaces.ifaddresses(interface)
+            # Kiểm tra IPv4 trong các interface
+            if netifaces.AF_INET in addresses:
+                for addr in addresses[netifaces.AF_INET]:
+                    ip = addr.get('addr')
+                    # Kiểm tra nếu IP thuộc dải 192.168.x.x hoặc 10.x.x.x (mạng LAN)
+                    if ip.startswith('192.168.') or ip.startswith('10.') or ip.startswith('172.'):
+                        return ip
+        return None
+    except Exception as e:
+        print(f"Error getting local IP: {e}")
+        return None
 
 if __name__ == "__main__":
    # Lấy địa chỉ IP public
-   public_ip = get_public_ip()
-   if public_ip == "27.72.153.24":
-       # Nếu IP public trùng khớp, sử dụng IP local
-       local_ip = get_local_ip()
-       if local_ip:
-           # Chạy Celery worker với IP local
-           os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=4 -Q render_video_content")
-   else:
-       os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip}-Reup --concurrency=2 -Q render_video_content")
+    public_ip = get_public_ip()
+    local_ip = get_local_ip()
+    print(f"dải ip của máy {public_ip} và {local_ip}")
+    if public_ip == "27.72.153.24":
+        # Nếu IP public trùng khớp, sử dụng IP local
+        local_ip = get_local_ip()
+        if local_ip:
+            # Chạy Celery worker với IP local
+            os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=4 -Q render_video_reupload")
+    else:
+        os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip}-Reup --concurrency=2 -Q render_video_reupload")

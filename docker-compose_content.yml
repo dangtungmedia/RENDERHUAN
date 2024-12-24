@@ -8,8 +8,6 @@ services:
     command: python start_celery_content.py
     volumes:
       - .:/app
-    networks:
-      - app_network
   voicevox:
     container_name: voicevox
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
@@ -18,11 +16,8 @@ services:
     restart: always 
     volumes:
       - .:/app
-    networks:
-      - app_network
-networks:
-  app_network:
-    driver: bridge
+
+
 
 
       
