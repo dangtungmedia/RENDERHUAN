@@ -28,7 +28,8 @@ def get_local_ip():
 if __name__ == "__main__":
    # Lấy địa chỉ IP public
    public_ip = get_public_ip()
-   print(f"dải ip của máy {public_ip}")
+   local_ip = get_local_ip()
+   print(f"dải ip của máy {public_ip} và {local_ip}")
    if public_ip == "27.72.153.24":
        # Nếu IP public trùng khớp, sử dụng IP local
        local_ip = get_local_ip()
