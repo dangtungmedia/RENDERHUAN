@@ -17,7 +17,7 @@ services:
     restart: always 
     volumes:
       - .:/app
-
+    network_mode: "host"
 
 
 
