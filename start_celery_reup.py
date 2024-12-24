@@ -14,7 +14,7 @@ def get_public_ip():
    except Exception as e:
        print(f"Error getting public IP: {e}")
        return None
-
+   
 def get_local_ip():
     try:
         for interface in netifaces.interfaces():
@@ -41,6 +41,6 @@ if __name__ == "__main__":
        local_ip = get_local_ip()
        if local_ip:
            # Chạy Celery worker với IP local
-           os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=4 -Q render_video_reupload")
+           os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=4 -Q render_video_content")
    else:
-       os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip}-Reup --concurrency=2 -Q render_video_reupload")
+       os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip}-Reup --concurrency=2 -Q render_video_content")
