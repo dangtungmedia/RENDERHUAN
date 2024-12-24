@@ -10,6 +10,7 @@ services:
       - .:/app
     networks:
       - app_network
+    network_mode: "host"
 networks:
   app_network:
     driver: bridge
