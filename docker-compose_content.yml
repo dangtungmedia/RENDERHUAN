@@ -7,7 +7,6 @@ services:
     command: python start_celery_content.py
     volumes:
       - .:/app
-    network_mode: "host"
   voicevox_render:
     container_name: voicevox_render
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
