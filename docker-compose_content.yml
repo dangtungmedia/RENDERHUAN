@@ -12,7 +12,8 @@ services:
     container_name: voicevox_render
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
     restart: always
-    ports:
-      - "50025:50025"  # Thêm ports mapping
     volumes:
       - .:/app
+    network_mode: "host"  # Phải thêm network_mode: "host" cho cả voicevox
+    environment:
+      - VOICEVOX_PORT=50025  # Định nghĩa port cho voicevox
