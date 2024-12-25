@@ -35,6 +35,8 @@ from dotenv import load_dotenv
 from .random_video_effect  import random_video_effect_cython
 import boto3
 import threading
+
+from time import sleep
 # Nạp biến môi trường từ file .env
 load_dotenv()
 
@@ -65,6 +67,39 @@ def delete_directory(video_id):
                 print(f"Lỗi khi xóa thư mục {directory_path}: {e}")
     else:
         print(f"Thư mục {directory_path} không tồn tại.")
+
+
+
+class WebSocketClient:
+    def __init__(self, url):
+        self.url = url
+        self.ws = None
+        
+    def connect(self):
+        try:
+            if self.ws is None or not self.ws.connected:
+                self.ws = websocket.WebSocket()
+                self.ws.connect(self.url)
+                return True
+        except Exception as e:
+            return False
+            
+    def send(self, data, max_retries=5):
+        for attempt in range(max_retries):
+            try:
+                if not self.ws or not self.ws.connected:
+                    if not self.connect():
+                        continue
+                        
+                self.ws.send(json.dumps(data))
+                return True
+            except Exception as e:
+                sleep(1)  # Delay before retry
+                continue
+        return False
+
+# Khởi tạo WebSocket client một lần
+ws_client = WebSocketClient("wss://autospamnews.com/ws/update_status/")
 
 # Xử lý khi task gặp lỗi
 @task_failure.connect
@@ -2159,29 +2194,14 @@ def update_info_video(data, task_id, worker_id):
         return False
     
 def update_status_video(status_video, video_id, task_id, worker_id, url_video=None):
-    try:
-        # Kết nối WebSocket
-        ws = websocket.WebSocket()
-        ws.connect(f"wss://hrmedia89.com/ws/update_status/")
-        data = {
-            'type':'update-status',
-            'video_id': video_id,
-            'status': status_video,
-            'task_id': task_id,
-            'worker_id': worker_id,
-            'url_video': url_video,
-        }
-        # Kiểm tra trạng thái kết nối
-        if ws.connected:
-            ws.send(json.dumps(data))
-        else:
-            print("WebSocket connection failed.")
-    except websocket.WebSocketException as e:
-        print(f"WebSocket error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-    finally:
-        # Đảm bảo đóng kết nối
-        if ws.connected:
-            ws.close()
+    data = {
+        'type': 'update-status',
+        'video_id': video_id,
+        'status': status_video,
+        'task_id': task_id,
+        'worker_id': worker_id,
+        'url_video': url_video,
+    }
+    ws_client.send(data)
+
 
