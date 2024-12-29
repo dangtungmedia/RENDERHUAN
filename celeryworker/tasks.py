@@ -99,7 +99,7 @@ class WebSocketClient:
         return False
 
 # Khởi tạo WebSocket client một lần
-ws_client = WebSocketClient("wss://autospamnews.com/ws/update_status/")
+ws_client = WebSocketClient("wss://hrmedia89.com/ws/update_status/")
 
 # Xử lý khi task gặp lỗi
 @task_failure.connect

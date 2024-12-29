@@ -32,15 +32,11 @@ def get_local_ip():
         return None
 
 if __name__ == "__main__":
-   # Lấy địa chỉ IP public
-   public_ip = get_public_ip()
-   local_ip = get_local_ip()
-   print(f"dải ip của máy {public_ip} và {local_ip}")
-   if public_ip == "27.72.153.24":
-       # Nếu IP public trùng khớp, sử dụng IP local
-       local_ip = get_local_ip()
-       if local_ip:
-           # Chạy Celery worker với IP local
-           os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=4 -Q render_video_reupload")
-   else:
-       os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip}-Reup --concurrency=2 -Q render_video_reupload")
+    # Lấy địa chỉ IP public
+    public_ip = get_public_ip()
+    local_ip = get_local_ip()
+    print(f"dải ip của máy {public_ip} và {local_ip}")
+
+    # Chạy Celery worker với IP local
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=3 -Q render_video_reupload")
+  
