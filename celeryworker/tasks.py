@@ -188,8 +188,8 @@ def render_video(self, data):
 
 @shared_task(bind=True, priority=10,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
 def render_video_reupload(self, data):
-    task_id = render_video.request.id
-    worker_id = render_video.request.hostname 
+    task_id = render_video_reupload.request.id
+    worker_id = render_video_reupload.request.hostname 
     video_id = data.get('video_id')
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     

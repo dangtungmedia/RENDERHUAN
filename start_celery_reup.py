@@ -38,5 +38,5 @@ if __name__ == "__main__":
     print(f"dải ip của máy {public_ip} và {local_ip}")
 
     # Chạy Celery worker với IP local
-    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=3 -Q render_video_reupload")
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Reup --concurrency=2 -Q render_video_reupload")
   
