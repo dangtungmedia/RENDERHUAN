@@ -35,6 +35,8 @@ from dotenv import load_dotenv
 from .random_video_effect  import random_video_effect_cython
 import boto3
 import threading
+from threading import Lock
+import logging
 
 from time import sleep
 # Nạp biến môi trường từ file .env
