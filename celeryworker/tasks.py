@@ -45,33 +45,6 @@ load_dotenv()
 SECRET_KEY=os.environ.get('SECRET_KEY')
 SERVER=os.environ.get('SERVER')
 ACCESS_TOKEN = None
-
-
-def delete_directory(video_id):
-    directory_path = f'media/{video_id}'
-    
-    # Kiểm tra nếu thư mục tồn tại
-    if os.path.exists(directory_path):
-        # Kiểm tra xem thư mục có trống không
-        if not os.listdir(directory_path):
-            try:
-                # Nếu thư mục trống, dùng os.rmdir để xóa
-                # os.rmdir(directory_path)
-                print(f"Đã xóa thư mục trống: {directory_path}")
-            except Exception as e:
-                print(f"Lỗi khi xóa thư mục {directory_path}: {e}")
-        else:
-            try:
-                # Nếu thư mục không trống, dùng shutil.rmtree để xóa toàn bộ
-                shutil.rmtree(directory_path)
-                print(f"Đã xóa thư mục cùng với các tệp: {directory_path}")
-            except Exception as e:
-                print(f"Lỗi khi xóa thư mục {directory_path}: {e}")
-    else:
-        print(f"Thư mục {directory_path} không tồn tại.")
-
-
-
 class WebSocketClient:
    def __init__(self, url, min_delay=1.0):
        self.url = url
@@ -157,6 +130,29 @@ class WebSocketClient:
 
 # Khởi tạo WebSocket client một lần
 ws_client = WebSocketClient("wss://hrmedia89.com/ws/update_status/")
+
+def delete_directory(video_id):
+    directory_path = f'media/{video_id}'
+    
+    # Kiểm tra nếu thư mục tồn tại
+    if os.path.exists(directory_path):
+        # Kiểm tra xem thư mục có trống không
+        if not os.listdir(directory_path):
+            try:
+                # Nếu thư mục trống, dùng os.rmdir để xóa
+                # os.rmdir(directory_path)
+                print(f"Đã xóa thư mục trống: {directory_path}")
+            except Exception as e:
+                print(f"Lỗi khi xóa thư mục {directory_path}: {e}")
+        else:
+            try:
+                # Nếu thư mục không trống, dùng shutil.rmtree để xóa toàn bộ
+                shutil.rmtree(directory_path)
+                print(f"Đã xóa thư mục cùng với các tệp: {directory_path}")
+            except Exception as e:
+                print(f"Lỗi khi xóa thư mục {directory_path}: {e}")
+    else:
+        print(f"Thư mục {directory_path} không tồn tại.")
 
 # Xử lý khi task gặp lỗi
 @task_failure.connect

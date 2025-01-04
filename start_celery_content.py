@@ -36,4 +36,4 @@ if __name__ == "__main__":
     public_ip = get_public_ip()
     local_ip = get_local_ip()
     print(f"dải ip của máy {public_ip} và {local_ip}")
-    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Content --concurrency=4 -Q render_video_content")
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip}-Content --concurrency=5 -Q render_video_content")
