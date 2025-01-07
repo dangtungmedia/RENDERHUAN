@@ -174,7 +174,7 @@ def clean_up_on_revoke(sender, request, terminated, signum, expired, **kw):
     else:
         print(f"Không thể tìm thấy video_id cho task {task_id} vì không có args.")
 
-@shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content')
+@shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content',rate_limit='4/m')
 def render_video(self, data):
     task_id = render_video.request.id
     worker_id = render_video.request.hostname  # Lưu worker ID
@@ -239,7 +239,7 @@ def render_video(self, data):
     shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
-@shared_task(bind=True, priority=10,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
+@shared_task(bind=True, priority=1,name='render_video_reupload',time_limit=140000,queue='render_video_reupload',rate_limit='4/m')
 def render_video_reupload(self, data):
     task_id = render_video_reupload.request.id
     worker_id = render_video_reupload.request.hostname 

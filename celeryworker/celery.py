@@ -12,15 +12,6 @@ app.autodiscover_tasks(['celeryworker'])
 # Thiết lập timezone cho Celery
 app.conf.timezone = 'Asia/Ho_Chi_Minh'  # Sử dụng đúng cú pháp với chữ hoa
 
-# Các cấu hình khác
-app.conf.worker_timeout = 120
-#thời gian chờ giữa các lần kiểm tra worker
-app.conf.worker_heartbeat_interval = 30
-app.conf.broker_connection_retry_on_startup = True
-app.conf.accept_content = ['json']
-app.conf.task_serializer = 'json'
-app.conf.result_serializer = 'json'
-
 # Định nghĩa một task debug đơn giản
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
