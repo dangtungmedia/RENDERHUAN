@@ -148,7 +148,7 @@ class WebSocketClient:
             self.logger.error(f"Error closing connection: {str(e)}")
 
 # Khởi tạo WebSocket client một lần
-ws_client = WebSocketClient("wss://autospamnews.com/ws/update_status/")
+ws_client = WebSocketClient("wss://hrmedia89.com/ws/update_status/")
 
 
 
