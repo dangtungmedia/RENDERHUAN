@@ -2067,7 +2067,7 @@ def downdload_video_reup(data, task_id, worker_id):
 
     # Cấu hình yt-dlp
     ydl_opts = {
-        'proxy': proxy_url,  # Cấu hình proxy
+        # 'proxy': proxy_url,  # Cấu hình proxy
         'format': 'bestvideo[height=720]+bestaudio/best',
         'outtmpl': f"{output_file}",
         'merge_output_format': 'mp4',  # Hợp nhất video và âm thanh thành định dạng MP4
