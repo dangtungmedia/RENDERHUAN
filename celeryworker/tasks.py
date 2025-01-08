@@ -1,4 +1,5 @@
 import os
+import ssl
 from celery import shared_task, Celery
 import os, shutil, urllib
 import time
@@ -12,9 +13,6 @@ import urllib
 import edge_tts, random, subprocess
 import asyncio, json, shutil
 from googletrans import Translator
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.probability import FreqDist
 import math
 from datetime import timedelta, datetime
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor
@@ -45,91 +43,114 @@ load_dotenv()
 SECRET_KEY=os.environ.get('SECRET_KEY')
 SERVER=os.environ.get('SERVER')
 ACCESS_TOKEN = None
-class WebSocketClient:
-   def __init__(self, url, min_delay=1.0):
-       self.url = url
-       self.ws = None
-       self.lock = Lock()
-       self.last_send_time = 0
-       self.min_delay = min_delay
-       
-       # Status messages that bypass rate limiting
-       self.important_statuses = [
-           "Render Thành Công : Đang Chờ Upload lên Kênh",
-           "Đang Render : Upload file File Lên Server thành công!",
-           "Đang Render : Đang xử lý video render"
-       ]
-       
-       # Setup logging
-       logging.basicConfig(level=logging.INFO)
-       self.logger = logging.getLogger(__name__)
-       
-   def should_send(self, status):
-       """Check if message should be sent based on status and rate limiting"""
-       current_time = time.time()
-       time_since_last = current_time - self.last_send_time
 
-       if status in self.important_statuses:
-           return True
-           
-       return time_since_last >= self.min_delay
-       
-   def connect(self):
-       """Establish WebSocket connection"""
-       try:
-           if self.ws is None or not self.ws.connected:
-               self.ws = websocket.WebSocket()
-               self.ws.connect(self.url)
-               self.logger.info("Successfully connected to WebSocket")
-               return True
-       except Exception as e:
-           self.logger.error(f"Connection failed: {str(e)}")
-           return False
-           
-   def send(self, data, max_retries=5):
-       """Send data through WebSocket with rate limiting and retries"""
-       with self.lock:
-           try:
-               status = data.get('status')
-               
-               if not self.should_send(status):
-                   return True
-                   
-               for attempt in range(max_retries):
-                   try:
-                       if not self.ws or not self.ws.connected:
-                           if not self.connect():
-                               self.logger.warning(f"Connection attempt {attempt + 1} failed")
-                               continue
-                               
-                       self.ws.send(json.dumps(data))
-                       self.last_send_time = time.time()
-                       self.logger.debug(f"Successfully sent message: {status}")
-                       return True
-                       
-                   except Exception as e:
-                       self.logger.error(f"Send attempt {attempt + 1} failed: {str(e)}")
-                       time.sleep(1)
-                       continue
-                       
-               self.logger.error(f"Failed to send after {max_retries} attempts")
-               return False
-               
-           except Exception as e:
-               self.logger.error(f"Error in send method: {str(e)}")
-               return False
-               
-   def close(self):
-       """Close WebSocket connection"""
-       try:
-           if self.ws:
-               self.ws.close()
-               self.logger.info("WebSocket connection closed")
-       except Exception as e:
-           self.logger.error(f"Error closing connection: {str(e)}")
+logging.basicConfig(filename='process_video.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+class WebSocketClient:
+    def __init__(self, url, min_delay=1.0):
+        self.url = url
+        self.ws = None
+        self.lock = Lock()
+        self.last_send_time = 0
+        self.min_delay = min_delay
+        
+        # Status messages that bypass rate limiting
+        self.important_statuses = [
+            "Render Thành Công : Đang Chờ Upload lên Kênh",
+            "Đang Render : Upload file File Lên Server thành công!",
+            "Đang Render : Đang xử lý video render",
+            "Đang Render : Đã lấy thành công thông tin video reup",
+            "Render Lỗi"
+        ]
+        self.logger = self._setup_logger()
+
+    def _setup_logger(self):
+        """Setup logging configuration"""
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        return logger
+        
+    def should_send(self, status):
+        """Check if message should be sent based on status and rate limiting"""
+        current_time = time.time()
+        time_since_last = current_time - self.last_send_time
+
+        # Check if status contains any important keywords
+        if status and any(keyword in status for keyword in self.important_statuses):
+            return True
+            
+        # Apply rate limiting for other statuses
+        return time_since_last >= self.min_delay
+        
+    def connect(self):
+        """Establish WebSocket connection"""
+        try:
+            if self.ws is None or not self.ws.connected:
+                self.ws = websocket.WebSocket(sslopt={
+                    "cert_reqs": ssl.CERT_NONE,
+                    "check_hostname": False
+                })
+                self.ws.settimeout(30)
+                self.ws.connect(self.url)
+                self.logger.info("Successfully connected to WebSocket")
+                return True
+        except Exception as e:
+            self.logger.error(f"Connection failed: {str(e)}")
+            return False
+
+    def send(self, data, max_retries=5):
+        """Send data through WebSocket with rate limiting and retries"""
+        with self.lock:
+            try:
+                status = data.get('status')
+                
+                if not self.should_send(status):
+                    return True
+                    
+                for attempt in range(max_retries):
+                    try:
+                        if not self.ws or not self.ws.connected:
+                            if not self.connect():
+                                sleep_time = min(2 * attempt + 1, 10)
+                                time.sleep(sleep_time)
+                                continue
+                                
+                        self.ws.send(json.dumps(data))
+                        self.last_send_time = time.time()
+                        self.logger.debug(f"Successfully sent message: {status}")
+                        return True
+                        
+                    except websocket.WebSocketTimeoutException:
+                        self.logger.error(f"Timeout on attempt {attempt + 1}")
+                        self.ws = None
+                    except Exception as e:
+                        self.logger.error(f"Send failed: {str(e)}")
+                        self.ws = None
+                        
+                    sleep_time = min(2 * attempt + 1, 10)
+                    time.sleep(sleep_time)
+                
+                self.logger.error(f"Failed to send after {max_retries} attempts")
+                return False
+                
+            except Exception as e:
+                self.logger.error(f"Error in send method: {str(e)}")
+                return False
+                
+    def close(self):
+        """Close WebSocket connection"""
+        try:
+            if self.ws:
+                self.ws.close()
+                self.logger.info("WebSocket connection closed")
+        except Exception as e:
+            self.logger.error(f"Error closing connection: {str(e)}")
 
 # Khởi tạo WebSocket client một lần
-ws_client = WebSocketClient("wss://hrmedia89.com/ws/update_status/")
+ws_client = WebSocketClient("wss://autospamnews.com/ws/update_status/")
+
+
 
 def delete_directory(video_id):
     directory_path = f'media/{video_id}'
@@ -161,8 +182,8 @@ def task_failure_handler(sender, task_id, exception, args, kwargs, traceback, ei
     worker_id = "None"
     update_status_video("Render Lỗi : Xử Lý Video Không Thành Công!", video_id, task_id, worker_id)
     delete_directory(video_id)
-    
 # Xử lý khi task bị hủy
+
 @task_revoked.connect
 def clean_up_on_revoke(sender, request, terminated, signum, expired, **kw):
     task_id = request.id
@@ -174,7 +195,7 @@ def clean_up_on_revoke(sender, request, terminated, signum, expired, **kw):
     else:
         print(f"Không thể tìm thấy video_id cho task {task_id} vì không có args.")
 
-@shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content',rate_limit='4/m')
+@shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content')
 def render_video(self, data):
     task_id = render_video.request.id
     worker_id = render_video.request.hostname  # Lưu worker ID
@@ -239,7 +260,7 @@ def render_video(self, data):
     shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
-@shared_task(bind=True, priority=1,name='render_video_reupload',time_limit=140000,queue='render_video_reupload',rate_limit='4/m')
+@shared_task(bind=True, priority=1,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
 def render_video_reupload(self, data):
     task_id = render_video_reupload.request.id
     worker_id = render_video_reupload.request.hostname 
@@ -257,12 +278,6 @@ def render_video_reupload(self, data):
         shutil.rmtree(f'media/{video_id}')
         update_status_video("Render Lỗi : Không thể xử lý url video liên hệ admin", data['video_id'], task_id, worker_id)
         return
-    # if data.get('url_reupload'):
-    #     success = downdload_video_reup(data, task_id, worker_id)
-    #     if not success:
-    #         shutil.rmtree(f'media/{video_id}')
-    #         return
-    # update_status_video("Đang Render : Tải xuống video thành công", data['video_id'], task_id, worker_id)
     
     success = cread_test_reup(data, task_id, worker_id)
     if not success:
@@ -1197,6 +1212,9 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
                     # Chạy lệnh FFmpeg
                     subprocess.run(cmd, check=True)
                 except subprocess.CalledProcessError as e:
+                    error_message = f"FFmpeg Error: {str(e)} | Command: {' '.join(cmd)}"
+                    update_status_video(f"Render Lỗi : {error_message}", video_id, task_id, worker_id)
+                    logging.error(error_message)
                     return False
         return True
     except Exception as e:
@@ -1238,7 +1256,6 @@ def create_video_lines(data, task_id, worker_id):
                         percent_complete = (processed_entries / total_entries) * 100
                         update_status_video(f"Đang Render : Đang tạo video {percent_complete:.2f}%", video_id, task_id, worker_id)
                     else:
-                        update_status_video("Render Lỗi: Lỗi trong quá trình tạo video cho một đoạn.", video_id, task_id, worker_id)
                         for pending in futures:
                             pending.cancel()  # Hủy tất cả các tác vụ chưa hoàn thành
                         return False  # Dừng quá trình nếu có lỗi trong việc tạo video cho một đoạn
@@ -1569,7 +1586,7 @@ def download_audio(data, task_id, worker_id):
         processed_entries = 0
 
         # Khởi tạo luồng xử lý tối đa 20 luồng
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=10) as executor:
             futures = {
                 executor.submit(process_voice_entry, data, text_entry, video_id, task_id, worker_id, language): idx
                 for idx, text_entry in enumerate(text_entries)
@@ -2177,7 +2194,6 @@ def get_video_info(video_url):
         print(f"Unexpected error: {e}")
         return None
     
-
 def update_info_video(data, task_id, worker_id):
     try:
         video_url = data.get('url_video_youtube')
@@ -2189,26 +2205,12 @@ def update_info_video(data, task_id, worker_id):
         result = get_video_info(video_url)
         if not result:
             raise ValueError(f"Failed to get video info from {video_url}")
+        
+        
+        url_thumnail = get_youtube_thumbnail(video_url)
 
         update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
-                          video_id, task_id, worker_id)
-
-        # Cập nhật thông tin video lên server
-        url = f'{SERVER}/api/'
-        payload = {
-            'video_id': str(video_id),
-            'action': 'update-info-video',
-            'secret_key': SECRET_KEY,
-            'title': result["title"],
-            'thumbnail_url': result["thumbnail_url"],
-        }
-
-        response = requests.post(url, json=payload)
-        response.raise_for_status()
-
-        update_status_video("Đang Render : Đã cập nhập thành công video youtube chuẩn bị tải video youtube", 
-                          video_id, task_id, worker_id)
-
+                          video_id, task_id, worker_id,url_thumbnail=url_thumnail['max'],title=result["title"])
         # Tải video
         download_url = result["preview_url"]
         if not download_url:
@@ -2217,6 +2219,8 @@ def update_info_video(data, task_id, worker_id):
                 return  True
             else:
                 return False
+        update_status_video("Đang Render : Đã tải xong video youtube", 
+                          video_id, task_id, worker_id)
         response = requests.get(download_url, stream=True)
         response.raise_for_status()
         output_file = f'media/{video_id}/cache.mp4'    
@@ -2246,13 +2250,42 @@ def update_info_video(data, task_id, worker_id):
                           data.get('video_id'), task_id, worker_id)
         return False
     
-def update_status_video(status_video, video_id, task_id, worker_id, url_video=None):
+def remove_invalid_chars(string):
+    # Kiểm tra nếu đầu vào không phải chuỗi
+    if not isinstance(string, str):
+        return ''
+    # Loại bỏ ký tự Unicode 4 byte
+    return re.sub(r'[^\u0000-\uFFFF]', '', string)
+
+def get_youtube_thumbnail(youtube_url):
+    try:
+        # Regex pattern để lấy video ID
+        pattern = r'(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)'
+        video_id = re.findall(pattern, youtube_url)[0]
+        
+        # Tạo các URL thumbnail
+        thumbnails = {
+            'max': f'https://i3.ytimg.com/vi/{video_id}/maxresdefault.jpg',
+            'hq': f'https://i3.ytimg.com/vi/{video_id}/hqdefault.jpg',
+            'mq': f'https://i3.ytimg.com/vi/{video_id}/mqdefault.jpg',
+            'sd': f'https://i3.ytimg.com/vi/{video_id}/sddefault.jpg',
+            'default': f'https://i3.ytimg.com/vi/{video_id}/default.jpg'
+        }
+        
+        return thumbnails
+        
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+def update_status_video(status_video, video_id, task_id, worker_id,url_thumbnail=None, url_video=None,title=None):
     data = {
         'type': 'update-status',
         'video_id': video_id,
         'status': status_video,
         'task_id': task_id,
         'worker_id': worker_id,
+        "url_thumbnail":url_thumbnail,
+        'title': remove_invalid_chars(title),
         'url_video': url_video,
     }
     ws_client.send(data)

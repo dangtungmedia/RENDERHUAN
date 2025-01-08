@@ -4,15 +4,17 @@ services:
     restart: always
     build:
       context: .
-    command: python start_celery_content.py
+    command: python Start_celery_app.py
     volumes:
       - .:/app
     network_mode: "host"
+    
   voicevox_render:
     container_name: voicevox_render
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
     ports:
-      - "127.0.0.1:50021:50021"
-    restart: always 
+      - "127.0.0.1:50025:50025"
+    restart: always
     volumes:
       - .:/app
+
