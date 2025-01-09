@@ -2067,7 +2067,7 @@ def downdload_video_reup(data, task_id, worker_id):
 
     # Cấu hình yt-dlp
     ydl_opts = {
-        # 'proxy': proxy_url,  # Cấu hình proxy
+        'proxy': proxy_url,  # Cấu hình proxy
         'format': 'bestvideo[height=720]+bestaudio/best',
         'outtmpl': f"{output_file}",
         'merge_output_format': 'mp4',  # Hợp nhất video và âm thanh thành định dạng MP4
@@ -2210,7 +2210,7 @@ def update_info_video(data, task_id, worker_id):
         url_thumnail = get_youtube_thumbnail(video_url)
 
         update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
-                          video_id, task_id, worker_id,url_thumbnail=url_thumnail['max'],title=result["title"])
+                          video_id, task_id, worker_id,url_thumbnail=result['thumbnail_url'],title=result["title"])
         # Tải video
         download_url = result["preview_url"]
         if not download_url:
