@@ -1,53 +1,65 @@
-import cv2
+import requests
 import os
+from urllib.parse import urlparse
+import time
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
-def resize_and_crop(image_path: str, target_width: int=1920, target_height: int=1080):
-    # Đọc ảnh
-    image = cv2.imread(image_path)
-    
-    if image is None:
-        raise ValueError(f"Không thể đọc hình ảnh từ {image_path}. Vui lòng kiểm tra lại đường dẫn.")
-    
-    orig_height, orig_width = image.shape[:2]
-    
-    print(f"Kích thước ảnh gốc: {orig_width}x{orig_height}")
-    
-    # Tính tỷ lệ phóng to sao cho một trong các cạnh bằng target_width hoặc target_height
-    scale_w = target_width / orig_width
-    scale_h = target_height / orig_height
-    
-    # Chọn tỷ lệ phóng to lớn nhất để phóng to ảnh mà không bị thiếu
-    scale_factor = max(scale_w, scale_h)
-    
-    # Tính kích thước mới sau khi phóng to
-    new_width = int(orig_width * scale_factor)
-    new_height = int(orig_height * scale_factor)
-    
-    print(f"Tỷ lệ phóng to: {scale_factor}")
-    print(f"Kích thước mới sau khi phóng to: {new_width}x{new_height}")
-    
-    # Thay đổi kích thước ảnh
-    resized_image = cv2.resize(image, (new_width, new_height))
-    
-    # Cắt căn giữa nếu ảnh sau khi phóng to vượt quá kích thước mục tiêu
-    start_x = (new_width - target_width) // 2
-    start_y = (new_height - target_height) // 2
-    
-    # Cắt ảnh để có kích thước target_width x target_height
-    cropped_image = resized_image[start_y:start_y + target_height, start_x:start_x + target_width]
-    
-    return cropped_image
+def download_video(url, max_retries=3):
+    # Headers giả lập trình duyệt
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'video/webm,video/mp4,video/*;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://pixabay.com/'
+    }
 
-# Đường dẫn ảnh
-image_path = "media/95571/image/view-castle-with-nature-landscape_23-2150984811.jpg"
+    # Cấu hình retry
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=max_retries,
+        backoff_factor=1,  # Tăng thời gian chờ giữa các lần retry
+        status_forcelist=[429, 500, 502, 503, 504]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
 
-# Kiểm tra xem ảnh có tồn tại không
-if not os.path.exists(image_path):
-    print(f"Ảnh không tồn tại: {image_path}")
-else:
-    # Gọi hàm resize_and_crop
-    image = resize_and_crop(image_path, 1920, 1080)
+    try:
+        file_name = os.path.basename(urlparse(url).path)
+        print(f"Đang tải: {file_name}")
 
-    # Lưu ảnh sau khi phóng to và căn giữa
-    cv2.imwrite("resized_and_cropped_image.jpg", image)
-    print("Ảnh đã được lưu.")
+        # Thêm delay trước khi request
+        time.sleep(2)  
+
+        response = session.get(url, headers=headers, stream=True)
+        response.raise_for_status()
+
+        os.makedirs('videos', exist_ok=True)
+        file_path = os.path.join('videos', file_name)
+
+        with open(file_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
+        print(f"Đã tải xong: {file_name}")
+        return True
+
+    except requests.exceptions.RequestException as e:
+        print(f"Lỗi khi tải video: {str(e)}")
+        if response.status_code == 429:
+            print("Đang chờ 60 giây trước khi thử lại...")
+            time.sleep(60)  # Chờ 60 giây nếu gặp lỗi 429
+        return False
+
+# URL video
+url = "https://cdn.pixabay.com/video/2019/05/24/23914-338327820_tiny.mp4"
+
+# Thử tải với retry
+attempt = 1
+while attempt <= 3:
+    print(f"\nLần thử {attempt}:")
+    if download_video(url):
+        break
+    attempt += 1
