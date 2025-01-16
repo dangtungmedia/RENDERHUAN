@@ -47,4 +47,4 @@ if __name__ == "__main__":
     elif public_ip == "27.72.153.24":
         os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip} --concurrency=5 -Q render_video_content,render_video_reupload --prefetch-multiplier=1")
     else:
-        os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip} --concurrency=3 -Q render_video_content,render_video_reupload --prefetch-multiplier=1")
+        os.system(f"celery -A celeryworker worker -l INFO --hostname={public_ip} --concurrency=3 -Q render_video_reupload --prefetch-multiplier=1")

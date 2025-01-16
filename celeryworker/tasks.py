@@ -2158,30 +2158,108 @@ def calculate_new_position(crop_data, original_resolution=(640, 360), target_res
 
     return round(new_left), round(new_top), round(new_width), round(new_height)
 
-def get_video_info(video_url):
-    api_url = "https://iloveyt.net/proxy.php"
-    form_data = {"url": video_url}
-
+def get_video_info(data,task_id,worker_id):
+    video_id = data.get('video_id')
+    output_file = f'media/{video_id}/cache.mp4'
+    video_url = data.get('url_video_youtube')
+    # Đảm bảo thư mục đích tồn tại
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    
+    # Thử phương thức 1: Sử dụng API
     try:
+        api_url = "https://iloveyt.net/proxy.php"
+        form_data = {"url": video_url}
         response = requests.post(api_url, data=form_data, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+        api_data = response.json()
         
-        if "api" not in data or "mediaItems" not in data["api"]:
+        if "api" not in api_data or "mediaItems" not in api_data["api"]:
             raise ValueError("Invalid API response format")
-        title = data["api"]["title"]
-        return {
-            "title": title
-        }
             
-    except requests.RequestException as e:
-        print(f"Network error: {e}")
+        title = api_data["api"]["title"]
+        media_preview_url = api_data["api"]["previewUrl"]
+        
+        # Tải video với cập nhật % tải
+        with requests.get(media_preview_url, stream=True) as response:
+            total_size = int(response.headers.get('content-length', 0))
+            chunk_size = 8192
+            downloaded_size = 0
+
+            with open(output_file, "wb") as file:
+                for chunk in response.iter_content(chunk_size=chunk_size):
+                    if chunk:
+                        file.write(chunk)
+                        downloaded_size += len(chunk)
+
+                        # Tính % tải và cập nhật trạng thái
+                        percent_complete = (downloaded_size / total_size) * 100
+                        update_status_video(
+                            f"Đang Render: Đang tải video {percent_complete:.2f}%",
+                            video_id,
+                            task_id,
+                            worker_id
+                        )
+        update_status_video(f"Đang Render: Đã tải xong video", video_id, task_id, worker_id)
+        return {"title": title}
+        
+    except (requests.RequestException, ValueError, KeyError, IOError) as e:
+        print(f"Phương thức 1 thất bại: {str(e)}")
+        update_status_video(f"Đang Render: Phương thức download 1 thất bại", video_id, task_id, worker_id)  
+        
+    # Phương thức 2: Sử dụng yt-dlp
+    try:
+        url = data.get('url_video_youtube')
+        if not url:
+            raise ValueError("Không tìm thấy URL video YouTube")
+            
+        max_retries = 4
+        retry_delay = 1
+        proxy_url = os.environ.get('PROXY_URL')
+        
+        ydl_opts = {
+            'format': 'bestvideo[height=720]+bestaudio/best',
+            'outtmpl': output_file,
+            'merge_output_format': 'mp4',
+            'quiet': False,
+            'no_warnings': False
+        }
+        
+    
+        for attempt in range(max_retries):
+            try:
+                if attempt == 3: 
+                    ydl_opts['proxy'] = proxy_url
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    update_status_video(f"Đang Render: Đang thử tải video (lần {attempt + 1}/{max_retries})", 
+                          data.get('video_id'), task_id, worker_id)
+                    
+                    # Lấy thông tin video trước
+                    video_info = ydl.extract_info(url, download=False)
+                    video_title = video_info.get('title', 'Không xác định')
+                    print(f"Tiêu đề video: {video_title}")
+                    # Tải video
+                    ydl.download([url])
+                    
+                    if os.path.exists(output_file):
+                        update_status_video(f"Đang Render: Đã tải xong video", video_id, task_id, worker_id)
+                        return {"title": video_title}
+                        
+            except yt_dlp.DownloadError as e:
+                print(f"Lỗi tải video (lần {attempt + 1}): {str(e)}")
+                if attempt < max_retries - 1:
+                    print(f"Chờ {retry_delay} giây trước khi thử lại...")
+                    time.sleep(retry_delay)
+                    
+            except Exception as e:
+                print(f"Lỗi không xác định (lần {attempt + 1}): {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+        update_status_video(f"Render Lỗi: Không thể tải video sau nhiều lần thử", 
+                          data.get('video_id'), task_id, worker_id)
         return None
-    except ValueError as e:
-        print(f"Data error: {e}")
-        return None
+        
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"Lỗi không xác định trong quá trình xử lý: {str(e)}")
+        update_status_video(f"Render Lỗi: Phương thức download youtube thất bại",video_id, task_id, worker_id)
         return None
     
 def update_info_video(data, task_id, worker_id):
