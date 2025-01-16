@@ -2184,6 +2184,48 @@ def get_video_info(video_url):
         print(f"Unexpected error: {e}")
         return None
     
+def update_info_video(data, task_id, worker_id):
+    try:
+        video_url = data.get('url_video_youtube')
+        video_id = data.get('video_id')
+        
+        if not video_url :
+            update_status_video(f"Render Lỗi: lỗi không có url video", 
+                          data.get('video_id'), task_id, worker_id)
+            return False
+
+
+        result = get_video_info(data,task_id,worker_id)
+        if not result:
+            update_status_video(f"Render Lỗi: lỗi lấy thông tin video và tải video", 
+                          data.get('video_id'), task_id, worker_id)
+            return False
+        
+        
+        url_thumnail = get_youtube_thumbnail(video_url)
+
+        update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
+                          video_id, task_id, worker_id,url_thumbnail=url_thumnail['max'],title=result["title"])
+        return True
+
+    except requests.RequestException as e:
+        print(f"Network error: {e}")
+        update_status_video(f"Render Lỗi: Lỗi kết nối - {str(e)}", 
+                          data.get('video_id'), task_id, worker_id)
+        return False
+        
+    except ValueError as e:
+        print(f"Value error: {e}")
+        update_status_video(f"Render Lỗi: {str(e)}", 
+                          data.get('video_id'), task_id, worker_id)
+        return False
+        
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        update_status_video(f"Render Lỗi: Lỗi không xác định - {str(e)}", 
+                          data.get('video_id'), task_id, worker_id)
+        return False
+    
 def cread_test_reup(data, task_id, worker_id):
     # Lấy ID video và đường dẫn tới video
     video_dir = "video"
@@ -2368,7 +2410,6 @@ def cread_test_reup(data, task_id, worker_id):
         update_status_video("Đang Lỗi: Lỗi xuất video bằng ffmpeg vui lòng chạy lại", data['video_id'], task_id, worker_id)
         return False
 
-   
 def remove_invalid_chars(string):
     # Kiểm tra nếu đầu vào không phải chuỗi
     if not isinstance(string, str):
