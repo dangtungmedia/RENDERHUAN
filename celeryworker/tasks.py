@@ -277,7 +277,6 @@ def cread_test_reup(data, task_id, worker_id):
     ]
 
     try:
-        # Khởi tạo lệnh ffmpeg và đọc output
         with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:    
             total_duration = None
             progress_bar = None
