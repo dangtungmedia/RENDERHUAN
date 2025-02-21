@@ -151,7 +151,6 @@ def render_video(self, data):
         return
     shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
-    update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
 @shared_task(bind=True, priority=1,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
 def render_video_reupload(self, data):
@@ -182,8 +181,6 @@ def render_video_reupload(self, data):
         update_status_video("Render Lỗi : Không thể upload video", data['video_id'], task_id, worker_id)
         return
     shutil.rmtree(f'media/{video_id}')
-    update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
-    time.sleep(2)
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
 
@@ -270,13 +267,14 @@ def cread_test_reup(data, task_id, worker_id):
         ),
         "-map", "[outv]",
         "-map", "[a]",
+        "-threads", "56",
         "-c:v", "libx264",
         "-c:a", "aac",
         "-preset", "ultrafast",
         output_path
     ]
-
     try:
+        # Khởi tạo lệnh ffmpeg và đọc output
         with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:    
             total_duration = None
             progress_bar = None
@@ -994,9 +992,9 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
                         "-i", cache_file,
                         "-t", str(duration),     # Thời gian video cần cắt
                         "-r", "24",              # Tốc độ khung hình đầu ra
-                        "-c:v", "h264_nvenc",       # Codec video
+                        "-c:v", "libx264",       # Codec video
                         "-crf", "23",            # Chất lượng video
-                        "-preset", "fast",     # Tốc độ mã hóa
+                        "-preset", "ultrafast",     # Tốc độ mã hóa
                         "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
                         "-vsync", "1",           # Đồng bộ hóa video
                         "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
@@ -1449,11 +1447,11 @@ def get_voice_japanese(data, text, file_name):
         try:
             # Tạo audio query với VoiceVox
             response_query = requests.post(
-                            f'http://127.0.0.1:50021/audio_query?speaker={voice_id}',  # API để tạo audio_query
+                            f'http://127.0.0.1:50025/audio_query?speaker={voice_id}',  # API để tạo audio_query
                             params={'text': text}  # Gửi văn bản cần chuyển thành giọng nói
                         )
             # Yêu cầu tạo âm thanh
-            url_synthesis = f"http://127.0.0.1:50021/synthesis?speaker={voice_id}"
+            url_synthesis = f"http://127.0.0.1:50025/synthesis?speaker={voice_id}"
             response_synthesis = requests.post(url_synthesis,data=json.dumps(response_query.json()))
             # Ghi nội dung phản hồi vào tệp
             with open(file_name, 'wb') as f:
@@ -1480,6 +1478,49 @@ def get_voice_japanese(data, text, file_name):
         print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
         return False
     
+    return True
+
+async def text_to_speech_async(text, voice, output_file):
+    communicate = edge_tts.Communicate(text=text, voice=voice)
+    await communicate.save(output_file)
+
+def get_voice_korea(data, text, file_name):
+    """Hàm xử lý TTS cho tiếng Hàn Quốc, tương tự get_voice_chat_gpt."""
+    directory = os.path.dirname(file_name)
+    name_langue = data.get('style')
+    
+    # Tạo thư mục nếu chưa tồn tại
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+    
+    success = False
+    attempt = 0
+    
+    while not success and attempt < 10:
+        try:
+            # Chạy text_to_speech dưới dạng không đồng bộ
+            asyncio.run(text_to_speech_async(text, name_langue, file_name))
+            
+            # Kiểm tra độ dài tệp âm thanh
+            duration = get_audio_duration(file_name)
+            if duration > 0:  # Đảm bảo rằng âm thanh có độ dài hợp lý
+                success = True
+                print(f"Tạo giọng nói thành công cho '{text}' tại {file_name}")
+                break
+            else:
+                if os.path.exists(file_name):
+                    os.remove(file_name)  # Xóa tệp nếu không hợp lệ
+                print(f"Lỗi: Tệp âm thanh {file_name} không hợp lệ.")
+        except Exception as e:
+            print(f"Lỗi khi tạo giọng nói cho tiếng Hàn: {e}. Thử lại...")
+        
+        attempt += 1
+        if not success:
+            time.sleep(1)  # Đợi 1 giây trước khi thử lại
+    
+    if not success:
+        print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
+        return False
     return True
 
 def get_voice_chat_gpt(data, text, file_name):
@@ -1994,8 +2035,6 @@ def get_video_info(data,task_id,worker_id):
     
         for attempt in range(max_retries):
             try:
-                if attempt == 3: 
-                    ydl_opts['proxy'] = proxy_url
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     update_status_video(f"Đang Render: Đang thử tải video (lần {attempt + 1}/{max_retries})", 
                           data.get('video_id'), task_id, worker_id)
@@ -2200,5 +2239,4 @@ def update_status_video(status_video, video_id, task_id, worker_id,url_thumbnail
         "secret_key": "ugz6iXZ.fM8+9sS}uleGtIb,wuQN^1J%EvnMBeW5#+CYX_ej&%"
     }
     http_client.send(data)
-
 
