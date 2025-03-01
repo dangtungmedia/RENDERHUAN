@@ -2087,7 +2087,11 @@ def update_info_video(data, task_id, worker_id):
             return False
         
         
-        url_thumnail = get_youtube_thumbnail(video_url)
+        url_thumnail = get_youtube_thumbnail(video_url,video_id)
+        if not url_thumnail:
+            update_status_video(f"Render Lỗi: lỗi lấy ảnh thumbnail", 
+                          data.get('video_id'), task_id, worker_id)
+            return False
 
         update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
                           video_id, task_id, worker_id,url_thumbnail=url_thumnail,title=result["title"])
@@ -2118,39 +2122,96 @@ def remove_invalid_chars(string):
     # Loại bỏ ký tự Unicode 4 byte
     return re.sub(r'[^\u0000-\uFFFF]', '', string)
 
-def get_youtube_thumbnail(youtube_url):
+def get_youtube_thumbnail(youtube_url, video_id):
     try:
+        # Đảm bảo video_id là chuỗi
+        video_id = str(video_id)
+
         # Regex pattern để lấy video ID
         pattern = r'(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)'
-        video_id = re.findall(pattern, youtube_url)[0]
-        
-        # Tạo các URL thumbnail theo thứ tự độ phân giải
+        match = re.findall(pattern, youtube_url)
+
+        if not match:
+            print("❌ Invalid YouTube URL")
+            return False
+
+        video_id_youtube = match[0]
+
+        # Danh sách URL thumbnail từ chất lượng cao đến thấp
         thumbnails = {
-            'max': f'https://i3.ytimg.com/vi/{video_id}/maxresdefault.jpg',
-            'hq': f'https://i3.ytimg.com/vi/{video_id}/hqdefault.jpg',
-            'mq': f'https://i3.ytimg.com/vi/{video_id}/mqdefault.jpg',
-            'sd': f'https://i3.ytimg.com/vi/{video_id}/sddefault.jpg',
-            'default': f'https://i3.ytimg.com/vi/{video_id}/default.jpg'
+            'max': f'https://i3.ytimg.com/vi/{video_id_youtube}/maxresdefault.jpg',
+            'hq': f'https://i3.ytimg.com/vi/{video_id_youtube}/hqdefault.jpg',
+            'mq': f'https://i3.ytimg.com/vi/{video_id_youtube}/mqdefault.jpg',
+            'sd': f'https://i3.ytimg.com/vi/{video_id_youtube}/sddefault.jpg',
+            'default': f'https://i3.ytimg.com/vi/{video_id_youtube}/default.jpg'
         }
-        
-        # Thử tải lần lượt từ max đến default
+
+        # Đường dẫn thư mục lưu ảnh
+        save_dir = os.path.join('media', video_id, 'thumbnail')
+
         for quality, url in thumbnails.items():
             try:
-                response = requests.get(url, stream=True)
+                response = requests.get(url, stream=True, timeout=5)
+
                 if response.status_code == 200:
-                    print(f"Thumbnail found: {quality} - {url}")
-                    return url
-                else:
-                    print(f"lỗi ảnh {url}")
-            except requests.exceptions.RequestException:
-                print(f"lỗi ảnh {url}")
-                continue
-        
-        # Nếu không có thumbnail nào khả dụng
-        return "No valid thumbnail found."
+                    # Nếu tải thành công, tạo thư mục lưu ảnh nếu chưa có
+                    os.makedirs(save_dir, exist_ok=True)
+                    file_path = os.path.join(save_dir, f"{video_id_youtube}_{quality}.jpg")
+
+                    # Lưu ảnh vào máy
+                    with open(file_path, 'wb') as file:
+                        for chunk in response.iter_content(1024):
+                            file.write(chunk)
+
+                    print(f"✅ Tải thành công: {file_path}")
+
+                    # Kiểm tra nếu ảnh tồn tại thì mới upload lên S3
+                    if os.path.exists(file_path):
+                        s3 = boto3.client(
+                            's3',
+                            endpoint_url=os.getenv('S3_ENDPOINT_URL'),
+                            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+                        )
+
+                        bucket_name = os.getenv('S3_BUCKET_NAME')
+                        object_name = f"data/{video_id}/thumbnail/{video_id_youtube}_{quality}.jpg"
+
+                        # Upload ảnh lên S3
+                        s3.upload_file(
+                            file_path,
+                            bucket_name,
+                            object_name,
+                            ExtraArgs={
+                                'ContentType': 'image/jpeg',
+                                'ContentDisposition': 'inline'
+                            }
+                        )
+
+                        # Tạo URL có thời hạn 1 năm
+                        expiration = 365 * 24 * 60 * 60
+                        s3_url = s3.generate_presigned_url(
+                            'get_object',
+                            Params={
+                                'Bucket': bucket_name,
+                                'Key': object_name,
+                                'ResponseContentType': 'image/jpeg',
+                                'ResponseContentDisposition': 'inline'
+                            },
+                            ExpiresIn=expiration
+                        )
+
+                        return s3_url  # Trả về URL của ảnh đã upload thành công
+
+            except requests.exceptions.RequestException as e:
+                print(f"❌ Lỗi khi tải ảnh {url}: {e}")
+                break  # Thay vì `continue`, dừng vòng lặp khi có lỗi
+
+        return False  # Không tìm thấy thumbnail hợp lệ
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        print(f"❌ Lỗi không xác định: {e}")
+        return False
 
 class HttpClient:
     def __init__(self, url, min_delay=1.0):
