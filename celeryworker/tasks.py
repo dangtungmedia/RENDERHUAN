@@ -267,10 +267,9 @@ def cread_test_reup(data, task_id, worker_id):
         ),
         "-map", "[outv]",
         "-map", "[a]",
-        "-threads", "56",
-        "-c:v", "libx264",
+        "-c:v", "h264_nvenc",
         "-c:a", "aac",
-        "-preset", "ultrafast",
+        "-preset", "p7",
         output_path
     ]
     try:
