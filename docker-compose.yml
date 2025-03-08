@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   celery_render:
     container_name: celery_render
@@ -8,17 +9,11 @@ services:
     volumes:
       - .:/app
     network_mode: "host"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all  # Sử dụng tất cả GPU có sẵn, hoặc có thể chỉ định số lượng cụ thể như 1,2,...
-              capabilities: [gpu]
-    runtime: nvidia
+    runtime: nvidia  # Chỉ định sử dụng nvidia runtime
     environment:
       - NVIDIA_VISIBLE_DEVICES=all  # Hoặc chỉ định GPU cụ thể như "0" hoặc "0,1"
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video  # Bao gồm khả năng mã hóa video
+
     
   # voicevox_render:
   #   container_name: voicevox_render
