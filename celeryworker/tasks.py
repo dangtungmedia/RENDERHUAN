@@ -869,17 +869,13 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
             "-ss", start_time_str,   # Thời gian bắt đầu cắt của video
             "-t", str(duration),     # Thời gian video cần cắt
             "-vf", f"scale={scale_width}:{scale_height},setpts={scale_factor}*PTS",  # Thay đổi độ phân giải và tốc độ video
-            "-r", "24",              # Tốc độ khung hình đầu ra
-            "-c:v", "libx264",       # Codec video
-            "-crf", "18",            # Chất lượng video
-            "-preset", "medium",     # Tốc độ mã hóa
-            "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
-            "-vsync", "1",           # Đồng bộ hóa video
-            "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
-            "-y",                    # Ghi đè file đầu ra nếu đã tồn tại
+            "-r", "24",                     # Tốc độ khung hình đầu ra
+            "-c:v", "hevc_nvenc",           # Codec video H.265 NVENC
+            "-preset", "fast",              # Chế độ mã hóa nhanh nhất
+            "-loglevel", "debug",           # Mức độ log để ghi chi tiết
+            "-y",                           # Ghi đè file đầu ra nếu đã tồn tại
             output_video
         ]
-    
     try:
         # Chạy lệnh FFmpeg
         subprocess.run(cmd, check=True)
@@ -1007,7 +1003,6 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         if file_type == "video":
             cut_and_scale_video_random(path_file, out_file, duration, 1920, 1080, 'video_screen')
         elif file_type == "image":
-            
             cache_file = f'media/{video_id}/video/chace_{text_entry["id"]}.mp4'
             success = random_video_effect_cython(path_file, cache_file, duration,24,1920, 1080)
             if not success:
