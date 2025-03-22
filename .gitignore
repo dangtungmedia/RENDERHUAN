@@ -28,6 +28,7 @@ AppUpload.rar
 package-lock.json
 
 staticfiles/*
+token.json
 !staticfiles/.gitkeep 
 .vscode/symbols.json
 
