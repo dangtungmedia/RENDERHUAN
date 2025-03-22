@@ -36,4 +36,4 @@ if __name__ == "__main__":
     local_ip = get_local_ip()
     if local_ip:
         # Chạy Celery worker với IP local
-        os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip} --concurrency=5 -Q render_video_reupload --prefetch-multiplier=1 -O fair")
+        os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip} --concurrency=5 -Q render_video_content,render_video_reupload --prefetch-multiplier=1 -O fair")

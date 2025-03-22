@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   celery_render:
     container_name: celery_render
@@ -19,14 +21,16 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all  # Hoặc chỉ định GPU cụ thể như "0" hoặc "0,1"
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video  # Bao gồm khả năng mã hóa video
-    
-  # voicevox_render:
-  #   container_name: voicevox_render
-  #   image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
-  #   ports:
-  #     - "127.0.0.1:50021:50021"
-  #   restart: always
-  #   volumes:
-  #     - .:/app
-      
 
+  voicevox_render:
+    container_name: voicevox_render
+    image: voicevox/voicevox_engine:nvidia-latest  # Đã cập nhật với tên đúng của image GPU
+    ports:
+      - "127.0.0.1:50021:50021"
+    restart: always
+    volumes:
+      - .:/app
+    runtime: nvidia  # Sử dụng GPU qua NVIDIA runtime
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all  # Sử dụng tất cả GPU (có thể thay đổi để chỉ dùng 1 GPU, ví dụ: "0" cho GPU đầu tiên)
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Các khả năng GPU mà Docker cần sử dụng
