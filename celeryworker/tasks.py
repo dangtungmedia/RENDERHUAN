@@ -36,6 +36,7 @@ import threading
 from threading import Lock
 import logging
 
+from time import sleep
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -46,13 +47,12 @@ from googleapiclient.errors import HttpError
 from urllib.parse import urlparse
 from time import sleep
 # Nạp biến môi trường từ file .env
+# Nạp biến môi trường từ file .env
 load_dotenv()
 
 SECRET_KEY=os.environ.get('SECRET_KEY')
 SERVER=os.environ.get('SERVER')
 ACCESS_TOKEN = None
-logging.basicConfig(filename='render_errors.log', level=logging.ERROR,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 def delete_directory(video_id):
     directory_path = f'media/{video_id}'
@@ -99,11 +99,10 @@ def clean_up_on_revoke(sender, request, terminated, signum, expired, **kw):
 
 @shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content')
 def render_video(self, data):
-    task_id = self.request.id  # Sử dụng self.request thay vì render_video_reupload.request
-    worker_id = self.request.hostname 
+    task_id = render_video.request.id
+    worker_id = render_video.request.hostname  # Lưu worker ID
     video_id = data.get('video_id')
-    # Kiểm tra xem task có bị hủy không ngay từ đầu
-    
+    print(data)
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     success = create_or_reset_directory(f'media/{video_id}')
 
@@ -165,15 +164,15 @@ def render_video(self, data):
 
 @shared_task(bind=True, priority=1,name='render_video_reupload',time_limit=140000,queue='render_video_reupload')
 def render_video_reupload(self, data):
-    task_id = self.request.id  # Sử dụng self.request thay vì render_video_reupload.request
-    worker_id = self.request.hostname 
+    task_id = render_video_reupload.request.id
+    worker_id = render_video_reupload.request.hostname 
     video_id = data.get('video_id')
-    # Kiểm tra xem task có bị hủy không ngay từ đầu
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     
     success = create_or_reset_directory(f'media/{video_id}')
     if not success:
         shutil.rmtree(f'media/{video_id}')
+        update_status_video("Render Lỗi : Không thể tạo thư mục", data['video_id'], task_id, worker_id)
         return
     
     success = update_info_video(data, task_id, worker_id)
@@ -189,50 +188,32 @@ def render_video_reupload(self, data):
     success = upload_video(data, task_id, worker_id)
     if not success:
         shutil.rmtree(f'media/{video_id}')
+        update_status_video("Render Lỗi : Không thể upload video", data['video_id'], task_id, worker_id)
         return
     shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
 
-def copy_videos_to_temp_folder(video_files, temp_folder):
-    # Tạo thư mục tạm nếu chưa tồn tại
-    os.makedirs(temp_folder, exist_ok=True)
-    
-    # Sao chép tất cả các video vào thư mục tạm
-    copied_videos = []
-    for video in video_files:
-        video_name = os.path.basename(video)
-        temp_video_path = os.path.join(temp_folder, video_name)
-        shutil.copy(video, temp_video_path)
-        copied_videos.append(temp_video_path)
-
-    return copied_videos
-
-def seconds_to_hms(seconds):
-    hours = seconds // 3600  # Tính giờ
-    minutes = (seconds % 3600) // 60  # Tính phút
-    seconds = seconds % 60  # Tính giây
-    return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"  # Định dạng: HH:MM:SS
 
 def cread_test_reup(data, task_id, worker_id):
+    # Lấy ID video và đường dẫn tới video
     video_dir = "video"
     video_id = data.get('video_id')
     video_path = f'media/{video_id}/cache.mp4'
-
+    
+    # Lấy thời gian video gốc và tính toán thời gian mới sau khi thay đổi tốc độ
     time_video = get_video_duration(video_path)
     speed = data.get('speed_video_crop', 1.0)
     if isinstance(speed, Decimal):
         speed = float(speed)
     duration = time_video / speed  # Thời gian video sau khi thay đổi tốc độ
     video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir) if f.endswith(('.mp4', '.mkv', '.avi'))]
-    
     if not video_files:
         update_status_video(f"Render Lỗi: không có video để render ", video_id, task_id, worker_id)
         return None
 
     selected_videos = []
     total_duration = 0
-    remaining_videos = set(video_files)
-    update_status_video("Đang Render: Đang Chọn video random", video_id, task_id, worker_id)
+    remaining_videos = set(video_files)  # Đảm bảo không chọn lại video đã chọn
 
     while total_duration < duration and remaining_videos:
         video = random.choice(list(remaining_videos))  # Chọn ngẫu nhiên video
@@ -241,34 +222,28 @@ def cread_test_reup(data, task_id, worker_id):
             video_duration = get_video_duration(video)
             selected_videos.append(video)
             total_duration += video_duration
-            # Chuyển đổi tổng thời gian từ giây thành giờ:phút:giây
-            formatted_duration = seconds_to_hms(total_duration)
-            formatted_limit = seconds_to_hms(duration)
-            update_status_video(f"Đang Render: Thời lượng videos {formatted_duration}/{formatted_limit}", video_id, task_id, worker_id)
         except Exception as e:
             print(f"Lỗi khi đọc thời gian video {video}: {e}")
 
     if total_duration < duration:
         update_status_video(f"Render Lỗi: Không thể chọn đủ video để vượt qua thời lượng yêu cầu.", video_id, task_id, worker_id)
         return None
-    update_status_video("Đang Render: Đã chọn xong video nối", video_id, task_id, worker_id)
-    # Tạo thư mục tạm để sao chép video
-    temp_folder = f'media/{video_id}/temp_video_folder'
-    update_status_video("Đang Render: Đang Coppy file tránh lỗi", video_id, task_id, worker_id)
-    copied_videos = copy_videos_to_temp_folder(selected_videos, temp_folder)
     
-    update_status_video("Đang Render: Đang Coppy xong videos chuẩn bị xuất video hoàn thành", video_id, task_id, worker_id)
+    video_id = data.get('video_id')
+    
+    # Nếu tất cả video được chuyển đổi thành công
+    update_status_video("Đang Render: Đã chọn xong video nối", video_id, task_id, worker_id)
     
     # Tạo tệp danh sách video để nối
     output_file_list = f'media/{video_id}/output_files.txt'
-    os.makedirs(os.path.dirname(output_file_list), exist_ok=True)
+    os.makedirs(os.path.dirname(output_file_list), exist_ok=True)  # Đảm bảo thư mục tồn tại
     
     try:
         with open(output_file_list, 'w') as f:
-            for video in copied_videos:
-                full_path = os.path.abspath(video)
-                if os.path.exists(full_path):
-                    f.write(f"file '{full_path}'\n")
+            for video in selected_videos:
+                full_path = os.path.abspath(video)  # Lấy đường dẫn tuyệt đối
+                if os.path.exists(full_path):  # Kiểm tra xem file có tồn tại không
+                    f.write(f"file '{full_path}'\n")  # Ghi đúng đường dẫn tuyệt đối
                 else:
                     print(f"Warning: Video không tồn tại - {full_path}")
     except Exception as e:
@@ -302,15 +277,15 @@ def cread_test_reup(data, task_id, worker_id):
         ),
         "-map", "[outv]",
         "-map", "[a]",
-        "-c:v", "hevc_nvenc",
+        "-threads", "56",
+        "-c:v", "libx264",
         "-c:a", "aac",
-        "-preset", "fast",
+        "-preset", "ultrafast",
         output_path
     ]
-    
     try:
         # Khởi tạo lệnh ffmpeg và đọc output
-        with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:
+        with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:    
             total_duration = None
             progress_bar = None
 
@@ -318,6 +293,7 @@ def cread_test_reup(data, task_id, worker_id):
             for line in process.stderr:
                 print(f"ffmpeg output: {line.strip()}")  # Log the ffmpeg output for debugging
                 if "Duration" in line:
+                    # Extract the total duration of the video
                     try:
                         duration_str = line.split(",")[0].split("Duration:")[1].strip()
                         h, m, s = map(float, duration_str.split(":"))
@@ -328,6 +304,7 @@ def cread_test_reup(data, task_id, worker_id):
                         continue
 
                 if "time=" in line and progress_bar:
+                    # Extract the current time of the video being processed
                     time_str = line.split("time=")[1].split(" ")[0].strip()
                     if time_str != 'N/A':
                         try:
@@ -340,21 +317,19 @@ def cread_test_reup(data, task_id, worker_id):
                                 update_status_video(f"Đang Render: xuất video thành công {percentage}%", data['video_id'], task_id, worker_id)
                         except ValueError as e:
                             print(f"Skipping invalid time format: {time_str}, error: {e}")
-                            print(f"Lỗi khi chạy lệnh ffmpeg: {str(e)}")
-                            logging.error(f"FFmpeg Error: {str(e)}")
             process.wait()
     except Exception as e:
+        # Xử lý lỗi ngoại lệ nếu có
         print(f"Lỗi khi chạy lệnh ffmpeg: {str(e)}")
-        logging.error(f"FFmpeg Error: {e}")
         update_status_video(f"Render Lỗi: Lỗi khi thực hiện lệnh ffmpeg - {str(e)}", video_id, task_id, worker_id)
         return False
     
     # Kiểm tra tệp kết quả
-    if os.path.exists(output_path) and os.path.getsize(output_path) > 0 and get_video_duration(output_path):
+    if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         update_status_video("Đang Render: Xuất video xong ! chuẩn bị upload lên sever", data['video_id'], task_id, worker_id)
         return True
     else:
-        update_status_video("Render Lỗi: Lỗi xuất video bằng ffmpeg vui lòng chạy lại ,file xuất lỗi", data['video_id'], task_id, worker_id)
+        update_status_video("Render Lỗi: Lỗi xuất video bằng ffmpeg vui lòng chạy lại", data['video_id'], task_id, worker_id)
         return False
 
 def select_videos_by_total_duration(file_path, min_duration):
@@ -381,28 +356,6 @@ def select_videos_by_total_duration(file_path, min_duration):
         data.remove(video)
     
     return selected_urls
-
-def authenticate():
-    """Xác thực với Google Drive API và lấy credentials"""
-    creds = None
-    SCOPES = ["https://www.googleapis.com/auth/drive"]
-    # Kiểm tra file token.json để lấy thông tin xác thực
-    if os.path.exists("token.json"):
-        try:
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-        except:
-            return None
-    # Nếu không có creds hợp lệ, thực hiện xác thực
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-            creds = flow.run_local_server(port=0)
-            # Lưu credentials để dùng lại
-            with open("token.json", "w") as token:
-                token.write(creds.to_json())
-    return creds
 
 def upload_video(data, task_id, worker_id):
     video_id = data.get('video_id')
@@ -509,19 +462,19 @@ def create_video_file(data, task_id, worker_id):
         print(f"Audio file not found: {audio_file}")
         return False
     ffmpeg_command = [
-        'ffmpeg',
-        '-f', 'concat',                # Chế độ kết hợp video
-        '-safe', '0',                   # Cho phép đường dẫn không an toàn (chẳng hạn như file với đường dẫn tuyệt đối)
-        '-i', input_files_video_path,   # Đường dẫn tệp video đầu vào (danh sách video)
-        '-i', audio_file,               # Đường dẫn tệp âm thanh đầu vào
-        '-vf', f"subtitles={ass_file_path}",  # Đường dẫn tệp phụ đề ASS
-        '-c:v', 'hevc_nvenc',           # Sử dụng codec H.265 NVENC (xử lý phần cứng NVIDIA)
-        '-preset', 'fast',              # Chế độ mã hóa nhanh
-        '-map', '0:v',                  # Lấy video từ input đầu tiên
-        '-map', '1:a',                  # Lấy audio từ input thứ hai (audio_file)
-        '-y',                           # Ghi đè file đầu ra nếu đã tồn tại
-        f"media/{video_id}/{name_video}.mp4"  # Đường dẫn và tên file đầu ra
-    ]
+            'ffmpeg',
+            '-f', 'concat',
+            '-safe', '0',
+            '-i', input_files_video_path,
+            '-i', audio_file,
+            '-vf', f"subtitles={ass_file_path}",
+            '-c:v', 'libx264',
+            '-map', '0:v',
+            '-map', '1:a',
+            '-y',
+            f"media/{video_id}/{name_video}.mp4"
+        ]
+    
     with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as process:
         for line in process.stderr:
             if "time=" in line:
@@ -869,13 +822,17 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
             "-ss", start_time_str,   # Thời gian bắt đầu cắt của video
             "-t", str(duration),     # Thời gian video cần cắt
             "-vf", f"scale={scale_width}:{scale_height},setpts={scale_factor}*PTS",  # Thay đổi độ phân giải và tốc độ video
-            "-r", "24",                     # Tốc độ khung hình đầu ra
-            "-c:v", "hevc_nvenc",           # Codec video H.265 NVENC
-            "-preset", "fast",              # Chế độ mã hóa nhanh nhất
-            "-loglevel", "debug",           # Mức độ log để ghi chi tiết
-            "-y",                           # Ghi đè file đầu ra nếu đã tồn tại
+            "-r", "24",              # Tốc độ khung hình đầu ra
+            "-c:v", "libx264",       # Codec video
+            "-crf", "18",            # Chất lượng video
+            "-preset", "medium",     # Tốc độ mã hóa
+            "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
+            "-vsync", "1",           # Đồng bộ hóa video
+            "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
+            "-y",                    # Ghi đè file đầu ra nếu đã tồn tại
             output_video
         ]
+    
     try:
         # Chạy lệnh FFmpeg
         subprocess.run(cmd, check=True)
@@ -1003,6 +960,7 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         if file_type == "video":
             cut_and_scale_video_random(path_file, out_file, duration, 1920, 1080, 'video_screen')
         elif file_type == "image":
+            
             cache_file = f'media/{video_id}/video/chace_{text_entry["id"]}.mp4'
             success = random_video_effect_cython(path_file, cache_file, duration,24,1920, 1080)
             if not success:
@@ -1035,17 +993,17 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
                 else:
                     cmd = [
                         "ffmpeg",
-                        "-i", cache_file,               # Đầu vào (cache_file)
-                        "-t", str(duration),            # Thời gian video cần cắt
-                        "-r", "24",                     # Tốc độ khung hình đầu ra
-                        "-c:v", "hevc_nvenc",           # Codec video H.265 NVENC
-                        "-preset", "fast",              # Chế độ mã hóa nhanh nhất
-                        "-pix_fmt", "yuv420p",          # Đảm bảo tương thích với đầu ra
-                        "-crf", "23",                   # Chất lượng video
-                        "-vsync", "1",                  # Đồng bộ hóa video
-                        "-loglevel", "debug",           # Mức độ log để ghi chi tiết
-                        "-y",                           # Ghi đè file đầu ra nếu đã tồn tại
-                        out_file                        # Đầu ra (out_file)
+                        "-i", cache_file,
+                        "-t", str(duration),     # Thời gian video cần cắt
+                        "-r", "24",              # Tốc độ khung hình đầu ra
+                        "-c:v", "libx264",       # Codec video
+                        "-crf", "23",            # Chất lượng video
+                        "-preset", "ultrafast",     # Tốc độ mã hóa
+                        "-pix_fmt", "yuv420p",   # Đảm bảo tương thích với đầu ra
+                        "-vsync", "1",           # Đồng bộ hóa video
+                        "-loglevel", "debug",    # Đặt mức log level để ghi chi tiết
+                        "-y",                    # Ghi đè file đầu ra nếu đã tồn tại
+                        out_file
                     ]
                 try:
                     # Chạy lệnh FFmpeg
@@ -1117,7 +1075,7 @@ def get_random_video_from_directory(directory_path):
 def get_voice_super_voice(data, text, file_name):     
     success = False
     attempt = 0
-    while not success and attempt < 15:
+    while not success and attempt < 200:
         try:
             url_voice_text = get_voice_text(text, data)
             if not url_voice_text:
@@ -1470,7 +1428,8 @@ def download_audio(data, task_id, worker_id):
     except Exception as e:
         update_status_video("Render Lỗi : Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
         return False
-
+    
+    
 def format_timestamp(seconds):
     """Chuyển đổi thời gian từ giây thành định dạng SRT (hh:mm:ss,ms)"""
     hours = int(seconds // 3600)
@@ -1783,6 +1742,7 @@ def download_single_image(url, local_directory):
             print(f"Lỗi yêu cầu khi tải xuống {url}: {e}")
         except Exception as e:
             print(f"Lỗi không xác định khi tải xuống {url}: {e}")
+        
         time.sleep(4)  # Đợi 1 giây trước khi thử lại
     return False  # Trả về False nếu không thể tải xuống
 
@@ -1808,12 +1768,7 @@ def download_image(data, task_id, worker_id):
                         video_id, task_id, worker_id
                     )
             return False
-        parsed_url = urlparse(iteam.get('url_video'))
-        if parsed_url.scheme in ['http', 'https']:
-            images.append(iteam.get('url_video'))
-        else:
-            url  =os.getenv('url_web') + iteam.get('url_video')
-            images.append(url)
+        images.append(iteam.get('url_video'))
             
     print(f"Số lượng hình ảnh cần tải: {len(images)}")
     total_images = len(images)  # Tổng số hình ảnh cần tải
@@ -2064,49 +2019,7 @@ def get_video_info(data,task_id,worker_id):
         print(f"Phương thức 1 thất bại: {str(e)}")
         update_status_video(f"Đang Render: Phương thức download 1 thất bại", video_id, task_id, worker_id)  
         
-        
-    # Thử phương thức 1: Sử dụng API
-    try:
-        api_url = "https://opendown.net/proxy.php"
-        form_data = {"url": video_url}
-        response = requests.post(api_url, data=form_data, timeout=10)
-        api_data = response.json()
-        
-        if "api" not in api_data or "mediaItems" not in api_data["api"]:
-            raise ValueError("Invalid API response format")
-            
-        title = api_data["api"]["title"]
-        media_preview_url = api_data["api"]["previewUrl"]
-        
-        # Tải video với cập nhật % tải
-        with requests.get(media_preview_url, stream=True) as response:
-            total_size = int(response.headers.get('content-length', 0))
-            chunk_size = 8192
-            downloaded_size = 0
-
-            with open(output_file, "wb") as file:
-                for chunk in response.iter_content(chunk_size=chunk_size):
-                    if chunk:
-                        file.write(chunk)
-                        downloaded_size += len(chunk)
-
-                        # Tính % tải và cập nhật trạng thái
-                        percent_complete = (downloaded_size / total_size) * 100
-                        update_status_video(
-                            f"Đang Render: Đang tải video {percent_complete:.2f}%",
-                            video_id,
-                            task_id,
-                            worker_id
-                        )
-        update_status_video(f"Đang Render: Đã tải xong video", video_id, task_id, worker_id)
-        return {"title": title}
-        
-    except (requests.RequestException, ValueError, KeyError, IOError) as e:
-        print(f"Phương thức 2 thất bại: {str(e)}")
-        update_status_video(f"Đang Render: Phương thức download 2 thất bại", video_id, task_id, worker_id)  
-        
-        
-    # Phương thức 3: Sử dụng yt-dlp
+    # Phương thức 2: Sử dụng yt-dlp
     try:
         url = data.get('url_video_youtube')
         if not url:
@@ -2114,6 +2027,8 @@ def get_video_info(data,task_id,worker_id):
             
         max_retries = 4
         retry_delay = 1
+        proxy_url = os.environ.get('PROXY_URL')
+        
         ydl_opts = {
             'format': 'bestvideo[height=720]+bestaudio/best',
             'outtmpl': output_file,
@@ -2158,7 +2073,7 @@ def get_video_info(data,task_id,worker_id):
         print(f"Lỗi không xác định trong quá trình xử lý: {str(e)}")
         update_status_video(f"Render Lỗi: Phương thức download youtube thất bại",video_id, task_id, worker_id)
         return None
-       
+    
 def update_info_video(data, task_id, worker_id):
     try:
         video_url = data.get('url_video_youtube')
@@ -2177,13 +2092,10 @@ def update_info_video(data, task_id, worker_id):
             return False
         
         
-        thumnail = get_youtube_thumbnail(video_url,video_id)
-        if not thumnail:
-            update_status_video(f"Render Lỗi: lỗi lấy ảnh thumbnail", 
-                          data.get('video_id'), task_id, worker_id)
-            return False
+        url_thumnail = get_youtube_thumbnail(video_url)
+
         update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
-                          video_id, task_id, worker_id,url_thumnail=thumnail,title=result["title"])
+                          video_id, task_id, worker_id,url_thumbnail=url_thumnail,title=result["title"])
         return True
 
     except requests.RequestException as e:
@@ -2211,70 +2123,39 @@ def remove_invalid_chars(string):
     # Loại bỏ ký tự Unicode 4 byte
     return re.sub(r'[^\u0000-\uFFFF]', '', string)
 
-def get_youtube_thumbnail(youtube_url, video_id):
+def get_youtube_thumbnail(youtube_url):
     try:
-        # Đảm bảo video_id là chuỗi
-        video_id = str(video_id)
-
         # Regex pattern để lấy video ID
         pattern = r'(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)'
-        match = re.findall(pattern, youtube_url)
-
-        if not match:
-            print("❌ Invalid YouTube URL")
-            return False
-
-        video_id_youtube = match[0]
-
-        # Danh sách URL thumbnail từ chất lượng cao đến thấp
+        video_id = re.findall(pattern, youtube_url)[0]
+        
+        # Tạo các URL thumbnail theo thứ tự độ phân giải
         thumbnails = {
-            'max': f'https://i3.ytimg.com/vi/{video_id_youtube}/maxresdefault.jpg',
-            'hq': f'https://i3.ytimg.com/vi/{video_id_youtube}/hqdefault.jpg',
-            'mq': f'https://i3.ytimg.com/vi/{video_id_youtube}/mqdefault.jpg',
-            'sd': f'https://i3.ytimg.com/vi/{video_id_youtube}/sddefault.jpg',
-            'default': f'https://i3.ytimg.com/vi/{video_id_youtube}/default.jpg'
+            'max': f'https://i3.ytimg.com/vi/{video_id}/maxresdefault.jpg',
+            'hq': f'https://i3.ytimg.com/vi/{video_id}/hqdefault.jpg',
+            'mq': f'https://i3.ytimg.com/vi/{video_id}/mqdefault.jpg',
+            'sd': f'https://i3.ytimg.com/vi/{video_id}/sddefault.jpg',
+            'default': f'https://i3.ytimg.com/vi/{video_id}/default.jpg'
         }
-
-        # Đường dẫn thư mục lưu ảnh
-        save_dir = os.path.join('media', video_id, 'thumbnail')
-
-        # Thử tối đa 5 lần nếu có lỗi
-        max_retries = 5
-
+        
+        # Thử tải lần lượt từ max đến default
         for quality, url in thumbnails.items():
-            attempt = 0
-            while attempt < max_retries:
-                try:
-                    response = requests.get(url, stream=True, timeout=5)
-
-                    if response.status_code == 200:
-                        # Nếu tải thành công, tạo thư mục lưu ảnh nếu chưa có
-                        os.makedirs(save_dir, exist_ok=True)
-                        file_path = os.path.join(save_dir, f"{video_id_youtube}_{quality}.jpg")
-
-                        # Lưu ảnh vào máy
-                        with open(file_path, 'wb') as file:
-                            for chunk in response.iter_content(1024):
-                                file.write(chunk)
-                        print(f"✅ Tải thành công: {file_path}")
-                        return file_path  # Đảm bảo nếu có lỗi vẫn quay lại False
-
-                except requests.exceptions.RequestException as e:
-                    attempt += 1
-                    print(f"❌ Lỗi khi tải ảnh {url}, lần thử {attempt}/{max_retries}: {e}")
-                    if attempt >= max_retries:
-                        print(f"❌ Không thể tải ảnh sau {max_retries} lần thử. Dừng việc tải và upload.")
-                        return False  # Không tải lên S3 nếu đã thử quá 5 lần
-                    else:
-                        # Nếu còn lần thử, đợi một thời gian rồi thử lại
-                        time.sleep(2)  # Thử lại sau 2 giây
-
-        return False  # Không tìm thấy thumbnail hợp lệ
+            try:
+                response = requests.get(url, stream=True)
+                if response.status_code == 200:
+                    print(f"Thumbnail found: {quality} - {url}")
+                    return url
+                else:
+                    print(f"lỗi ảnh {url}")
+            except requests.exceptions.RequestException:
+                print(f"lỗi ảnh {url}")
+                continue
+        
+        # Nếu không có thumbnail nào khả dụng
+        return "No valid thumbnail found."
 
     except Exception as e:
-        print(f"❌ Lỗi không xác định: {e}")
-        return False
-
+        return f"Error: {str(e)}"
 
 class HttpClient:
     def __init__(self, url, min_delay=1.0):
@@ -2378,3 +2259,4 @@ def update_status_video(status_video, video_id, task_id, worker_id, url_thumnail
             logging.error(f"File not found: {url_thumnail}")
     else:
         http_client.send(data)
+
