@@ -136,3 +136,12 @@ if __name__ == "__main__":
         max_videos=10000  # Số lượng video để thử nghiệm
     )
     downloader.download_videos(max_workers=20)
+
+
+
+ffmpeg -y -hwaccel cuda -hwaccel_output_format cuda -i 1.mp4 -hwaccel cuda -hwaccel_output_format cuda -i 2.mp4 -filter_complex "[0:v]crop=720:ih:0:0[cropped]; [cropped][1:v]overlay_cuda=200:100[outv]" -map "[outv]" -map 0:a? -c:v h264_nvenc -preset p7 -rc vbr -b:v 100M -c:a copy output.mp4
+
+
+
+
+ffmpeg -y -i video/20978-314099031_medium.mp4 -ss 00:00:10 -t 20  -i video_screen/screen10.mov -filter_complex "[0:v]fps=24,scale=1920:1080,setpts=1*PTS[bg]; [1:v]scale=1920:1080[fg]; [bg][fg]overlay=format=auto[outv]" -map "[outv]" -c:v h264_nvenc -preset fast output.mp4
