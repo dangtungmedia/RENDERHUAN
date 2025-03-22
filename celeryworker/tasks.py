@@ -419,7 +419,7 @@ def upload_video(data, task_id, worker_id):
             # Định nghĩa metadata cho file
             file_metadata = {
                 "name": os.path.basename(video_path),
-                "parents": ["1apzRBnKoOMKRPFq4dEu0DuYkaxQTxVGY"]  # ID thư mục trên Google Drive
+                "parents": [os.getenv('ID_FORLDER_GOOGLE_API')]  # ID thư mục trên Google Drive
             }
 
             # Tạo đối tượng MediaFileUpload và chỉ định callback
