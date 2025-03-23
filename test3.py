@@ -3,6 +3,7 @@ import random
 import json
 import requests
 import time
+import subprocess
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from typing import Set, List, Dict
@@ -12,6 +13,19 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from threading import Lock
 import sys
+import shutil
+from multiprocessing import Pool, cpu_count
+import os
+import requests
+from tqdm import tqdm
+
+import zipfile
+import os
+from dotenv import load_dotenv
+
+# Nạp biến môi trường từ file .env
+load_dotenv()
+
 
 # Cấu hình logging
 logging.basicConfig(
@@ -24,8 +38,8 @@ logging.basicConfig(
 )
 
 class VideoDownloader:
-    def __init__(self, json_file: str, output_dir: str, max_videos: int = 10000):
-        self.json_file = Path(json_file)
+    def __init__(self, json_file: str, output_dir: str, max_videos: int = 5000):
+        self.json_file = json_file
         self.output_dir = Path(output_dir)
         self.max_videos = max_videos
         self.selected_urls: Set[str] = set()
@@ -49,6 +63,7 @@ class VideoDownloader:
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
 
+        # Ensure output_dir exists
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def load_urls(self) -> List[Dict]:
@@ -62,8 +77,12 @@ class VideoDownloader:
         return (self.output_dir / file_name).exists()
 
     def download_single_video(self, item: Dict, index: int, max_retries: int = 10) -> bool:
+        temp_dir = "chace_video"
+        os.makedirs(temp_dir, exist_ok=True)
+
         url = item['url']
         file_name = os.path.basename(urlparse(url).path)
+        file_cache = Path(temp_dir) / file_name  # Sử dụng Path để kết hợp đường dẫn
         file_path = self.output_dir / file_name
 
         if file_path.exists():
@@ -78,13 +97,29 @@ class VideoDownloader:
                 response.raise_for_status()
 
                 file_size = 0
-                with open(file_path, 'wb') as video_file:
+                with open(file_cache, 'wb') as video_file:
                     for chunk in response.iter_content(chunk_size=8192):
                         if chunk:
                             video_file.write(chunk)
                             file_size += len(chunk)
 
                 if file_size > 0:
+                    # Convert video using ffmpeg
+                    ffmpeg_command = [
+                        "ffmpeg",
+                        "-hwaccel", "cuda", "-hwaccel_output_format", "cuda",
+                        "-i", str(file_cache),  # Đường dẫn video đầu vào
+                        "-vf", "scale_cuda=1280:720",  # Độ phân giải
+                        "-r", "24",  # Frame rate
+                        "-c:v", "hevc_nvenc",  # Codec video
+                        "-preset", "fast",  # Chế độ mã hóa nhanh
+                        str(file_path)  # Đường dẫn lưu video sau xử lý
+                    ]
+                    subprocess.run(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+                    # Sau khi xử lý xong, xóa tệp tạm
+                    os.remove(file_cache)
+
                     with self.lock:  # Đảm bảo cập nhật self.downloaded_count một cách an toàn
                         self.downloaded_count += 1
                     logging.info(f"[{index}] Tải thành công: {file_name} ({file_size/1024/1024:.2f}MB)")
@@ -92,7 +127,6 @@ class VideoDownloader:
                     return True
                 else:
                     logging.warning(f"[{index}] File rỗng: {file_name}")
-                    file_path.unlink(missing_ok=True)
                     return False
 
             except requests.exceptions.RequestException as e:
@@ -126,22 +160,92 @@ class VideoDownloader:
                             future.cancel()
                         return
                     futures.remove(f)
-
+        
         logging.info(f"Tải thành công {self.downloaded_count} video vào thư mục '{self.output_dir}'")
 
+
+def download_file(url, output_path):
+    # Gửi yêu cầu GET và lấy tệp
+    response = requests.get(url, stream=True)
+    # Kiểm tra nếu yêu cầu thành công
+    if response.status_code == 200:
+        # Lấy kích thước tệp
+        total_size = int(response.headers.get('content-length', 0))
+        
+        # Mở tệp để ghi dữ liệu
+        with open(output_path, 'wb') as file:
+            # Tạo tiến độ với tqdm
+            with tqdm(total=total_size, unit='B', unit_scale=True) as bar:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        file.write(chunk)  # Ghi chunk vào tệp
+                        bar.update(len(chunk))  # Cập nhật tiến độ
+        print(f"Tải xuống hoàn tất! Tệp được lưu tại {output_path}")
+    else:
+        print(f"Lỗi khi tải tệp: {response.status_code}")
+
+
+def download_file(output_path):
+    url =  os.getenv('url_web') + '/render/down_load_screen/' 
+    # Gửi yêu cầu GET và lấy tệp
+    response = requests.get(url, stream=True)
+    # Kiểm tra nếu yêu cầu thành công
+    if response.status_code == 200:
+        # Lấy kích thước tệp
+        total_size = int(response.headers.get('content-length', 0))
+        
+        # Mở tệp để ghi dữ liệu
+        with open(output_path, 'wb') as file:
+            # Tạo tiến độ với tqdm
+            with tqdm(total=total_size, unit='B', unit_scale=True) as bar:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        file.write(chunk)  # Ghi chunk vào tệp
+                        bar.update(len(chunk))  # Cập nhật tiến độ
+        print(f"Tải xuống hoàn tất! Tệp được lưu tại {output_path}")
+    else:
+        print(f"Lỗi khi tải tệp: {response.status_code}")
+
+def unzip_with_progress(zip_file_path, output_dir):
+    # Kiểm tra nếu thư mục đích không tồn tại thì tạo mới
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Mở file zip và giải nén
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        # Lấy danh sách các file trong zip
+        total_files = len(zip_ref.namelist())
+        
+        # Giải nén từng file và hiển thị tiến độ
+        for i, file in enumerate(zip_ref.namelist()):
+            zip_ref.extract(file, output_dir)
+            
+            # Tính toán phần trăm và hiển thị
+            percent_done = (i + 1) / total_files * 100
+            print(f"Đang giải nén {file}... {percent_done:.2f}%")
+
+    print(f"Đã giải nén thành công vào thư mục {output_dir}")
+
+# Main function
 if __name__ == "__main__":
-    downloader = VideoDownloader(
-        json_file='filtered_data.json',
-        output_dir='video',
-        max_videos=10000  # Số lượng video để thử nghiệm
-    )
-    downloader.download_videos(max_workers=20)
-
-
-
-ffmpeg -y -hwaccel cuda -hwaccel_output_format cuda -i 1.mp4 -hwaccel cuda -hwaccel_output_format cuda -i 2.mp4 -filter_complex "[0:v]crop=720:ih:0:0[cropped]; [cropped][1:v]overlay_cuda=200:100[outv]" -map "[outv]" -map 0:a? -c:v h264_nvenc -preset p7 -rc vbr -b:v 100M -c:a copy output.mp4
-
-
-
-
-ffmpeg -y -i video/20978-314099031_medium.mp4 -ss 00:00:10 -t 20  -i video_screen/screen10.mov -filter_complex "[0:v]fps=24,scale=1920:1080,setpts=1*PTS[bg]; [1:v]scale=1920:1080[fg]; [bg][fg]overlay=format=auto[outv]" -map "[outv]" -c:v h264_nvenc -preset fast output.mp4
+    output_dir = 'video_xxx'
+    json_file = 'filtered_data.json'
+    
+    # Tạo thư mục video nếu chưa tồn tại
+    if not os.path.exists(output_dir):
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=10)
+        downloader.download_videos(max_workers=20)
+        # Xóa thư mục tạm sau khi tải xong
+        shutil.rmtree("chace_video", ignore_errors=True)
+    else:
+        print("Có video rồi không cần tải nữa !")
+    video_screen = "video_screen"
+    # Tạo thư mục video nếu chưa tồn tại
+    if not os.path.exists(video_screen):
+        zip_file_path = 'video_screen.zip'
+        download_file(zip_file_path)
+        unzip_with_progress(zip_file_path, video_screen)
+        os.remove(zip_file_path)
+    else:
+        print("Có video Screen rồi không cần tải nữa !")
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={os.getenv('name_woker')} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")

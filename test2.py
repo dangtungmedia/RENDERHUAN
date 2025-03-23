@@ -1,65 +1,29 @@
-import requests
 import os
-from urllib.parse import urlparse
-import time
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+import requests
+from tqdm import tqdm
 
-def download_video(url, max_retries=3):
-    # Headers giả lập trình duyệt
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'video/webm,video/mp4,video/*;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Referer': 'https://pixabay.com/'
-    }
+def download_file(url, output_path):
+    # Gửi yêu cầu GET và lấy tệp
+    response = requests.get(url, stream=True)
+    # Kiểm tra nếu yêu cầu thành công
+    if response.status_code == 200:
+        # Lấy kích thước tệp
+        total_size = int(response.headers.get('content-length', 0))
+        
+        # Mở tệp để ghi dữ liệu
+        with open(output_path, 'wb') as file:
+            # Tạo tiến độ với tqdm
+            with tqdm(total=total_size, unit='B', unit_scale=True) as bar:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        file.write(chunk)  # Ghi chunk vào tệp
+                        bar.update(len(chunk))  # Cập nhật tiến độ
+        print(f"Tải xuống hoàn tất! Tệp được lưu tại {output_path}")
+    else:
+        print(f"Lỗi khi tải tệp: {response.status_code}")
 
-    # Cấu hình retry
-    session = requests.Session()
-    retry_strategy = Retry(
-        total=max_retries,
-        backoff_factor=1,  # Tăng thời gian chờ giữa các lần retry
-        status_forcelist=[429, 500, 502, 503, 504]
-    )
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+# Sử dụng hàm
+url = 'https://hrmedia89.com/render/down_load_screen/'  # Thay thế bằng đường dẫn tệp thực tế
+output_path = 'video_screen.zip'  # Đường dẫn và tên tệp đầu ra
 
-    try:
-        file_name = os.path.basename(urlparse(url).path)
-        print(f"Đang tải: {file_name}")
-
-        # Thêm delay trước khi request
-        time.sleep(2)  
-
-        response = session.get(url, headers=headers, stream=True)
-        response.raise_for_status()
-
-        os.makedirs('videos', exist_ok=True)
-        file_path = os.path.join('videos', file_name)
-
-        with open(file_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-
-        print(f"Đã tải xong: {file_name}")
-        return True
-
-    except requests.exceptions.RequestException as e:
-        print(f"Lỗi khi tải video: {str(e)}")
-        if response.status_code == 429:
-            print("Đang chờ 60 giây trước khi thử lại...")
-            time.sleep(60)  # Chờ 60 giây nếu gặp lỗi 429
-        return False
-
-# URL video
-url = "https://cdn.pixabay.com/video/2019/05/24/23914-338327820_tiny.mp4"
-
-# Thử tải với retry
-attempt = 1
-while attempt <= 3:
-    print(f"\nLần thử {attempt}:")
-    if download_video(url):
-        break
-    attempt += 1
+download_file(url, output_path)
