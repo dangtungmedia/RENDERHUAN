@@ -523,8 +523,8 @@ def create_video_file(data, task_id, worker_id):
         '-i', input_files_video_path,   # Đường dẫn tệp video đầu vào (danh sách video)
         '-i', audio_file,               # Đường dẫn tệp âm thanh đầu vào
         '-vf', f"subtitles={ass_file_path}",  # Đường dẫn tệp phụ đề ASS
-        '-c:v', 'libx265',           # Sử dụng codec H.265 NVENC (xử lý phần cứng NVIDIA)
-        '-preset', 'ultrafast',              # Chế độ mã hóa nhanh
+        '-c:v', 'h264_nvenc',           # Sử dụng codec H.265 NVENC (xử lý phần cứng NVIDIA)
+        '-preset', 'fast',              # Chế độ mã hóa nhanh
         '-map', '0:v',                  # Lấy video từ input đầu tiên
         '-map', '1:a',                  # Lấy audio từ input thứ hai (audio_file)
         '-y',                           # Ghi đè file đầu ra nếu đã tồn tại
@@ -873,7 +873,7 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
             "-i", input_video,
             "-ss", start_time_str,   # Thời gian bắt đầu cắt của video
             "-t", str(duration),     # Thời gian video cần cắt
-            "-vf", f"fps=24,scale_cuda={scale_width}:{scale_height},setpts={scale_factor}*PTS",  # Thay đổi độ phân giải và tốc độ video
+            "-vf", f"fps=24,scale={scale_width}:{scale_height},setpts={scale_factor}*PTS",  # Thay đổi độ phân giải và tốc độ video
             "-r", "24",              # Tốc độ khung hình đầu ra
             "-c:v", "hevc_nvenc",    # Codec video
             '-preset', 'fast',   
