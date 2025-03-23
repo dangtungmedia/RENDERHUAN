@@ -82,7 +82,7 @@ def delete_directory(video_id):
 def task_failure_handler(sender, task_id, exception, args, kwargs, traceback, einfo, **kw):
     video_id = args[0].get('video_id')
     worker_id = "None"
-    update_status_video(f"Render Lỗi :{os.getenv('name_woker')} Xử Lý Video Không Thành Công!", video_id, task_id, worker_id)
+    update_status_video(f"Render Lỗi : {os.getenv('name_woker')}{os.getenv('name_woker')} Xử Lý Video Không Thành Công!", video_id, task_id, worker_id)
     delete_directory(video_id)
 # Xử lý khi task bị hủy
 
@@ -108,12 +108,12 @@ def render_video(self, data):
     success = create_or_reset_directory(f'media/{video_id}')
     
     if not os.path.exists("video")  and not os.path.exists("video_screen") :
-        update_status_video(f"Render Lỗi :  Thiếu các tệp video  và  video_screen ", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Thiếu các tệp video  và  video_screen ", data['video_id'], task_id, worker_id)
         return
 
     if not success:
         shutil.rmtree(f'media/{video_id}')
-        update_status_video(f"Render Lỗi :  Không thể tạo thư mục", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tạo thư mục", data['video_id'], task_id, worker_id)
         return
     update_status_video("Đang Render : Tạo thư mục thành công", data['video_id'], task_id, worker_id)
 
@@ -121,7 +121,7 @@ def render_video(self, data):
     success = download_image(data, task_id, worker_id)
     if not success:
         shutil.rmtree(f'media/{video_id}')
-        update_status_video(f"Render Lỗi :  Không thể tải xuống hình ảnh", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tải xuống hình ảnh", data['video_id'], task_id, worker_id)
         return
     update_status_video("Đang Render : Tải xuống hình ảnh thành công", data['video_id'], task_id, worker_id)
     #THử
@@ -137,7 +137,7 @@ def render_video(self, data):
     success = merge_audio_video(data, task_id, worker_id)
     if not success:
         shutil.rmtree(f'media/{video_id}')
-        update_status_video(f"Render Lỗi :  Không thể nối giọng đọc và chèn nhạc nền", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể nối giọng đọc và chèn nhạc nền", data['video_id'], task_id, worker_id)
         return
     
     update_status_video("Đang Render : Nối giọng đọc và chèn nhạc nền thành công", data['video_id'], task_id, worker_id)
@@ -162,7 +162,7 @@ def render_video(self, data):
     success = upload_video(data, task_id, worker_id)
     if not success:
         shutil.rmtree(f'media/{video_id}')
-        update_status_video(f"Render Lỗi :  Không thể upload video", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể upload video", data['video_id'], task_id, worker_id)
         return
     shutil.rmtree(f'media/{video_id}')
     update_status_video(f"Render Thành Công : Đang Chờ Upload lên Kênh", data['video_id'], task_id, worker_id)
@@ -176,7 +176,7 @@ def render_video_reupload(self, data):
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     
     if not os.path.exists("video")  and not os.path.exists("video_screen") :
-        update_status_video(f"Render Lỗi :  Thiếu các tệp video  và  video_screen ", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Thiếu các tệp video  và  video_screen ", data['video_id'], task_id, worker_id)
         return
     
     success = create_or_reset_directory(f'media/{video_id}')
@@ -484,11 +484,11 @@ def upload_video(data, task_id, worker_id):
             return True
         
         except Exception as e:
-            update_status_video(f"Render Lỗi :  Lỗi khi upload file: {str(e)}", video_id, task_id, worker_id)
+            update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Lỗi khi upload file: {str(e)}", video_id, task_id, worker_id)
             logging.error(f"Error during file upload: {str(e)}")
             return False
     else:
-        update_status_video(f"Render Lỗi :  Google API credentials error", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Google API credentials error", video_id, task_id, worker_id)
         logging.error("Google API credentials error")
         return False
 
@@ -543,7 +543,7 @@ def create_video_file(data, task_id, worker_id):
                     update_status_video(f"Đang Render: Đã xuất video {percentage:.2f}%", video_id, task_id, worker_id)
                 except Exception as e:
                     print(f"Error parsing time: {e}")
-                    update_status_video(f"Render Lỗi :  Không thể tính toán hoàn thành", data['video_id'], task_id, worker_id)
+                    update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tính toán hoàn thành", data['video_id'], task_id, worker_id)
         process.wait()
         
     if process.returncode != 0:
@@ -551,10 +551,10 @@ def create_video_file(data, task_id, worker_id):
             print("FFmpeg encountered an error.")
             stderr_output = ''.join(process.stderr)
             print(f"Error log:\n{stderr_output}")
-            update_status_video(f"Render Lỗi :  không thể render video hoàn thành ", data['video_id'], task_id, worker_id)
+            update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  không thể render video hoàn thành ", data['video_id'], task_id, worker_id)
         except:
             pass
-        update_status_video(f"Render Lỗi :  không thể render video hoàn thành ", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  không thể render video hoàn thành ", data['video_id'], task_id, worker_id)
         return False
     else:
         print("Lồng nhạc nền thành công.")
@@ -714,7 +714,7 @@ def create_subtitles(data, task_id, worker_id):
             update_status_video("Đang Render : Tạo phụ đề thành công", data['video_id'], task_id, worker_id)
             return True
     except:
-        update_status_video(f"Render Lỗi :  Không thể tạo phụ đề", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tạo phụ đề", data['video_id'], task_id, worker_id)
         return False
 
 def merge_audio_video(data, task_id, worker_id):
@@ -971,7 +971,7 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         # Kiểm tra nếu thời lượng âm thanh không hợp lệ
         if duration <= 0:
             update_status_video(
-                        f"Render Lỗi :  Thời lượng âm thanh không hợp lệ",
+                        f"Render Lỗi : {os.getenv('name_woker')} Thời lượng âm thanh không hợp lệ",
                         video_id, task_id, worker_id
                     )
             
@@ -984,7 +984,7 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         # Kiểm tra đường dẫn file
         if not file:
             update_status_video(
-                        f"Render Lỗi :  Đường dẫn url không hợp lệ",
+                        f"Render Lỗi : {os.getenv('name_woker')} Đường dẫn url không hợp lệ",
                         video_id, task_id, worker_id
                     )
             raise FileNotFoundError(f"File not found for URL: {text_entry.get('url_video')}")
@@ -997,7 +997,7 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         file_type = check_file_type(path_file)
         if file_type not in ["video", "image"]:
             update_status_video(
-                        f"Render Lỗi :  Loại file không hợp lệ",
+                        f"Render Lỗi : {os.getenv('name_woker')} Loại file không hợp lệ",
                         video_id, task_id, worker_id
                     )
             raise ValueError(f"Unsupported file type: {file_type} for {path_file}")
@@ -1492,7 +1492,7 @@ def download_audio(data, task_id, worker_id):
                         result = future.result()  # Lấy kết quả từ công việc hoàn thành
                         if result[0] is False:  # Nếu có lỗi trong quá trình tải
                             print("Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.")
-                            update_status_video(f"Render Lỗi :  Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.", data['video_id'], task_id, worker_id)
+                            update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.", data['video_id'], task_id, worker_id)
                             # Hủy tất cả các công việc chưa hoàn thành
                             for f in futures.keys():
                                 f.cancel()
@@ -1508,13 +1508,13 @@ def download_audio(data, task_id, worker_id):
                     except Exception as e:
                         print(f"Lỗi khi xử lý giọng đọc cho đoạn văn bản {text_entries[idx]['id']}: {e}")
                         update_status_video(
-                            f"Render Lỗi :  Lỗi khi tạo giọng đọc - {e}",
+                            f"Render Lỗi :  {os.getenv('name_woker')} Lỗi khi tạo giọng đọc - {e}",
                             video_id, task_id, worker_id
                         )
                         # Hủy tất cả các công việc chưa hoàn thành
                         for f in futures.keys():
                             f.cancel()
-                        update_status_video(f"Render Lỗi :  Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
+                        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
                         return False  # Dừng toàn bộ nếu gặp lỗi
                 # Ghi vào input_files.txt theo đúng thứ tự ban đầu của text_entries
                 for file_name in result_files:
@@ -1522,7 +1522,7 @@ def download_audio(data, task_id, worker_id):
                         file.write(f"file 'voice/{os.path.basename(file_name)}'\n")
         return True
     except Exception as e:
-        update_status_video(f"Render Lỗi :  Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
         return False
 
 def format_timestamp(seconds):
@@ -1858,7 +1858,7 @@ def download_image(data, task_id, worker_id):
     for iteam in text_entries:
         if iteam.get('url_video') =="":
             update_status_video(
-                        f"Render Lỗi :  iteam hình ảnh lỗi vui lòng xử lý lại",
+                        f"Render Lỗi :  {os.getenv('name_woker')} iteam hình ảnh lỗi vui lòng xử lý lại",
                         video_id, task_id, worker_id
                     )
             return False
@@ -1894,7 +1894,7 @@ def download_image(data, task_id, worker_id):
                 else:
                     # Hủy tất cả các tác vụ còn lại khi gặp lỗi tải xuống
                     update_status_video(
-                        f"Render Lỗi :  Không thể tải xuống hình ảnh -{url}",
+                        f"Render Lỗi : {os.getenv('name_woker')} Không thể tải xuống hình ảnh -{url}",
                         video_id, task_id, worker_id
                     )
                     for pending in future_to_url:
@@ -1903,7 +1903,7 @@ def download_image(data, task_id, worker_id):
             except Exception as e:
                 print(f"Lỗi khi tải xuống {url}: {e}")
                 update_status_video(
-                    f"Render Lỗi :  Lỗi không xác định - {e} - {url}",
+                    f"Render Lỗi : {os.getenv('name_woker')} Lỗi không xác định - {e} - {url}",
                     video_id, task_id, worker_id
                 )
                 # Hủy tất cả các tác vụ còn lại và ngừng tiến trình
