@@ -206,7 +206,7 @@ def download_file(output_path):
     else:
         print(f"Lỗi khi tải tệp: {response.status_code}")
 
-def unzip_with_progress(zip_file_path, output_dir):
+def unzip_with_progress(zip_file_path):
     # Kiểm tra nếu thư mục đích không tồn tại thì tạo mới
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -218,7 +218,7 @@ def unzip_with_progress(zip_file_path, output_dir):
         
         # Giải nén từng file và hiển thị tiến độ
         for i, file in enumerate(zip_ref.namelist()):
-            zip_ref.extract(file, output_dir)
+            zip_ref.extract(file)
             
             # Tính toán phần trăm và hiển thị
             percent_done = (i + 1) / total_files * 100
@@ -228,6 +228,7 @@ def unzip_with_progress(zip_file_path, output_dir):
 
 # Main function
 if __name__ == "__main__":
+    print("đang xử lý ...")
     output_dir = 'video'
     json_file = 'filtered_data.json'
     
@@ -244,8 +245,30 @@ if __name__ == "__main__":
     if not os.path.exists(video_screen):
         zip_file_path = 'video_screen.zip'
         download_file(zip_file_path)
-        unzip_with_progress(zip_file_path, video_screen)
+        unzip_with_progress(zip_file_path)
         os.remove(zip_file_path)
     else:
         print("Có video Screen rồi không cần tải nữa !")
+        
+    token_json = "token.json"
+    if not os.path.exists(token_json):
+        url =  os.getenv('url_web') + '/render/token_api_google/' 
+        # Gửi yêu cầu GET và lấy tệp
+        response = requests.get(url, stream=True)
+        # Kiểm tra nếu yêu cầu thành công
+        if response.status_code == 200:
+            # Lấy kích thước tệp
+            total_size = int(response.headers.get('content-length', 0))
+            
+            # Mở tệp để ghi dữ liệu
+            with open(token_json, 'wb') as file:
+                # Tạo tiến độ với tqdm
+                with tqdm(total=total_size, unit='B', unit_scale=True) as bar:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        if chunk:
+                            file.write(chunk)  # Ghi chunk vào tệp
+                            bar.update(len(chunk))  # Cập nhật tiến độ
+            print(f"Tải xuống hoàn tất! Tệp được lưu tại {token_json}")
+        else:
+            print(f"Lỗi khi tải tệp: {response.status_code}")  
     os.system(f"celery -A celeryworker worker -l INFO --hostname={os.getenv('name_woker')} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
