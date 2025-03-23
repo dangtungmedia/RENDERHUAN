@@ -186,9 +186,11 @@ def download_file(url, output_path):
 
 
 def download_file(output_path):
-    url =  os.getenv('url_web') + '/render/down_load_screen/' 
+    url = os.getenv('url_web') + '/render/down_load_screen/'
+    
     # Gửi yêu cầu GET và lấy tệp
     response = requests.get(url, stream=True)
+    
     # Kiểm tra nếu yêu cầu thành công
     if response.status_code == 200:
         # Lấy kích thước tệp
@@ -198,10 +200,24 @@ def download_file(output_path):
         with open(output_path, 'wb') as file:
             # Tạo tiến độ với tqdm
             with tqdm(total=total_size, unit='B', unit_scale=True) as bar:
+                downloaded_size = 0  # Khởi tạo biến để theo dõi số byte đã tải
+                previous_percent = 0  # Biến để lưu trữ phần trăm đã in trước đó
+                
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:
                         file.write(chunk)  # Ghi chunk vào tệp
+                        downloaded_size += len(chunk)  # Cập nhật số byte đã tải
                         bar.update(len(chunk))  # Cập nhật tiến độ
+
+                        # Tính toán phần trăm đã tải xuống và làm tròn về số nguyên
+                        percent_done = (downloaded_size / total_size) * 100
+                        percent_done_int = int(percent_done)  # Làm tròn phần trăm về số nguyên
+                        
+                        # Chỉ in nếu phần trăm thay đổi hoặc lớn hơn 1%
+                        if percent_done_int - previous_percent >= 1:
+                            print(f"Đang tải {output_path}... {percent_done_int}%")
+                            previous_percent = percent_done_int  # Cập nhật giá trị phần trăm trước đó
+        
         print(f"Tải xuống hoàn tất! Tệp được lưu tại {output_path}")
     else:
         print(f"Lỗi khi tải tệp: {response.status_code}")
@@ -240,6 +256,7 @@ if __name__ == "__main__":
         shutil.rmtree("chace_video", ignore_errors=True)
     else:
         print("Có video rồi không cần tải nữa !")
+        
     video_screen = "video_screen"
     # Tạo thư mục video nếu chưa tồn tại
     if not os.path.exists(video_screen):
@@ -270,5 +287,7 @@ if __name__ == "__main__":
                             bar.update(len(chunk))  # Cập nhật tiến độ
             print(f"Tải xuống hoàn tất! Tệp được lưu tại {token_json}")
         else:
-            print(f"Lỗi khi tải tệp: {response.status_code}")  
+            print(f"Lỗi khi tải tệp: {response.status_code}") 
+    else:
+        print(f"đã có file {token_json} và không cần tải nữa !") 
     os.system(f"celery -A celeryworker worker -l INFO --hostname={os.getenv('name_woker')} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
