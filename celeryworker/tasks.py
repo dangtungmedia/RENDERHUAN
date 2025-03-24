@@ -989,7 +989,7 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         return True
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-        update_status_video(f"Đang Render : lỗi xử lý tổng quát video {e}", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi : lỗi xử lý tổng quát video {e}", video_id, task_id, worker_id)
         return False
 
 def image_to_video_zoom_out(image_file,path_video, path_audio,scale_width, scale_height, overlay_video,max_retries=3):
@@ -1182,10 +1182,10 @@ def create_video_lines(data, task_id, worker_id):
                     for pending in futures:
                         pending.cancel()  # Hủy tất cả các tác vụ chưa hoàn thành
                         return False  # Dừng quá trình nếu có lỗi trong việc tạo video cho một đoạn
-        update_status_video("Đang Lỗi : Tạo video thành công", video_id, task_id, worker_id)
+        update_status_video("Render Render: Tạo video thành công", video_id, task_id, worker_id)
         return True
     except Exception as e:
-        update_status_video(f"Đang Lỗi : lỗi xử lý tổng quát video {e}", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi : lỗi xử lý tổng quát video {e}", video_id, task_id, worker_id)
         return False  # Dừng quá trình nếu có lỗi tổng quát
 
 def get_random_video_from_directory(directory_path):
