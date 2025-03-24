@@ -38,7 +38,7 @@ def convert_video(file_name):
         "-i", input_path,  # Đường dẫn video đầu vào
         "-vf", f"scale={target_resolution}",  # Độ phân giải
         "-r", str(target_fps),  # Frame rate
-        "-c:v", "h264_nvenc",  # Codec video
+        "-c:v", "hevc_nvenc",  # Codec video
         "-preset", "fast",  # Chế độ mã hóa nhanh
         output_path  # Đường dẫn lưu video sau xử lý
     ]
