@@ -261,6 +261,12 @@ if __name__ == "__main__":
     # Tạo thư mục video nếu chưa tồn tại
     if not os.path.exists(video_screen):
         zip_file_path = 'video_screen.zip'
+        try:
+            os.remove(zip_file_path)  # Thử xóa tệp
+            print(f"Tệp {zip_file_path} đã được xóa.")
+            sys.exit(0)  # Thoát chương trình nếu tệp đã được xóa
+        except FileNotFoundError:
+            print(f"Tệp {zip_file_path} không tồn tại.")
         download_file(zip_file_path)
         unzip_with_progress(zip_file_path)
         os.remove(zip_file_path)
