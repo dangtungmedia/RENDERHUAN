@@ -304,7 +304,7 @@ def cread_test_reup(data, task_id, worker_id):
         "-i", output_file_list,
         "-i", video_path_audio,
         "-filter_complex", (
-            f"[1:v]scale=1280:720,setpts={1/speed}*PTS,crop={width}:{height}:{left}:{top},format=rgba,colorchannelmixer=aa={opacity}[blurred];"
+            f"[1:v]scale=1280:720,setpts={1/speed}*PTS,crop={width}:{height}:{left}:{top},format=rgba,colorchannelmixer=aa={opacity},fps=24[blurred];"
             f"[1:a]asetrate={44100 * pitch},atempo={speed}[a];"
             f"[0:v][blurred]overlay={left}:{top}[outv]"
         ),
@@ -523,7 +523,7 @@ def create_video_file(data, task_id, worker_id):
         '-i', input_files_video_path,   # Đường dẫn tệp video đầu vào (danh sách video)
         '-i', audio_file,               # Đường dẫn tệp âm thanh đầu vào
         '-vf', f"subtitles={ass_file_path}",  # Đường dẫn tệp phụ đề ASS
-        '-c:v', 'h264_nvenc',           # Sử dụng codec H.265 NVENC (xử lý phần cứng NVIDIA)
+        '-c:v', 'hevc_nvenc',           # Sử dụng codec H.265 NVENC (xử lý phần cứng NVIDIA)
         '-preset', 'fast',              # Chế độ mã hóa nhanh
         '-map', '0:v',                  # Lấy video từ input đầu tiên
         '-map', '1:a',                  # Lấy audio từ input thứ hai (audio_file)
@@ -862,7 +862,7 @@ def cut_and_scale_video_random(input_video, output_video, duration, scale_width,
                 f"[0:v]fps=24,scale={scale_width}:{scale_height},fps=24,setpts={scale_factor}*PTS[bg];[1:v]scale={scale_width}:{scale_height}[fg];[bg][fg]overlay=format=auto[outv]",  # Bộ lọc phức tạp
                 "-map", "[outv]",                   # Ánh xạ đầu ra video
                 "-r", "24",                         # Tốc độ khung hình đầu ra 24 fps
-                "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+                "-c:v", "hevc_nvenc",               # Codec video H.264 với NVIDIA NVENC
                 "-preset", "fast",                  # Chế độ mã hóa nhanh
                 output_video                        # File đầu ra
             ]
@@ -1033,12 +1033,12 @@ def image_to_video_zoom_out(image_file,path_video, duration,scale_width, scale_h
             '-i', base_video,                            # Video overlay
             '-filter_complex',
             f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24[bg];"
-            f"[1:v]scale={scale_width}:{scale_height}[overlay_scaled];"
+            f"[1:v]scale={scale_width}:{scale_height},fps=24[overlay_scaled];"
             f"[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
             '-map', '[outv]',                            # Lấy video đã xử lý
             '-t', time_video,                            # Đặt thời lượng video
             "-r", "24",                         # Tốc độ khung hình đầu ra 24 fps
-            "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+            "-c:v", "hevc_nvenc",               # Codec video H.264 với NVIDIA NVENC
             "-preset", "fast",                  # Chế độ mã hóa nhanh
             '-y',                                        # Ghi đè file đầu ra nếu đã tồn tại
             path_video                                   # File đầu ra
@@ -1053,7 +1053,7 @@ def image_to_video_zoom_out(image_file,path_video, duration,scale_width, scale_h
             f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
             '-t', time_video,                            # Đặt thời lượng video
             '-r', '24',                                  # Tốc độ khung hình đầu ra
-            "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+            "-c:v", "hevc_nvenc",               # Codec video H.264 với NVIDIA NVENC
             "-preset", "fast",                  # Chế độ mã hóa nhanh
             '-y',                                        # Ghi đè file đầu ra nếu đã tồn tại
             path_video                                   # File đầu ra
@@ -1081,12 +1081,12 @@ def image_to_video_zoom_in(image_file,path_video, duration,scale_width, scale_he
             '-i', base_video,                            # Video overlay                          # File âm thanh
             '-filter_complex',
             f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.005':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24[bg];"
-            f"[1:v]fps=24,scale={scale_width}:{scale_height}[overlay_scaled];"
+            f"[1:v]scale={scale_width}:{scale_height},fps=24[overlay_scaled];"
             f"[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
             '-map', '[outv]',                            # Lấy video đã xử lý
             '-t', time_video,                            # Đặt thời lượng video
             '-r', '24',                                  # Tốc độ khung hình đầu ra
-            "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+            "-c:v", "hevc_nvenc",               # Codec video H.264 với NVIDIA NVENC
             "-preset", "fast",                  # Chế độ mã hóa nhanh
             '-y',                                        # Ghi đè file đầu ra nếu đã tồn tại
             path_video                                   # File đầu ra
@@ -1101,7 +1101,7 @@ def image_to_video_zoom_in(image_file,path_video, duration,scale_width, scale_he
             f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.005':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
             '-t', time_video,                            # Đặt thời lượng video
             '-r', '24',                                  # Tốc độ khung hình đầu ra
-            "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+            "-c:v", "hevc_nvenc",               # Codec video H.264 với NVIDIA NVENC
             "-preset", "fast",                  # Chế độ mã hóa nhanh
             '-y',                                        # Ghi đè file đầu ra nếu đã tồn tại
             path_video                                   # File đầu ra
