@@ -109,7 +109,7 @@ class VideoDownloader:
                         "ffmpeg",
                         "-hwaccel", "cuda", "-hwaccel_output_format", "cuda",
                         "-i", str(file_cache),  # Đường dẫn video đầu vào
-                        "-vf", "scale_cuda=1280:720",  # Độ phân giải
+                        "-vf", "scale=1280:720",  # Độ phân giải
                         "-r", "24",  # Frame rate
                         "-c:v", "hevc_nvenc",  # Codec video
                         "-preset", "fast",  # Chế độ mã hóa nhanh
@@ -250,7 +250,7 @@ if __name__ == "__main__":
     
     # Tạo thư mục video nếu chưa tồn tại
     if not os.path.exists(output_dir):
-        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=10)
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=5000)
         downloader.download_videos(max_workers=20)
         # Xóa thư mục tạm sau khi tải xong
         shutil.rmtree("chace_video", ignore_errors=True)
