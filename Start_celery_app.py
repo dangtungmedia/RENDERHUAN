@@ -189,7 +189,7 @@ def download_file(output_path):
     url = os.getenv('url_web') + '/render/down_load_screen/'
     
     # Gửi yêu cầu GET và lấy tệp
-    response = requests.get(url, stream=True)
+    response = requests.get(url, stream=True,timeout=500)
     
     # Kiểm tra nếu yêu cầu thành công
     if response.status_code == 200:
@@ -203,7 +203,7 @@ def download_file(output_path):
                 downloaded_size = 0  # Khởi tạo biến để theo dõi số byte đã tải
                 previous_percent = 0  # Biến để lưu trữ phần trăm đã in trước đó
                 
-                for chunk in response.iter_content(chunk_size=1024):
+                for chunk in response.iter_content(chunk_size=20 * 1024 * 1024):
                     if chunk:
                         file.write(chunk)  # Ghi chunk vào tệp
                         downloaded_size += len(chunk)  # Cập nhật số byte đã tải
