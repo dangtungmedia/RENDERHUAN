@@ -30,16 +30,19 @@ video_files = [f for f in os.listdir(chace_video_folder) if os.path.isfile(os.pa
 def convert_video(file_name):
     input_path = os.path.join(chace_video_folder, file_name)
     output_path = os.path.join(video_folder, f"converted_{file_name}")
-
+    
     # Lệnh FFmpeg để chuyển đổi video
     ffmpeg_command = [
         "ffmpeg",
-        "-hwaccel", "cuda", "-hwaccel_output_format", "cuda",
         "-i", input_path,  # Đường dẫn video đầu vào
-        "-vf", f"scale={target_resolution}",  # Độ phân giải
-        "-r", str(target_fps),  # Frame rate
-        "-c:v", "hevc_nvenc",  # Codec video
-        "-preset", "fast",  # Chế độ mã hóa nhanh
+        "-vf", f"scale=1280:720,fps=24",  # Độ phân giải
+        "-c:v", "h264_nvenc",  # Codec video
+        "-profile:v" ,"high",
+        "-b:v","12558k",
+        "-an","-f",
+        "mp4","-movflags",
+        "+faststart",
+        "-y",
         output_path  # Đường dẫn lưu video sau xử lý
     ]
 

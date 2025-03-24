@@ -104,16 +104,19 @@ class VideoDownloader:
                             file_size += len(chunk)
 
                 if file_size > 0:
-                    # Convert video using ffmpeg
                     ffmpeg_command = [
                         "ffmpeg",
-                        "-hwaccel", "cuda", "-hwaccel_output_format", "cuda",
-                        "-i", str(file_cache),  # Đường dẫn video đầu vào
-                        "-vf", "scale=1280:720",  # Độ phân giải
-                        "-r", "24",  # Frame rate
-                        "-c:v", "hevc_nvenc",  # Codec video
-                        "-preset", "fast",  # Chế độ mã hóa nhanh
-                        str(file_path)  # Đường dẫn lưu video sau xử lý
+                        "-i", rf"{file_cache}",  # Đường dẫn video đầu vào
+                        "-vf", f"scale=1280:720,fps=24",  # Độ phân giải
+                        "-c:v", "h264_nvenc",  # Codec video
+                        "-r","24",
+                        "-profile:v" ,"high",
+                        "-b:v","12558k",
+                        "-an","-f",
+                        "mp4","-movflags",
+                        "+faststart",
+                        "-y",
+                        file_path  # Đường dẫn lưu video sau xử lý
                     ]
                     subprocess.run(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -247,10 +250,10 @@ if __name__ == "__main__":
     print("đang xử lý ...")
     output_dir = 'video'
     json_file = 'filtered_data.json'
-    
+
     # Tạo thư mục video nếu chưa tồn tại
     if not os.path.exists(output_dir):
-        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=5000)
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=200)
         downloader.download_videos(max_workers=20)
         # Xóa thư mục tạm sau khi tải xong
         shutil.rmtree("chace_video", ignore_errors=True)
@@ -297,3 +300,4 @@ if __name__ == "__main__":
     else:
         print(f"đã có file {token_json} và không cần tải nữa !") 
     os.system(f"celery -A celeryworker worker -l INFO --hostname={os.getenv('name_woker')} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
+
