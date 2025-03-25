@@ -773,7 +773,6 @@ def format_time(seconds):
     secs = seconds % 60
     return f"{hours:02}:{minutes:02}:{secs:06.3f}"
 
-
 def check_video_integrity(video_path):
     """Kiểm tra xem video có thể phát được không bằng FFmpeg."""
     try:
@@ -1008,7 +1007,7 @@ def image_to_video_zoom_out(image_file,path_video, path_audio,scale_width, scale
             '-i', base_video,                            # Video overlay
             '-i', path_audio,  
             '-filter_complex',
-            f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24[bg];"
+            f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d=240:s={scale_width}x{scale_height}:fps=24[bg];"
             f"[1:v]scale={scale_width}:{scale_height},fps=24[overlay_scaled];"
             f"[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
             '-r', '24',   
@@ -1034,7 +1033,7 @@ def image_to_video_zoom_out(image_file,path_video, path_audio,scale_width, scale
             '-i', image_file,
             '-i', path_audio, # File hình ảnh đầu vào 
             '-vf',
-            f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
+            f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d=240:s={scale_width}x{scale_height}:fps=24",
             '-r', '24',                                  # Tốc độ khung hình đầu ra
             "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
             "-profile:v","high",
@@ -1081,7 +1080,7 @@ def image_to_video_zoom_in(image_file,path_video, path_audio,scale_width, scale_
             '-i', base_video,                            # Video overlay
             '-i', path_audio,                           # File âm thanh
             '-filter_complex',
-            f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.002':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24[bg];"
+            f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.002':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d=240:s={scale_width}x{scale_height}:fps=24[bg];"
             f"[1:v]scale={scale_width}:{scale_height},fps=24[overlay_scaled];"
             f"[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
             '-r', '24', 
@@ -1107,7 +1106,7 @@ def image_to_video_zoom_in(image_file,path_video, path_audio,scale_width, scale_
             '-i', image_file,                            # File hình ảnh đầu vào                         
             '-i', path_audio,    # File âm thanh
             '-vf',
-            f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.005':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
+            f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.005':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d=240:s={scale_width}x{scale_height}:fps=24",
             '-r', '24',                                  # Tốc độ khung hình đầu ra
             "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
             "-profile:v","high",
