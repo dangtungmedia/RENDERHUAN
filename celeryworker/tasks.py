@@ -823,7 +823,7 @@ def cut_and_scale_video_random(input_video, output_video, path_audio, scale_widt
                 "-r","24",
                 "-map", "[outv]",
                 "-map", "2:a:0",
-                "-c:v", "h264_nvenc",
+                "-c:v", "libx264",
                 "-profile:v", "high",
                 "-b:v", "8306k",
                 "-c:a", "aac",
@@ -842,7 +842,7 @@ def cut_and_scale_video_random(input_video, output_video, path_audio, scale_widt
                 "-i", path_audio,                # Audio đầu vào
                 "-vf", f"scale={scale_width}:{scale_height},fps=24,setpts={scale_factor}*PTS,format=yuv420p",  # Bộ lọc video
                 '-r', '24',                                  # Tốc độ khung hình đầu ra
-                "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+                "-c:v", "libx264",               # Codec video H.264 với NVIDIA NVENC
                 "-profile:v","high",
                 "-b:v","8306k",
                 "-c:a","aac",
@@ -1014,7 +1014,7 @@ def image_to_video_zoom_out(image_file,path_video, path_audio,scale_width, scale
             '-r', '24',   
             '-map', '[outv]',                            # Lấy video đã xử lý
             '-map', "2:a:0",
-            "-c:v","h264_nvenc",
+            "-c:v","libx264",
             "-profile:v","high",
             "-b:v","8306k",
             "-c:a","aac",
@@ -1036,7 +1036,7 @@ def image_to_video_zoom_out(image_file,path_video, path_audio,scale_width, scale
             '-vf',
             f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.001':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
             '-r', '24',                                  # Tốc độ khung hình đầu ra
-            "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+            "-c:v", "libx264",               # Codec video H.264 với NVIDIA NVENC
             "-profile:v","high",
             "-b:v","8306k",
             "-c:a","aac",
@@ -1087,7 +1087,7 @@ def image_to_video_zoom_in(image_file,path_video, path_audio,scale_width, scale_
             '-r', '24', 
             '-map', '[outv]',                            # Lấy video đã xử lý
             '-map', "2:a:0",
-            "-c:v","h264_nvenc",
+            "-c:v","libx264",
             "-profile:v","high",
             "-b:v","8306k",
             "-c:a","aac",
@@ -1109,7 +1109,7 @@ def image_to_video_zoom_in(image_file,path_video, path_audio,scale_width, scale_
             '-vf',
             f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.005':x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):d={duration}*24:s={scale_width}x{scale_height}:fps=24",
             '-r', '24',                                  # Tốc độ khung hình đầu ra
-            "-c:v", "h264_nvenc",               # Codec video H.264 với NVIDIA NVENC
+            "-c:v", "libx264",               # Codec video H.264 với NVIDIA NVENC
             "-profile:v","high",
             "-b:v","8306k",
             "-c:a","aac",
@@ -1159,7 +1159,7 @@ def create_video_lines(data, task_id, worker_id):
                 update_status_video("Lỗi: Phụ đề không khớp", video_id, task_id, worker_id)
                 return False  # Dừng quá trình nếu phụ đề không khớp
 
-        with ThreadPoolExecutor(max_workers=1) as executor:
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = {
                 executor.submit(process_video_segment, data, text_entry, data_sub, i, video_id, task_id, worker_id): text_entry
                 for i, text_entry in enumerate(text_entries)
