@@ -474,7 +474,7 @@ def upload_video(data, task_id, worker_id):
                 ).execute()
 
                 update_status_video(
-                    "Đang Render : Upload thành công!", 
+                    "Đang Render : Upload file File Lên Server thành công!", 
                     video_id, 
                     task_id, 
                     worker_id,
@@ -494,7 +494,7 @@ def upload_video(data, task_id, worker_id):
             time.sleep(3)  # Chờ 3 giây trước khi thử lại
 
     # Nếu vẫn lỗi sau tất cả lần thử
-    update_status_video(f"Render Lỗi : Không thể upload sau {max_retries} lần thử", video_id, task_id, worker_id)
+    update_status_video(f"Render Lỗi : Không thể upload sau {max_retries} lần thử file google driver", video_id, task_id, worker_id)
     return False
 
 def get_total_duration_from_ass(ass_file_path):
