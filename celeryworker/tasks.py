@@ -45,6 +45,7 @@ from googleapiclient.http import MediaFileUpload
 from googleapiclient.errors import HttpError
 from urllib.parse import urlparse
 from time import sleep
+from google.auth.exceptions import GoogleAuthError
 # Nạp biến môi trường từ file .env
 load_dotenv()
 
@@ -409,29 +410,38 @@ def upload_video(data, task_id, worker_id):
     video_id = data.get('video_id')
     name_video = data.get('name_video')
     video_path = f'media/{video_id}/{name_video}.mp4'
-    update_status_video(f"Đang Render : Đang Upload File Lên Server", video_id, task_id, worker_id)
+    
+    update_status_video("Đang Render : Đang Upload File Lên Server", video_id, task_id, worker_id)
     
     creds = authenticate()
-    
-    if creds:
+    if not creds:
+        update_status_video(f"Render Lỗi : Google API credentials error", video_id, task_id, worker_id)
+        logging.error("Google API credentials error")
+        return False
+
+    max_retries = 5  # Số lần thử lại tối đa
+    attempt = 0
+    file_id = None
+    url = None
+
+    while attempt < max_retries:
         try:
             service = build("drive", "v3", credentials=creds)
 
-            # Định nghĩa metadata cho file
+            # Metadata file
             file_metadata = {
                 "name": os.path.basename(video_path),
-                "parents": [os.getenv('ID_FORLDER_GOOGLE_API')]  # ID thư mục trên Google Drive
+                "parents": [os.getenv('ID_FORLDER_GOOGLE_API')]
             }
 
-            # Tạo đối tượng MediaFileUpload và chỉ định callback
+            # Cấu hình upload file
             media = MediaFileUpload(
                 video_path, 
-                mimetype="application/octet-stream", 
-                chunksize=1024*1024,  # Dữ liệu upload theo từng chunk 1MB
+                mimetype="video/mp4", 
+                chunksize=1024*1024,  # Chia nhỏ file thành từng phần 1MB
                 resumable=True
             )
 
-            # Upload file với callback
             request = service.files().create(
                 body=file_metadata, 
                 media_body=media, 
@@ -442,48 +452,50 @@ def upload_video(data, task_id, worker_id):
             while response is None:
                 status, response = request.next_chunk()
                 if status:
-                    # Tính toán tiến độ tải lên
-                    uploaded_mb = status.progress() * (os.path.getsize(video_path) / (1024 * 1024))  # Kích thước đã tải lên tính bằng MB
-                    total_mb = os.path.getsize(video_path) / (1024 * 1024)  # Tổng kích thước file tính bằng MB
+                    uploaded_mb = status.progress() * (os.path.getsize(video_path) / (1024 * 1024))
+                    total_mb = os.path.getsize(video_path) / (1024 * 1024)
                     update_status_video(
-                        f"Đang Render : Đang Upload File Lên Server ({status.progress() * 100:.2f}%) - {uploaded_mb:.1f}MB/{total_mb:.1f}MB", 
+                        f"Đang Render : Uploading... {status.progress() * 100:.2f}% - {uploaded_mb:.1f}MB/{total_mb:.1f}MB", 
                         video_id, 
                         task_id, 
                         worker_id
                     )
-                    
-            # Sau khi upload xong
-            url = response.get('webViewLink')
+
+            # Upload thành công, lấy ID và URL
             file_id = response.get('id')
-            permissions = {
-                'type': 'anyone',
-                'role': 'reader',  # Quyền đọc
-            }
-            # Tạo quyền truy cập chia sẻ cho file
-            service.permissions().create(
-                fileId=file_id,
-                body=permissions
-            ).execute()
-                
-            update_status_video(
-                "Đang Render : Upload file File Lên Server thành công!", 
-                video_id, 
-                task_id, 
-                worker_id,
-                url_video=url,
-                id_video_google=file_id
-            )
-            logging.info(f"File uploaded successfully: {url}")
-            return True
-        
+            url = response.get('webViewLink')
+            print(url)
+
+            if file_id and url:
+                # Cấp quyền truy cập công khai
+                service.permissions().create(
+                    fileId=file_id,
+                    body={'type': 'anyone', 'role': 'reader'}
+                ).execute()
+
+                update_status_video(
+                    "Đang Render : Upload thành công!", 
+                    video_id, 
+                    task_id, 
+                    worker_id,
+                    url_video=url,
+                    id_video_google=file_id
+                )
+                logging.info(f"File uploaded successfully: {url}")
+                return file_id, url
+
+        except GoogleAuthError as auth_error:
+            logging.error(f"Lỗi xác thực Google API: {auth_error}")
+            break  # Nếu lỗi xác thực, không thử lại
         except Exception as e:
-            update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Lỗi khi upload file: {str(e)}", video_id, task_id, worker_id)
-            logging.error(f"Error during file upload: {str(e)}")
-            return False
-    else:
-        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Google API credentials error", video_id, task_id, worker_id)
-        logging.error("Google API credentials error")
-        return False
+            attempt += 1
+            logging.error(f"Attempt {attempt}/{max_retries} - Error uploading file: {e}")
+            update_status_video(f"Render Lỗi : Thử lại upload ({attempt}/{max_retries})", video_id, task_id, worker_id)
+            time.sleep(3)  # Chờ 3 giây trước khi thử lại
+
+    # Nếu vẫn lỗi sau tất cả lần thử
+    update_status_video(f"Render Lỗi : Không thể upload sau {max_retries} lần thử", video_id, task_id, worker_id)
+    return False
 
 def get_total_duration_from_ass(ass_file_path):
     """Lấy tổng thời gian từ file .ass dựa trên thời gian kết thúc của dòng Dialogue cuối cùng"""
