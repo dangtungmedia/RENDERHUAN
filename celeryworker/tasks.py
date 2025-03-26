@@ -1170,7 +1170,7 @@ def create_video_lines(data, task_id, worker_id):
                 update_status_video("Lỗi: Phụ đề không khớp", video_id, task_id, worker_id)
                 return False  # Dừng quá trình nếu phụ đề không khớp
 
-        with ThreadPoolExecutor(max_workers=1) as executor:
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = {
                 executor.submit(process_video_segment, data, text_entry, data_sub, i, video_id, task_id, worker_id): text_entry
                 for i, text_entry in enumerate(text_entries)
@@ -1182,7 +1182,7 @@ def create_video_lines(data, task_id, worker_id):
                     if result:
                         processed_entries += 1
                         percent_complete = (processed_entries / total_entries) * 100
-                        update_status_video(f"Đang Render : Đang tạo video {processed_entries} thành công", video_id, task_id, worker_id)
+                        update_status_video(f"Đang Render : Đang tạo video {processed_entries}/{total_entries} thành công", video_id, task_id, worker_id)
                     else:
                         for pending in futures:
                             pending.cancel()  # Hủy tất cả các tác vụ chưa hoàn thành
