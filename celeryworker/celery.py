@@ -11,6 +11,7 @@ app.autodiscover_tasks(['celeryworker'])
 
 # Thiết lập timezone cho Celery
 app.conf.timezone = 'Asia/Ho_Chi_Minh'  # Sử dụng đúng cú pháp với chữ hoa
+app.conf.worker_prefetch_multiplier = 1
 
 # Định nghĩa một task debug đơn giản
 @app.task(bind=True, ignore_result=True)
