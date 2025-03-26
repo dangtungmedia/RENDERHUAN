@@ -252,13 +252,13 @@ if __name__ == "__main__":
     json_file = 'filtered_data.json'
 
     # Tạo thư mục video nếu chưa tồn tại
-    if not os.path.exists(output_dir):
-        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=200)
-        downloader.download_videos(max_workers=20)
+    #if not os.path.exists(output_dir):
+        #downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=200)
+        #downloader.download_videos(max_workers=20)
         # Xóa thư mục tạm sau khi tải xong
-        shutil.rmtree("chace_video", ignore_errors=True)
-    else:
-        print("Có video rồi không cần tải nữa !")
+        #shutil.rmtree("chace_video", ignore_errors=True)
+    #else:
+        #print("Có video rồi không cần tải nữa !")
         
     video_screen = "video_screen"
     # Tạo thư mục video nếu chưa tồn tại
