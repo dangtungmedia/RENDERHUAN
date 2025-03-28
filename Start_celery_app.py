@@ -1,4 +1,9 @@
 import os
+import requests
+import socket
+import netifaces
+
+import os
 import random
 import json
 import requests
@@ -108,10 +113,10 @@ class VideoDownloader:
                         "ffmpeg",
                         "-i", rf"{file_cache}",  # Đường dẫn video đầu vào
                         "-vf", f"scale=1280:720,fps=24",  # Độ phân giải
-                        "-c:v", "libx264 ",  # Codec video
+                        "-c:v", "h264_nvenc",  # Codec video
                         "-r","24",
                         "-profile:v" ,"high",
-                        "-b:v","12558k",
+                        "-b:v","8306k",
                         "-an","-f",
                         "mp4","-movflags",
                         "+faststart",
@@ -245,6 +250,23 @@ def unzip_with_progress(zip_file_path):
 
     print(f"Đã giải nén thành công vào thư mục {output_dir}")
 
+
+def get_local_ip():
+    try:
+        for interface in netifaces.interfaces():
+            addresses = netifaces.ifaddresses(interface)
+            # Kiểm tra IPv4 trong các interface
+            if netifaces.AF_INET in addresses:
+                for addr in addresses[netifaces.AF_INET]:
+                    ip = addr.get('addr')
+                    # Kiểm tra nếu IP thuộc dải 192.168.x.x hoặc 10.x.x.x (mạng LAN)
+                    if ip.startswith('192.168.') or ip.startswith('10.') or ip.startswith('172.'):
+                        return ip
+        return None
+    except Exception as e:
+        print(f"Error getting local IP: {e}")
+        return None
+
 # Main function
 if __name__ == "__main__":
     print("đang xử lý ...")
@@ -252,52 +274,13 @@ if __name__ == "__main__":
     json_file = 'filtered_data.json'
 
     # Tạo thư mục video nếu chưa tồn tại
-    #if not os.path.exists(output_dir):
-        #downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=200)
-        #downloader.download_videos(max_workers=20)
+    if not os.path.exists(output_dir):
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=3000)
+        downloader.download_videos(max_workers=20)
         # Xóa thư mục tạm sau khi tải xong
-        #shutil.rmtree("chace_video", ignore_errors=True)
-    #else:
-        #print("Có video rồi không cần tải nữa !")
-        
-    video_screen = "video_screen"
-    # Tạo thư mục video nếu chưa tồn tại
-    if not os.path.exists(video_screen):
-        zip_file_path = 'video_screen.zip'
-        try:
-            os.remove(zip_file_path)  # Thử xóa tệp
-            print(f"Tệp {zip_file_path} đã được xóa.")
-            sys.exit(0)  # Thoát chương trình nếu tệp đã được xóa
-        except FileNotFoundError:
-            print(f"Tệp {zip_file_path} không tồn tại.")
-        download_file(zip_file_path)
-        unzip_with_progress(zip_file_path)
-        os.remove(zip_file_path)
+        shutil.rmtree("chace_video", ignore_errors=True)
     else:
-        print("Có video Screen rồi không cần tải nữa !")
-        
-    token_json = "token.json"
-    if not os.path.exists(token_json):
-        url =  os.getenv('url_web') + '/render/token_api_google/' 
-        # Gửi yêu cầu GET và lấy tệp
-        response = requests.get(url, stream=True)
-        # Kiểm tra nếu yêu cầu thành công
-        if response.status_code == 200:
-            # Lấy kích thước tệp
-            total_size = int(response.headers.get('content-length', 0))
-            
-            # Mở tệp để ghi dữ liệu
-            with open(token_json, 'wb') as file:
-                # Tạo tiến độ với tqdm
-                with tqdm(total=total_size, unit='B', unit_scale=True) as bar:
-                    for chunk in response.iter_content(chunk_size=1024):
-                        if chunk:
-                            file.write(chunk)  # Ghi chunk vào tệp
-                            bar.update(len(chunk))  # Cập nhật tiến độ
-            print(f"Tải xuống hoàn tất! Tệp được lưu tại {token_json}")
-        else:
-            print(f"Lỗi khi tải tệp: {response.status_code}") 
-    else:
-        print(f"đã có file {token_json} và không cần tải nữa !") 
-    os.system(f"celery -A celeryworker worker -l INFO --hostname={os.getenv('name_woker')} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
+        print("Có video rồi không cần tải nữa !")
+    local_ip = get_local_ip()
+    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
 
