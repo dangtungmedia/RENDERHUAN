@@ -36,22 +36,17 @@ import threading
 from threading import Lock
 import logging
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.http import MediaIoBaseDownload
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-from googleapiclient.errors import HttpError
+
 from urllib.parse import urlparse
 from time import sleep
-from google.auth.exceptions import GoogleAuthError
 # Nạp biến môi trường từ file .env
 load_dotenv()
 
 SECRET_KEY=os.environ.get('SECRET_KEY')
 SERVER=os.environ.get('SERVER')
 ACCESS_TOKEN = None
+failed_accounts = set()
+valid_tokens = {}
 logging.basicConfig(filename='render_errors.log', level=logging.ERROR,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -98,12 +93,11 @@ def clean_up_on_revoke(sender, request, terminated, signum, expired, **kw):
     else:
         print(f"Không thể tìm thấy video_id cho task {task_id} vì không có args.")
 
-@shared_task(bind=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content')
+@shared_task(bind=True,ignore_result=True, priority=0,name='render_video',time_limit=14200,queue='render_video_content')
 def render_video(self, data):
     task_id = self.request.id  # Sử dụng self.request thay vì render_video_reupload.request
     worker_id = self.request.hostname 
     video_id = data.get('video_id')
-    # Kiểm tra xem task có bị hủy không ngay từ đầu
     
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     success = create_or_reset_directory(f'media/{video_id}')
@@ -124,6 +118,7 @@ def render_video(self, data):
         shutil.rmtree(f'media/{video_id}')
         update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tải xuống hình ảnh", data['video_id'], task_id, worker_id)
         return
+
     update_status_video("Đang Render : Tải xuống hình ảnh thành công", data['video_id'], task_id, worker_id)
     #THử
     if not data.get('url_audio'):
@@ -303,7 +298,7 @@ def cread_test_reup(data, task_id, worker_id):
         ),
         "-map", "[outv]",
         "-map", "[a]",
-        "-c:v", "libx264",
+        "-c:v", "h264_nvenc",
         "-c:a", "aac",
         "-preset", "fast",
         output_path
@@ -382,28 +377,6 @@ def select_videos_by_total_duration(file_path, min_duration):
         data.remove(video)
     
     return selected_urls
-
-def authenticate():
-    """Xác thực với Google Drive API và lấy credentials"""
-    creds = None
-    SCOPES = ["https://www.googleapis.com/auth/drive"]
-    # Kiểm tra file token.json để lấy thông tin xác thực
-    if os.path.exists("token.json"):
-        try:
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-        except:
-            return None
-    # Nếu không có creds hợp lệ, thực hiện xác thực
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-            creds = flow.run_local_server(port=0)
-            # Lưu credentials để dùng lại
-            with open("token.json", "w") as token:
-                token.write(creds.to_json())
-    return creds
 
 def upload_video(data, task_id, worker_id):
     video_id = data.get('video_id')
@@ -994,7 +967,6 @@ def process_video_segment(data, text_entry, data_sub, i, video_id, task_id, work
         
         # Xử lý video hoặc ảnh
         if file_type == "video":
-            
             cut_and_scale_video_random(path_file, out_file, path_audio, 1920, 1080, 'video_screen')
             
         elif file_type == "image":
@@ -1176,7 +1148,7 @@ def create_video_lines(data, task_id, worker_id):
                 update_status_video("Lỗi: Phụ đề không khớp", video_id, task_id, worker_id)
                 return False  # Dừng quá trình nếu phụ đề không khớp
 
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=4) as executor:
             futures = {
                 executor.submit(process_video_segment, data, text_entry, data_sub, i, video_id, task_id, worker_id): text_entry
                 for i, text_entry in enumerate(text_entries)
@@ -1209,90 +1181,62 @@ def get_random_video_from_directory(directory_path):
     video_files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
     return os.path.join(directory_path, random.choice(video_files))
 
-def get_voice_super_voice(data, text, file_name):     
-    success = False
-    attempt = 0
-    while not success and attempt < 15:
-        try:
-            url_voice_text = get_voice_text(text, data)
-            if not url_voice_text:
-                return False
-            
-            url_voice = get_audio_url(url_voice_text)
-            if not url_voice:
-                return False
+def login_data(email, password):
+    """ Đăng nhập để lấy idToken """
+    data = {
+        "returnSecureToken": True,
+        "email": email,
+        "password": password,
+        "clientType": "CLIENT_TYPE_WEB"
+    }
+    params = {"key": "AIzaSyBJN3ZYdzTmjyQJ-9TdpikbsZDT9JUAYFk"}
+    url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
+    response = requests.post(url, params=params, json=data)
+    response.raise_for_status()
+    return response.json()['idToken']
 
-        
-            final_url = get_url_voice_succes(url_voice)
-            if not final_url:
-                return False
-            
-            response = requests.get(final_url, stream=True, timeout=200)
-            if response.status_code == 200:
-                with open(file_name, 'wb') as f:
-                    f.write(response.content)
-                # Kiểm tra độ dài tệp âm thanh
-                duration = get_audio_duration(file_name)
-                if duration > 0:
-                    success = True
-                else:
-                    if os.path.exists(file_name):
-                        os.remove(file_name)
-            else:
-                print(f"Lỗi: API trả về trạng thái {response.status_code}. Thử lại...")
-        except requests.RequestException as e:
-            print(f"Lỗi mạng khi gọi API: {e}. Thử lại...")
-        except Exception as e:
-            print(f"Lỗi không xác định: {e}. Thử lại...")
-            
-        attempt += 1
-        if not success:
-            time.sleep(25)
-    if not success:
-        print(f"Không thể tạo giọng nói sau {attempt} lần thử.")
-    return success
+def get_access_token(idToken):
+    """ Lấy access_token từ idToken """
+    response = requests.post('https://typecast.ai/api/auth-fb/custom-token', json={"token": idToken})
+    response.raise_for_status()
+    return response.json()["result"]['access_token']
 
-def get_url_voice_succes(url_voice):
-    max_retries = 40  # Số lần thử lại tối đa
-    retry_delay = 2  # Thời gian chờ giữa các lần thử (giây)
+def active_token(access_token):
+    """ Lấy idToken từ access_token """
+    params = {"key": "AIzaSyBJN3ZYdzTmjyQJ-9TdpikbsZDT9JUAYFk"}
+    response = requests.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken',
+                             params=params, json={"token": access_token, "returnSecureToken": True})
+    response.raise_for_status()
+    return response.json()['idToken']
 
-    for attempt in range(max_retries):
-         # Làm mới token nếu cần
-        if ACCESS_TOKEN is None:  # Nếu token chưa có, làm mới
-            print("Refreshing ACCESS_TOKEN...")
-            get_cookie(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))
-            
-        url = url_voice + '/cloudfront'
-        headers = {
-            'Authorization': f'Bearer {ACCESS_TOKEN}'
-        }
-        try:
-            response = requests.get(url, headers=headers)
-            if response.status_code == 200:
-                return response.json()['result']
-            elif response.status_code == 401:  # Token hết hạn
-                print("Unauthorized. Token may be expired. Refreshing token...")
-                get_cookie(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))
-            else:
-                print("API call failed with status code:", response.status_code)
-                print("Response text:", response.text)
-        except requests.RequestException as e:
-            print("Error occurred during API request:", e)
-        # Chờ trước khi thử lại
-        time.sleep(retry_delay)
-    
-    return False     
+def get_cookie(email, password):
+    """ Lấy Access Token từ email/password """
+    try:
+        Token_login = login_data(email, password)
+        idToken = get_access_token(Token_login)
+        ACCESS_TOKEN = active_token(idToken)
+    except Exception:
+        ACCESS_TOKEN = None
+    return ACCESS_TOKEN
 
-def get_audio_url(url_voice_text):
+def load_accounts(filename="accounts.txt"):
+    """ Đọc danh sách tài khoản từ file và xáo trộn """
+    accounts = []
+    with open(filename, "r") as file:
+        for line in file:
+            line = line.strip()
+            if "|" in line:
+                email, password = line.split("|", 1)
+                accounts.append((email, password))
+    random.shuffle(accounts)  # Xáo trộn tài khoản để tránh bị chặn theo thứ tự
+    return accounts
+
+def get_audio_url(ACCESS_TOKEN,url_voice_text):
     """Hàm lấy URL audio từ API."""
     max_retries = 40  # Số lần thử lại tối đa
-    retry_delay = 3  # Thời gian chờ giữa các lần thử (giây)
+    retry_delay = 5  # Thời gian chờ giữa các lần thử (giây)
 
     for attempt in range(max_retries):
-        # Làm mới token nếu cần
-        if ACCESS_TOKEN is None:  # Nếu token chưa có, làm mới
-            get_cookie(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))
-            
         # Gửi yêu cầu POST đến API
         url = "https://typecast.ai/api/speak/batch/get"
         headers = {
@@ -1314,170 +1258,73 @@ def get_audio_url(url_voice_text):
                         pass
                 except (KeyError, IndexError, TypeError) as e:
                     print("Error parsing JSON response:", e)
-            elif response.status_code == 401:  # Token hết hạn
-                get_cookie(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))
-            else:
-               pass
         except requests.RequestException as e:
             print("Error occurred during API request:", e)
-
         # Chờ trước khi thử lại
         time.sleep(retry_delay)
     return False
 
-def get_voice_text(text, data):
-    retry_count = 0
-    max_retries = 50 # Giới hạn số lần thử lại
-    while retry_count < max_retries:
-        try:
-            style_name_data = json.loads(data.get("style"))
-            style_name_data[0]["text"] = text
+def get_voice_super_voice(data, text, file_name): 
+    """ Gửi request để lấy voice """
+    global failed_accounts, valid_tokens
+    accounts = load_accounts()
+    for email, password in accounts:  
+        if email in failed_accounts:  
+            continue  # Bỏ qua tài khoản đã gặp lỗi trước đó
+        # Sử dụng token đã lưu nếu có
+        ACCESS_TOKEN = valid_tokens.get(email) or get_cookie(email, password)
+        if not ACCESS_TOKEN:
+            failed_accounts.add(email)
+            continue
+        valid_tokens[email] = ACCESS_TOKEN  # Lưu lại token hợp lệ
 
+        print(ACCESS_TOKEN)
+        
+        style_name_data = json.loads(data.get("style"))
+        style_name_data[0]["text"] = text
 
-            if ACCESS_TOKEN is None:
-                get_cookie(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))
-            
-            # Gửi yêu cầu POST
-            url = 'https://typecast.ai/api/speak/batch/post'
-            headers = {
-                'Authorization': f'Bearer {ACCESS_TOKEN}',
-                'Content-Type': 'application/json'
-            }
-            response = requests.post(url, headers=headers, json=style_name_data)
-            print("Response status code:", response.status_code)
-            print("Response text:", response.text)
-            # Nếu thành công, trả về dữ liệu
-            if response.status_code == 200:
-                return response.json().get("result", {}).get("speak_urls", [])
-            
+        for retry_count in range(2):  
+            try:
+                response = requests.post(
+                    'https://typecast.ai/api/speak/batch/post',
+                    headers={'Authorization': f'Bearer {ACCESS_TOKEN}', 'Content-Type': 'application/json'},
+                    json=style_name_data
+                )
 
-            # Nếu gặp lỗi unauthorized, tăng số lần thử lại
-            elif response.status_code == 401:
-                print("Unauthorized. Token may be expired. Refreshing token...")
-                get_cookie(os.environ.get('EMAIL'), os.environ.get('PASSWORD'))
-                retry_count += 1
-                time.sleep(10)  # Chờ 1 giây trước khi thử lại
-            else:
-                print("API call failed:", response.status_code)
-                retry_count += 1
-                time.sleep(10)  # Chờ 1 giây trước khi thử lại
-        except Exception as e:
-            retry_count += 1
-            time.sleep(10)  # Chờ 1 giây trước khi thử lại
+                if response.status_code == 200:
+                    print(f"✅ Thành công với {email}")
+                    url = response.json().get("result", {}).get("speak_urls", [])
+
+                    url_voice = get_audio_url(ACCESS_TOKEN, url)
+                    print("xxxxxxxxxxxxxxxxxxx")
+                    if url_voice:
+                        response = requests.get(url_voice, stream=True,headers={'Authorization': f'Bearer {ACCESS_TOKEN}'})
+                        if response.status_code == 200:
+                            with open(file_name, 'wb') as f:
+                                f.write(response.content)
+                            print(f"✅ Đã lưu file: {file_name}")
+                            return True
+                        else:
+                            print(f"⚠️ Lỗi tải file, status: {response.status_code}")
+                    failed_accounts.add(email)
+                    break
+                  
+                else:
+                    print(f"❌ Lỗi {response.status_code}, thử lại ({retry_count+1}/2)...")
+                    time.sleep(1)
+
+            except Exception as e:
+                print(f"⚠️ Lỗi: {str(e)}, thử lại ({retry_count+1}/2)...")
+                time.sleep(1)
+    print("🚫 Đã thử hết tài khoản nhưng vẫn thất bại!")
     return False
-  
-# Hàm thử lại với decorator
-def retry(retries=30, delay=5):
-    """
-    Decorator để tự động thử lại nếu hàm gặp lỗi.
-    
-    Args:
-        retries (int): Số lần thử lại tối đa.
-        delay (int): Thời gian chờ giữa các lần thử (giây).
-
-    Returns:
-        Kết quả trả về từ hàm nếu thành công, None nếu thất bại.
-    """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            for attempt in range(1, retries + 1):
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    print(f"Lỗi trong {func.__name__}, lần thử {attempt}: {e}")
-                    if attempt < retries:
-                        time.sleep(delay)
-                    else:
-                        print(f"{func.__name__} thất bại sau {retries} lần thử.")
-                        return None
-        return wrapper
-    return decorator
-
-@retry(retries=20, delay=5)
-def active_token(access_token):
-    """
-    Lấy idToken từ access_token.
-    """
-    Params = {
-        "key": "AIzaSyBJN3ZYdzTmjyQJ-9TdpikbsZDT9JUAYFk"
-    }
-    data = {
-        "token": access_token,
-        "returnSecureToken": True
-    }
-    response = requests.post(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken',
-        params=Params,
-        json=data
-    )
-    response.raise_for_status()
-    return response.json()['idToken']
-
-@retry(retries=20, delay=5)
-def get_access_token(idToken):
-    """
-    Lấy access_token từ idToken.
-    """
-    data = {
-        "token": idToken
-    }
-    response = requests.post(
-        'https://typecast.ai/api/auth-fb/custom-token',
-        json=data
-    )
-    response.raise_for_status()
-    return response.json()["result"]['access_token']
-
-@retry(retries=20, delay=5)
-def login_data(email, password):
-    """
-    Lấy idToken bằng cách đăng nhập với email và password.
-    """
-    data = {
-        "returnSecureToken": True,
-        "email": email,
-        "password": password,
-        "clientType": "CLIENT_TYPE_WEB"
-    }
-    Params = {
-        "key": "AIzaSyBJN3ZYdzTmjyQJ-9TdpikbsZDT9JUAYFk"
-    }
-    url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
-    response = requests.post(url, params=Params, json=data)
-    response.raise_for_status()
-    return response.json()['idToken']
-
-def get_cookie(email, password):
-    """
-    Kết hợp các bước:
-    1. Đăng nhập để lấy idToken nếu access_token không được cung cấp.
-    2. Lấy idToken từ active_token nếu access_token có sẵn.
-    3. Lấy access_token từ idToken và lưu vào biến toàn cục.
-
-    Args:
-        email (str): Email đăng nhập.
-        password (str): Mật khẩu đăng nhập.
-        access_token (str, optional): Access token nếu đã có sẵn.
-
-    Returns:
-        str: Access token (cookie) nếu thành công, None nếu thất bại.
-    """
-    global ACCESS_TOKEN  # Khai báo biến toàn cục
-    try:
-        Token_login = login_data(email, password)
-
-        idToken = get_access_token(Token_login)  # Lưu vào biến toàn cục
-        
-        ACCESS_TOKEN = active_token(idToken)
-        
-    except Exception as e:
-        ACCESS_TOKEN = None
 
 def process_voice_entry(data, text_entry, video_id, task_id, worker_id, language):
     """Hàm xử lý giọng nói cho từng trường hợp ngôn ngữ."""
     file_name = f'media/{video_id}/voice/{text_entry["id"]}.wav'
     success = False
     
+    print(f"Đang tạo giọng nói cho đoạn văn bản ID {text_entry['id']}")
     # Xử lý ngôn ngữ tương ứng và kiểm tra kết quả tải
     if language == 'Japanese-VoiceVox':
         success = get_voice_japanese(data, text_entry['text'], file_name)
@@ -1515,53 +1362,44 @@ def download_audio(data, task_id, worker_id):
         # Tạo thư mục nếu chưa tồn tại
         os.makedirs(f'media/{video_id}/voice', exist_ok=True)
 
+        os.makedirs(f'media/{video_id}/voice', exist_ok=True)
+
         # Danh sách giữ đường dẫn tệp theo thứ tự
         result_files = [None] * total_entries
         processed_entries = 0
 
-        # Khởi tạo luồng xử lý tối đa 20 luồng
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            futures = {
-                executor.submit(process_voice_entry, data, text_entry, video_id, task_id, worker_id, language): idx
-                for idx, text_entry in enumerate(text_entries)
-            }
-            # Mở file để ghi các đường dẫn tệp âm thanh theo thứ tự
-            with open(f'media/{video_id}/input_files.txt', 'w') as file:
-                for future in as_completed(futures):
-                    idx = futures[future]
-                    try:
-                        result = future.result()  # Lấy kết quả từ công việc hoàn thành
-                        if result[0] is False:  # Nếu có lỗi trong quá trình tải
-                            print("Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.")
-                            update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.", data['video_id'], task_id, worker_id)
-                            # Hủy tất cả các công việc chưa hoàn thành
-                            for f in futures.keys():
-                                f.cancel()
-                            return False
-                        entry_id, file_name = result
-                        result_files[idx] = file_name  # Đảm bảo thứ tự cho file_name
-                        processed_entries += 1
-                        percent_complete = (processed_entries / total_entries) * 100
-                        update_status_video(
-                            f"Đang Render : Đang tạo giọng đọc ({processed_entries} /{total_entries}) {percent_complete:.2f}%",
-                            video_id, task_id, worker_id
-                        )
-                    except Exception as e:
-                        print(f"Lỗi khi xử lý giọng đọc cho đoạn văn bản {text_entries[idx]['id']}: {e}")
-                        update_status_video(
-                            f"Render Lỗi :  {os.getenv('name_woker')} Lỗi khi tạo giọng đọc - {e}",
-                            video_id, task_id, worker_id
-                        )
-                        # Hủy tất cả các công việc chưa hoàn thành
-                        for f in futures.keys():
-                            f.cancel()
-                        update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
-                        return False  # Dừng toàn bộ nếu gặp lỗi
-                # Ghi vào input_files.txt theo đúng thứ tự ban đầu của text_entries
-                for file_name in result_files:
-                    if file_name:
-                        file.write(f"file 'voice/{os.path.basename(file_name)}'\n")
-        time.sleep(1)
+        # Xử lý từng đoạn văn bản một theo thứ tự
+        for idx, text_entry in enumerate(text_entries):
+            try:
+                result = process_voice_entry(data, text_entry, video_id, task_id, worker_id, language)  # Gọi trực tiếp hàm xử lý cho mỗi entry
+                if result[0] is False:  # Nếu có lỗi trong quá trình tải
+                    print("Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.")
+                    update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Lỗi khi tải giọng nói, dừng toàn bộ tiến trình.", data['video_id'], task_id, worker_id)
+                    return False  # Dừng lại nếu có lỗi
+
+                entry_id, file_name = result
+                result_files[idx] = file_name  # Đảm bảo thứ tự cho file_name
+                processed_entries += 1
+                percent_complete = (processed_entries / total_entries) * 100
+                update_status_video(
+                    f"Đang Render : Đang tạo giọng đọc ({processed_entries} /{total_entries}) {percent_complete:.2f}%",
+                    video_id, task_id, worker_id
+                )
+
+            except Exception as e:
+                print(f"Lỗi khi xử lý giọng đọc cho đoạn văn bản {text_entries[idx]['id']}: {e}")
+                update_status_video(
+                    f"Render Lỗi :  {os.getenv('name_woker')} Lỗi khi tạo giọng đọc - {e}",
+                    video_id, task_id, worker_id
+                )
+                update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Không thể tải xuống âm thanh", data['video_id'], task_id, worker_id)
+                return False  # Dừng toàn bộ nếu gặp lỗi
+
+        # Ghi vào input_files.txt theo đúng thứ tự ban đầu của text_entries
+        with open(f'media/{video_id}/input_files.txt', 'w') as file:
+            for file_name in result_files:
+                if file_name:
+                    file.write(f"file 'voice/{os.path.basename(file_name)}'\n")
         update_status_video(
                             f"Đang Render : Đã tạo xong giọng đọc",
                             video_id, task_id, worker_id
@@ -1883,7 +1721,6 @@ def download_single_image(url, local_directory):
             print(f"Lỗi yêu cầu khi tải xuống {url}: {e}")
         except Exception as e:
             print(f"Lỗi không xác định khi tải xuống {url}: {e}")
-        time.sleep(4)  # Đợi 1 giây trước khi thử lại
     return False  # Trả về False nếu không thể tải xuống
 
 def download_image(data, task_id, worker_id):
@@ -1919,43 +1756,23 @@ def download_image(data, task_id, worker_id):
     total_images = len(images)  # Tổng số hình ảnh cần tải
 
     downloaded_images = 0  # Số hình ảnh đã tải xuống thành công
-
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        future_to_url = {
-            executor.submit(download_single_image, image, local_directory): image
-            for image in images
-        }
-
-        for future in as_completed(future_to_url):
-            url = future_to_url[future]
-            try:
-                # Kiểm tra kết quả của từng tương lai
-                if future.result():
-                    downloaded_images += 1
-                    percent_complete = (downloaded_images / total_images) * 100
-                    update_status_video(
-                        f"Đang Render : Tải xuống  file thành công ({downloaded_images}/{total_images}) - {percent_complete:.2f}%",
-                        video_id, task_id, worker_id
-                    )
-                else:
-                    # Hủy tất cả các tác vụ còn lại khi gặp lỗi tải xuống
-                    update_status_video(
-                        f"Render Lỗi : {os.getenv('name_woker')} Không thể tải xuống hình ảnh -{url}",
-                        video_id, task_id, worker_id
-                    )
-                    for pending in future_to_url:
-                        pending.cancel()  # Hủy tất cả các tác vụ chưa hoàn thành
-                    return False  # Ngừng tiến trình ngay khi gặp lỗi
-            except Exception as e:
-                print(f"Lỗi khi tải xuống {url}: {e}")
-                update_status_video(
-                    f"Render Lỗi : {os.getenv('name_woker')} Lỗi không xác định - {e} - {url}",
-                    video_id, task_id, worker_id
-                )
-                # Hủy tất cả các tác vụ còn lại và ngừng tiến trình
-                for pending in future_to_url:
-                    pending.cancel()
-                return False
+    
+    for image in images:
+        is_down_load = download_single_image(image, local_directory)
+        if is_down_load:
+            downloaded_images += 1
+            percent_complete = (downloaded_images / total_images) * 100
+            update_status_video(
+                f"Đang Render : Tải xuống  file thành công ({downloaded_images}/{total_images}) - {percent_complete:.2f}%",
+                video_id, task_id, worker_id
+            )
+        else:
+            print(f"Lỗi tải xuống hình ảnh từ {image}")
+            update_status_video(
+                f"Render Lỗi :  {os.getenv('name_woker')} Lỗi tải xuống hình ảnh {image}",
+                video_id, task_id, worker_id
+            )
+            return False
     return True
 
 def create_or_reset_directory(directory_path):
