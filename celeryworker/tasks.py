@@ -840,7 +840,7 @@ def cut_and_scale_video_random(input_video, output_video, path_audio, scale_widt
                 "-r","24",
                 "-map", "[outv]",
                 "-map", "2:a:0",
-                "-c:v", "libx264 ",
+                "-c:v", "libx264",
                 "-profile:v", "high",
                 "-b:v", "8306k",
                 "-c:a", "aac",
@@ -859,7 +859,7 @@ def cut_and_scale_video_random(input_video, output_video, path_audio, scale_widt
                 "-i", path_audio,                # Audio đầu vào
                 "-vf", f"scale={scale_width}:{scale_height},fps=24,setpts={scale_factor}*PTS,format=yuv420p",  # Bộ lọc video
                 '-r', '24',                                  # Tốc độ khung hình đầu ra
-                "-c:v", "libx264 ",               # Codec video H.264 với NVIDIA NVENC
+                "-c:v", "libx264",               # Codec video H.264 với NVIDIA NVENC
                 "-profile:v","high",
                 "-b:v","8306k",
                 "-c:a","aac",
