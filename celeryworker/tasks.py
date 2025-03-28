@@ -164,7 +164,7 @@ def render_video_reupload(self, data):
     # Kiểm tra xem task có bị hủy không ngay từ đầu
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     
-    if not os.path.exists("video")  and not os.path.exists("video_screen") :
+    if not os.path.exists("video"):
         update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Thiếu các tệp video  và  video_screen ", data['video_id'], task_id, worker_id)
         return
     

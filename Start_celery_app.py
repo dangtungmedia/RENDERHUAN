@@ -274,13 +274,13 @@ if __name__ == "__main__":
     json_file = 'filtered_data.json'
 
     # Tạo thư mục video nếu chưa tồn tại
-    # if not os.path.exists(output_dir):
-    #     downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=3000)
-    #     downloader.download_videos(max_workers=20)
-    #     # Xóa thư mục tạm sau khi tải xong
-    #     shutil.rmtree("chace_video", ignore_errors=True)
-    # else:
-    #     print("Có video rồi không cần tải nữa !")
+    if not os.path.exists(output_dir):
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=3000)
+        downloader.download_videos(max_workers=20)
+        # Xóa thư mục tạm sau khi tải xong
+        shutil.rmtree("chace_video", ignore_errors=True)
+    else:
+        print("Có video rồi không cần tải nữa !")
     local_ip = get_local_ip()
     os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
 
