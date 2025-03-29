@@ -708,8 +708,8 @@ def create_subtitles(data, task_id, worker_id):
                 duration = get_video_duration(f'media/{video_id}/video/{iteam["id"]}.mp4')
                 duration_milliseconds = duration * 1000
                 end_time = start_time + timedelta(milliseconds=duration_milliseconds)
-                start_time_delay =  start_time + timedelta(milliseconds=500)  # Adjust start time
-                end_time_delay = start_time + timedelta(milliseconds=duration_milliseconds - 500)
+                start_time_delay =  start_time + timedelta(milliseconds=100)  # Adjust start time
+                end_time_delay = start_time + timedelta(milliseconds=duration_milliseconds - 100)
                 # end_time = start_time + duration
                 # Viết phụ đề
                 ass_file.write(f"Dialogue: 0,{format_timedelta_ass(start_time_delay)},{format_timedelta_ass(end_time_delay)},Default,,0,0,0,,2,{get_text_lines(data,iteam['text'])}\n")
