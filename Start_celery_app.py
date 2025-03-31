@@ -113,13 +113,9 @@ class VideoDownloader:
                         "ffmpeg",
                         "-i", rf"{file_cache}",  # Đường dẫn video đầu vào
                         "-vf", f"scale=1280:720,fps=24",  # Độ phân giải
-                        "-c:v", "h264_nvenc",  # Codec video
-                        "-r","24",
-                        "-profile:v" ,"high",
-                        "-b:v","8306k",
-                        "-an","-f",
-                        "mp4","-movflags",
-                        "+faststart",
+                        "-c:v", "hevc_nvenc",
+                        "-c:a", "aac",
+                        "-preset", "p7",
                         "-y",
                         file_path  # Đường dẫn lưu video sau xử lý
                     ]
