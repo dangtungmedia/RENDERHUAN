@@ -30,7 +30,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 from dotenv import load_dotenv
 import psutil
-from .random_video_effect  import random_video_effect_cython
 import boto3
 import threading
 from threading import Lock
@@ -2431,7 +2430,7 @@ def update_status_video(status_video, video_id, task_id, worker_id, url_thumnail
         'title': remove_invalid_chars(title),
         'url_video': url_video,
         'id_video_google': id_video_google,
-        "secret_key": "ugz6iXZ.fM8+9sS}uleGtIb,wuQN^1J%EvnMBeW5#+CYX_ej&%"
+        "secret_key": os.environ.get('SECRET_KEY')
     }
     
     if url_thumnail:

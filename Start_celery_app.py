@@ -265,7 +265,6 @@ def get_local_ip():
 
 # Main function
 if __name__ == "__main__":
-    print("đang xử lý ...")
     output_dir = 'video'
     json_file = 'filtered_data.json'
 
