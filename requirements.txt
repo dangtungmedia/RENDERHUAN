@@ -106,3 +106,4 @@ websockets==13.1
 whisper==1.1.10
 yarl==1.11.1
 yt-dlp==2024.10.7
+aioboto3
