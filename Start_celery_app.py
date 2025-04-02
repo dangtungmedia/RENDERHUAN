@@ -113,13 +113,12 @@ class VideoDownloader:
                         "ffmpeg",
                         "-i", rf"{file_cache}",  # Đường dẫn video đầu vào
                         "-vf", f"scale=1280:720,fps=24",  # Độ phân giải
-                        "-c:v", "h264_nvenc",  # Codec video
-                        "-r","24",
-                        "-profile:v" ,"high",
-                        "-b:v","8306k",
-                        "-an","-f",
-                        "mp4","-movflags",
-                        "+faststart",
+                        "-r", "24",
+                        "-c:v", "hevc_nvenc",
+                        "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
+                        "-b:a", "192k",  # Bitrate âm thanh hợp lý
+                        "-preset", "ultrafast",
+                        "-pix_fmt", "p7",
                         "-y",
                         file_path  # Đường dẫn lưu video sau xử lý
                     ]
@@ -272,15 +271,22 @@ if __name__ == "__main__":
     print("đang xử lý ...")
     output_dir = 'video'
     json_file = 'filtered_data.json'
+    directory_path = "media"
+
+    if os.path.exists(directory_path):
+        shutil.rmtree(directory_path)  # Xóa thư mục và tất cả nội dung bên trong, kể cả khi nó trống
+        print(f"Đã xóa thư mục: {directory_path}")
+    else:
+        print(f"Thư mục {directory_path} không tồn tại.")
 
     # Tạo thư mục video nếu chưa tồn tại
-    # if not os.path.exists(output_dir):
-    #     downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=3000)
-    #     downloader.download_videos(max_workers=20)
-    #     # Xóa thư mục tạm sau khi tải xong
-    #     shutil.rmtree("chace_video", ignore_errors=True)
-    # else:
-    #     print("Có video rồi không cần tải nữa !")
+    if not os.path.exists(output_dir):
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=3000)
+        downloader.download_videos(max_workers=20)
+        # Xóa thư mục tạm sau khi tải xong
+        shutil.rmtree("chace_video", ignore_errors=True)
+    else:
+        print("Có video rồi không cần tải nữa !")
     local_ip = get_local_ip()
     os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
 
