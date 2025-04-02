@@ -230,7 +230,7 @@ def cread_test_reup(data, task_id, worker_id):
     video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir) if f.endswith(('.mp4', '.mkv', '.avi'))]
     
     if not video_files:
-        update_status_video(f"Render Lỗi: không có video để render ", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} không có video để render ", video_id, task_id, worker_id)
         return None
 
     selected_videos = []
@@ -253,16 +253,9 @@ def cread_test_reup(data, task_id, worker_id):
             print(f"Lỗi khi đọc thời gian video {video}: {e}")
 
     if total_duration < duration:
-        update_status_video(f"Render Lỗi: Không thể chọn đủ video để vượt qua thời lượng yêu cầu.", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Không thể chọn đủ video để vượt qua thời lượng yêu cầu.", video_id, task_id, worker_id)
         return None
     update_status_video("Đang Render: Đã chọn xong video nối", video_id, task_id, worker_id)
-    
-    # Tạo thư mục tạm để sao chép video
-    temp_folder = f'media/{video_id}/temp_video_folder'
-    update_status_video("Đang Render: Đang Coppy file tránh lỗi", video_id, task_id, worker_id)
-    copied_videos = copy_videos_to_temp_folder(selected_videos, temp_folder)
-    
-    update_status_video("Đang Render: Đang Coppy xong videos chuẩn bị xuất video hoàn thành", video_id, task_id, worker_id)
     
     # Tạo tệp danh sách video để nối
     output_file_list = f'media/{video_id}/output_files.txt'
@@ -270,14 +263,14 @@ def cread_test_reup(data, task_id, worker_id):
     
     try:
         with open(output_file_list, 'w') as f:
-            for video in copied_videos:
+            for video in selected_videos:
                 full_path = os.path.abspath(video)
                 if os.path.exists(full_path):
                     f.write(f"file '{full_path}'\n")
                 else:
                     print(f"Warning: Video không tồn tại - {full_path}")
     except Exception as e:
-        update_status_video(f"Render Lỗi: Không thể tạo danh sách video {str(e)}", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Không thể tạo danh sách video {str(e)}", video_id, task_id, worker_id)
         return False
 
     # Lấy dữ liệu crop từ tham số
@@ -351,7 +344,7 @@ def cread_test_reup(data, task_id, worker_id):
     except Exception as e:
         print(f"Lỗi khi chạy lệnh ffmpeg: {str(e)}")
         logging.error(f"FFmpeg Error: {e}")
-        update_status_video(f"Render Lỗi: Lỗi khi thực hiện lệnh ffmpeg - {str(e)}", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi:{os.getenv('name_woker')} Lỗi khi thực hiện lệnh ffmpeg - {str(e)}", video_id, task_id, worker_id)
         return False
     
     # Kiểm tra tệp kết quả
@@ -359,7 +352,7 @@ def cread_test_reup(data, task_id, worker_id):
         update_status_video("Đang Render: Xuất video xong ! chuẩn bị upload lên sever", data['video_id'], task_id, worker_id)
         return True
     else:
-        update_status_video("Render Lỗi: Lỗi xuất video bằng ffmpeg vui lòng chạy lại ,file xuất lỗi", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Lỗi xuất video bằng ffmpeg vui lòng chạy lại ,file xuất lỗi", data['video_id'], task_id, worker_id)
         return False
 
 def select_videos_by_total_duration(file_path, min_duration):
@@ -431,7 +424,7 @@ def upload_video(data, task_id, worker_id):
             
             if not os.path.exists(video_path):
                 error_msg = f"Không tìm thấy file {video_path}"
-                update_status_video(f"Render Lỗi : {error_msg}", video_id, task_id, worker_id)
+                update_status_video(f"Render Lỗi : {os.getenv('name_woker')} {error_msg}", video_id, task_id, worker_id)
                 return False
 
             object_name = f'data/{video_id}/{name_video}.mp4'
@@ -473,15 +466,15 @@ def upload_video(data, task_id, worker_id):
 
         except FileNotFoundError as e:
             error_msg = str(e)
-            update_status_video(f"Render Lỗi : File không tồn tại - {error_msg[:20]}", video_id, task_id, worker_id)
+            update_status_video(f"Render Lỗi : {os.getenv('name_woker')} File không tồn tại - {error_msg[:20]}", video_id, task_id, worker_id)
             break  # Nếu file không tồn tại, dừng thử
         except Exception as e:
             error_msg = str(e)
-            update_status_video(f"Render Lỗi : Lỗi khi upload {error_msg[:20]}", video_id, task_id, worker_id)
+            update_status_video(f"Render Lỗi :{os.getenv('name_woker')} Lỗi khi upload {error_msg[:20]}", video_id, task_id, worker_id)
             attempt += 1
             if attempt < max_retries:
                 # Nếu còn lượt thử lại, đợi một chút rồi thử lại
-                update_status_video(f"Render Lỗi : Thử lại lần {attempt + 1}", video_id, task_id, worker_id)
+                update_status_video(f"Render Lỗi :{os.getenv('name_woker')} Thử lại lần {attempt + 1}", video_id, task_id, worker_id)
                 time.sleep(3)  # Đợi 3 giây trước khi thử lại
     return success
 
@@ -561,14 +554,14 @@ def create_video_file(data, task_id, worker_id):
                     update_status_video(f"Đang Render: Đã xuất video {percentage:.2f}%", video_id, task_id, worker_id)
                 except Exception as e:
                     print(f"Error parsing time: {e}")
-                    update_status_video("Render Lỗi : Không thể tính toán hoàn thành", data['video_id'], task_id, worker_id)
+                    update_status_video(f"Render Lỗi : {os.getenv('name_woker')} Không thể tính toán hoàn thành", data['video_id'], task_id, worker_id)
         process.wait()
             
     if process.returncode != 0:
         print("FFmpeg encountered an error.")
         stderr_output = ''.join(process.stderr)
         print(f"Error log:\n{stderr_output}")
-        update_status_video("Render Lỗi : không thể render video hoàn thành ", data['video_id'], task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')} không thể render video hoàn thành ", data['video_id'], task_id, worker_id)
         return False
     else:
         print("Lồng nhạc nền thành công.")
@@ -944,10 +937,10 @@ async def cut_and_scale_video_random_async(input_video, path_video, path_audio, 
                 "-map", "[outv]",
                 "-map", "2:a",
                 "-t", str(duration),
-                "-c:v", "libx265",
+                "-c:v", "hevc_nvenc",
                 "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
                 "-b:a", "192k",  # Bitrate âm thanh hợp lý
-                "-preset", "ultrafast",
+                "-preset", "p7",
                 "-pix_fmt", "yuv420p",
                 "-y",
                 path_video
@@ -963,10 +956,10 @@ async def cut_and_scale_video_random_async(input_video, path_video, path_audio, 
                 "-map", "1:a",
                 "-t", str(duration),
                 '-r', '24',
-                "-c:v", "libx265",
+                "-c:v", "hevc_nvenc",
                 "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
                 "-b:a", "192k",  # Bitrate âm thanh hợp lý
-                "-preset", "ultrafast",
+                "-preset", "p7",
                 "-pix_fmt", "yuv420p",  # Ghi đè file đầu ra nếu đã tồn tại
                 "-y",
                 path_video  # File đầu ra
@@ -1045,10 +1038,10 @@ async def image_to_video_zoom_in_async(image_file, path_video, path_audio, scale
             "-map", "[outv]",
             "-map", "2:a",  # Ánh xạ tất cả stream âm thanh từ file audio thứ 3
             "-t", str(duration),  # Đặt thời lượng video bằng thời lượng audio
-            "-c:v", "libx265",
+            "-c:v", "hevc_nvenc",
             "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
             "-b:a", "192k",  # Bitrate âm thanh hợp lý
-            "-preset", "ultrafast",
+            "-preset", "p7",
             "-pix_fmt", "yuv420p",
             path_video
         ]
@@ -1066,10 +1059,10 @@ async def image_to_video_zoom_in_async(image_file, path_video, path_audio, scale
             "-map", "0:v",  # Đơn giản hóa ánh xạ video
             "-map", "1:a",  # Đơn giản hóa ánh xạ audio
             "-t", str(duration),
-            "-c:v", "libx265",
+            "-c:v", "hevc_nvenc",
             "-c:a", "aac",
             "-b:a", "192k",
-            "-preset", "ultrafast",
+            "-preset", "p7",
             "-pix_fmt", "yuv420p",
             path_video
         ]
@@ -1139,7 +1132,7 @@ async def image_to_video_zoom_out_async(image_file, path_video, path_audio, scal
                     "-filter_complex", 
                     f"[0:v]format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.002':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=240:s={scale_width}x{scale_height}:fps=24[bg];[1:v]scale={scale_width}:{scale_height},fps=24[overlay_scaled];[bg][overlay_scaled]overlay=format=auto,format=yuv420p[outv]",
                     "-r", "24", "-map", "[outv]", "-map", "2:a", "-t", str(duration),
-                    "-c:v", "libx265", "-c:a", "aac", "-b:a", "192k", "-preset", "ultrafast", "-pix_fmt", "yuv420p", path_video
+                    "-c:v", "hevc_nvenc", "-c:a", "aac", "-b:a", "192k", "-preset", "p7", "-pix_fmt", "yuv420p", path_video
                 ]
             else:
                 # Trường hợp 2: Không sử dụng overlay video, sử dụng file audio riêng biệt
@@ -1148,7 +1141,7 @@ async def image_to_video_zoom_out_async(image_file, path_video, path_audio, scal
                     "-i", image_file, "-i", path_audio,  # Path audio làm input thứ 2
                     "-vf", f"format=yuv420p,scale=8000:-1,zoompan=z='zoom+0.005':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=240:s={scale_width}x{scale_height},fps=24",
                     "-r", "24", "-map", "0:v", "-map", "1:a", "-t", str(duration),
-                    "-c:v", "libx265", "-c:a", "aac", "-b:a", "192k", "-preset", "ultrafast", "-pix_fmt", "yuv420p", path_video
+                    "-c:v", "hevc_nvenc", "-c:a", "aac", "-b:a", "192k", "-preset", "p7", "-pix_fmt", "yuv420p", path_video
                 ]
             
             # Chỉ hiển thị lệnh để debug
@@ -1238,19 +1231,19 @@ async def create_video_lines_async(data, task_id, worker_id, max_concurrent):
                 pass
             except Exception as e:
                 print(f"Lỗi khi tạo video: {e}")
-                update_status_video(f"Render Lỗi: Lỗi khi tạo video - {e}", video_id, task_id, worker_id)
+                update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Lỗi khi tạo video - {e}", video_id, task_id, worker_id)
                 # Hủy tất cả các tác vụ còn lại
                 for remaining_task in tasks:
                     if not remaining_task.done():
                         remaining_task.cancel()
                 return False
         
-        update_status_video("Render Render: Tạo video thành công", video_id, task_id, worker_id)
+        update_status_video(f"Render Render: {os.getenv('name_woker')} Tạo video thành công", video_id, task_id, worker_id)
         return True
         
     except Exception as e:
         print("xxxxxxxx{}".format(e))
-        update_status_video(f"Render Lỗi : lỗi xử lý tổng quát video {e}", video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi : {os.getenv('name_woker')} lỗi xử lý tổng quát video {e}", video_id, task_id, worker_id)
         return False  # Dừng quá trình nếu có lỗi tổng quát
 
 async def get_random_video_from_directory(directory_path):
@@ -2215,13 +2208,13 @@ def get_video_info(data,task_id,worker_id):
                 print(f"Lỗi không xác định (lần {attempt + 1}): {str(e)}")
                 if attempt < max_retries - 1:
                     time.sleep(retry_delay)
-        update_status_video(f"Render Lỗi: Không thể tải video sau nhiều lần thử", 
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Không thể tải video sau nhiều lần thử", 
                           data.get('video_id'), task_id, worker_id)
         return None
         
     except Exception as e:
         print(f"Lỗi không xác định trong quá trình xử lý: {str(e)}")
-        update_status_video(f"Render Lỗi: Phương thức download youtube thất bại",video_id, task_id, worker_id)
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Phương thức download youtube thất bại",video_id, task_id, worker_id)
         return None
        
 def update_info_video(data, task_id, worker_id):
@@ -2230,21 +2223,21 @@ def update_info_video(data, task_id, worker_id):
         video_id = data.get('video_id')
         
         if not video_url :
-            update_status_video(f"Render Lỗi: lỗi không có url video", 
+            update_status_video(f"Render Lỗi: {os.getenv('name_woker')} lỗi không có url video", 
                           data.get('video_id'), task_id, worker_id)
             return False
 
 
         result = get_video_info(data,task_id,worker_id)
         if not result:
-            update_status_video(f"Render Lỗi: lỗi lấy thông tin video và tải video", 
+            update_status_video(f"Render Lỗi: {os.getenv('name_woker')} lỗi lấy thông tin video và tải video", 
                           data.get('video_id'), task_id, worker_id)
             return False
         
         
         thumnail = get_youtube_thumbnail(video_url,video_id)
         if not thumnail:
-            update_status_video(f"Render Lỗi: lỗi lấy ảnh thumbnail", 
+            update_status_video(f"Render Lỗi:  {os.getenv('name_woker')} lỗi lấy ảnh thumbnail", 
                           data.get('video_id'), task_id, worker_id)
             return False
         update_status_video("Đang Render : Đã lấy thành công thông tin video reup", 
@@ -2253,19 +2246,19 @@ def update_info_video(data, task_id, worker_id):
 
     except requests.RequestException as e:
         print(f"Network error: {e}")
-        update_status_video(f"Render Lỗi: Lỗi kết nối - {str(e)}", 
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Lỗi kết nối - {str(e)}", 
                           data.get('video_id'), task_id, worker_id)
         return False
         
     except ValueError as e:
         print(f"Value error: {e}")
-        update_status_video(f"Render Lỗi: {str(e)}", 
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')}  {str(e)}", 
                           data.get('video_id'), task_id, worker_id)
         return False
         
     except Exception as e:
         print(f"Unexpected error: {e}")
-        update_status_video(f"Render Lỗi: Lỗi không xác định - {str(e)}", 
+        update_status_video(f"Render Lỗi: {os.getenv('name_woker')} Lỗi không xác định - {str(e)}", 
                           data.get('video_id'), task_id, worker_id)
         return False
     
