@@ -21,7 +21,7 @@ if active_tasks:
             print(f"    Tên: {task['name']}")
             print(f"    Thời gian bắt đầu: {task.get('time_start', 'N/A')}")
             print(f"    Keyword args: {task.get('kwargs', {})}")
-            
+
             data = task.get('args', [])
             
             # Đảm bảo data có phần tử và có key 'video_id'
