@@ -25,7 +25,7 @@ app.conf.result_serializer = 'json'
 
 app.conf.task_track_started = True
 app.conf.worker_prefetch_multiplier = 1
-app.conftask_acks_late=True,  # Xác nhận task khi hoàn thành
-app.conftask_reject_on_worker_lost=True,  # Từ chối task nếu worker bị mất kết nối
-app.confworker_cancel_long_running_tasks_on_exit=True,  # Hủy task nếu worker bị dừng
-app.confbroker_connection_retry_on_startup = True
+app.conf.task_acks_late=True,  # Xác nhận task khi hoàn thành
+app.conf.task_reject_on_worker_lost=True,  # Từ chối task nếu worker bị mất kết nối
+app.conf.worker_cancel_long_running_tasks_on_exit=True,  # Hủy task nếu worker bị dừng
+app.conf.broker_connection_retry_on_startup = True
