@@ -22,7 +22,6 @@ if active_tasks:
             print(f"    Tên: {task['name']}")
             print(f"    Thời gian bắt đầu: {task.get('time_start', 'N/A')}")
             print(f"    Keyword args: {task.get('kwargs', {})}")
-            
             data = task.get('args', [])
             
             # Đảm bảo data có phần tử và có key 'video_id'
@@ -39,6 +38,9 @@ if active_tasks:
                     'worker': worker,
                     'time_start': task.get('time_start', 'N/A')
                 })
+                
+                
+                print(video_id)
             else:
                 print(f"    --> Không tìm thấy video_id trong task này")
     
@@ -63,6 +65,7 @@ if active_tasks:
             for task_info in task_details[video_id]:
                 print(f"  - Task ID: {task_info['task_id']}")
                 print(f"    Worker: {task_info['worker']}")
+                print("xxxxxxxxxxxxxxxxxxx")
                 print(f"    Worker: {video_id}")
                 print(f"    Thời gian bắt đầu: {task_info['time_start']}")
                 
