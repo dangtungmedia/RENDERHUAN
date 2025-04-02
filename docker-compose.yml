@@ -19,4 +19,18 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all  # Hoặc chỉ định GPU cụ thể như "0" hoặc "0,1"
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video  # Bao gồm khả năng mã hóa video
-    
+  voicevox:
+    image: voicevox/voicevox_engine:nvidia-latest
+    container_name: voicevox-engine
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - "127.0.0.1:50021:50021"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    restart: unless-stopped

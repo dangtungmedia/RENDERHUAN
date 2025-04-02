@@ -28,3 +28,6 @@ https://www.youtube.com/watch?v=Z6gOGWSmjvU&pp=ygUGY2h1IGR1
 yt-dlp -v "https://www.youtube.com/watch?v=Z6gOGWSmjvU&pp=ygUGY2h1IGR1"
 
 python setup.py build_ext --inplace
+
+
+docker exec -it ffacd2514822 /bin/bash
