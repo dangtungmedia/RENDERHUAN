@@ -63,6 +63,7 @@ if active_tasks:
             for task_info in task_details[video_id]:
                 print(f"  - Task ID: {task_info['task_id']}")
                 print(f"    Worker: {task_info['worker']}")
+                print(f"    Worker: {video_id}")
                 print(f"    Thời gian bắt đầu: {task_info['time_start']}")
                 
                 
@@ -70,6 +71,6 @@ if active_tasks:
         print("\nTrạng thái hiện tại của các video:")
         print(len(videos))
         for video in videos:
-            print(f"Video ID: {video.id}, Trạng thái: {video.status_video} , name video {video.name_video}")
+            print(f"Video ID: {video.id}, Trạng thái: {video.status_video} , name video {video.name_video} ,{video.folder_id} ,{video.profile_id}")
 else:
     print("Không có task đang hoạt động hoặc không có worker nào đang chạy")
