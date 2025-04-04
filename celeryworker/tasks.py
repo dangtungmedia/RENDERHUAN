@@ -2265,7 +2265,7 @@ def update_info_video(data, task_id, worker_id):
             update_status_video(f"Render Lỗi: {os.getenv('name_woker')} lỗi lấy ảnh thumbnail", 
                           data.get('video_id'), task_id, worker_id)
             return False
-        update_status_video(f"Đang Render : {os.getenv('name_woker')} Đã lấy thành công thông tin video reup", 
+        update_status_video(f"Đang Render : Đã lấy thành công thông tin video reup", 
                           video_id, task_id, worker_id,url_thumnail=thumnail,title=result["title"])
         return True
 
