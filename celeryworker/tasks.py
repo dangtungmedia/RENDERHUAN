@@ -2415,9 +2415,10 @@ def update_status_video(status_video, video_id, task_id, worker_id, url_thumnail
         try:
             with open(url_thumnail, 'rb') as f:
                 data_file = {'thumnail': f}
-                http_client.send(data, file_data=data_file)
+                return http_client.send(data, file_data=data_file)  # Gửi tại đây luôn
         except FileNotFoundError:
-            pass
+            print(f"❌ Không tìm thấy file: {url_thumnail}")
     else:
-        http_client.send(data)
+        return http_client.send(data)
+
         
