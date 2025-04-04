@@ -26,6 +26,7 @@ if active_tasks:
             
             # Đảm bảo data có phần tử và có key 'video_id'
             if data and isinstance(data[0], dict) and 'video_id' in data[0]:
+                print(f"    Tên: {task['name']}")
                 video_id = data[0]['video_id']
                 list_id.append(video_id)
                 tasks_to_revoke.append(task_id)

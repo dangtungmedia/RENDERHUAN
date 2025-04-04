@@ -30,4 +30,4 @@ yt-dlp -v "https://www.youtube.com/watch?v=Z6gOGWSmjvU&pp=ygUGY2h1IGR1"
 python setup.py build_ext --inplace
 
 
-docker exec -it 6655d7697fdc /bin/bash
+docker exec -it 1d44c2b710a0 /bin/bash

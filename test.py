@@ -7,7 +7,7 @@ purged = app.control.purge()
 print(f"Đã xóa {purged} task.")
 
 from core.celery import app 
-from apps.render.models import VideoRender
+from apps.render.task import render_video_task
 
 # Kiểm tra các task đang hoạt động
 active_tasks = app.control.inspect().active()
