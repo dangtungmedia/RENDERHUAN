@@ -2314,8 +2314,9 @@ def get_youtube_thumbnail(youtube_url, video_id):
             'sd': f'https://i3.ytimg.com/vi/{video_id_youtube}/sddefault.jpg',
             'default': f'https://i3.ytimg.com/vi/{video_id_youtube}/default.jpg'
         }
-
-        save_dir = os.path.join('media', video_id, 'thumbnail')
+        BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+        MEDIA_DIR = os.path.join(BASE_DIR, 'media')
+        save_dir = os.path.join(MEDIA_DIR, video_id, 'thumbnail')
         os.makedirs(save_dir, exist_ok=True)
 
         for quality, url in thumbnails.items():
