@@ -117,8 +117,8 @@ class VideoDownloader:
                         "-c:v", "hevc_nvenc",
                         "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
                         "-b:a", "192k",  # Bitrate âm thanh hợp lý
-                        "-preset", "ultrafast",
-                        "-pix_fmt", "p7",
+                        "-preset", "p7",
+                        "-pix_fmt", "yuv420p",
                         "-y",
                         file_path  # Đường dẫn lưu video sau xử lý
                     ]
@@ -281,7 +281,7 @@ if __name__ == "__main__":
 
     # Tạo thư mục video nếu chưa tồn tại
     if not os.path.exists(output_dir):
-        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=3000)
+        downloader = VideoDownloader(json_file=json_file, output_dir=output_dir, max_videos=10000)
         downloader.download_videos(max_workers=20)
         # Xóa thư mục tạm sau khi tải xong
         shutil.rmtree("chace_video", ignore_errors=True)
