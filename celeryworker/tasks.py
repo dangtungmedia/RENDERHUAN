@@ -1379,7 +1379,7 @@ async def cut_and_scale_video_random_async(input_video, path_video, path_audio, 
                     stderr=asyncio.subprocess.PIPE
                 )
                 
-                stdout, stderr =  process.communicate()
+                stdout, stderr = await process.communicate()
                 
                 if process.returncode == 0:
                     print(f"Video created successfully: {path_video}")
