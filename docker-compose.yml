@@ -10,15 +10,9 @@ services:
     network_mode: host
   voicevox_render:
     container_name: voicevox_render
-    image: voicevox/voicevox_engine:nvidia-ubuntu20.04-latest
+    image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
     ports:
       - "127.0.0.1:50021:50021"
     restart: always
     volumes:
       - .:/app
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [ gpu ]
-    runtime: nvidia
