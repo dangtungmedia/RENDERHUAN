@@ -118,7 +118,7 @@ def render_video(self, data):
     update_status_video("Đang Render : Đang xử lý video render", data['video_id'], task_id, worker_id)
     success = create_or_reset_directory(f'media/{video_id}')
     
-    if not os.path.exists("video_screen") :
+    if not os.path.exists("VIDEO_SCREEN") :
         update_status_video(f"Render Lỗi : {os.getenv('name_woker')}  Thiếu các tệp video  và  video_screen ", data['video_id'], task_id, worker_id)
         return
 
