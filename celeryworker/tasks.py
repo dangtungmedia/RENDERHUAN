@@ -1566,7 +1566,7 @@ async def get_random_video_from_directory(directory_path):
 
 def create_video_lines(data, task_id, worker_id):
     logical_cores = psutil.cpu_count(logical=True)
-    max_concurrent=int(logical_cores /8)
+    max_concurrent=int(logical_cores /4)
     return asyncio.run(create_video_lines_async(data, task_id, worker_id,max_concurrent))
 
 async def login_data_async(session, email, password):
