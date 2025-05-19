@@ -114,10 +114,10 @@ class VideoDownloader:
                         "-i", rf"{file_cache}",  # Đường dẫn video đầu vào
                         "-vf", f"scale=1280:720,fps=24",  # Độ phân giải
                         "-r", "24",
-                        "-c:v", "h264_nvenc",  # Codec video
+                        "-c:v", "hevc_nvenc",  # Codec video
                         "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
                         "-b:a", "192k",  # Bitrate âm thanh hợp lý
-                        "-preset", "p7",
+                        "-preset", "hq",
                         "-pix_fmt", "yuv420p",  # Định dạng pixel
                         "-y",
                         file_path  # Đường dẫn lưu video sau xử lý
@@ -266,13 +266,28 @@ def get_local_ip():
         print(f"Error getting local IP: {e}")
         return None
 
+def get_public_ip():
+    try:
+        # Sử dụng ipify API để lấy địa chỉ IPv4 public
+        response = requests.get("https://api.ipify.org")
+        if response.status_code == 200:
+            return response.text.strip()
+        else:
+            print(f"Failed to get public IP: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"Error getting public IP: {e}")
+        return None
+
+
 # Main function
 if __name__ == "__main__":
     print("đang xử lý ...")
     output_dir = 'video'
     json_file = 'filtered_data.json'
     directory_path = "media"
-
+    ip_puplic = get_public_ip()
+    local_ip = get_local_ip()
     if os.path.exists(directory_path):
         shutil.rmtree(directory_path)  # Xóa thư mục và tất cả nội dung bên trong, kể cả khi nó trống
         print(f"Đã xóa thư mục: {directory_path}")
@@ -287,6 +302,6 @@ if __name__ == "__main__":
         shutil.rmtree("chace_video", ignore_errors=True)
     else:
         print("Có video rồi không cần tải nữa !")
-    local_ip = get_local_ip()
-    os.system(f"celery -A celeryworker worker -l INFO --hostname={local_ip} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
+    
+    os.system(f"celery -A celeryworker worker -l INFO --hostname=IPV4:{ip_puplic}/IP_LOCLAL:{local_ip} --concurrency={os.getenv('Luong_Render')} -Q {os.getenv('Task_Render')} --prefetch-multiplier=1")
 
