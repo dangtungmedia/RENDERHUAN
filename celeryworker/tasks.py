@@ -754,7 +754,9 @@ def create_subtitles(data, task_id, worker_id):
             total_entries = json.loads(text)
          
             for i,iteam in enumerate(total_entries):
+                print(f'media/{video_id}/video/{iteam["id"]}.mp4')
                 duration = get_video_duration(f'media/{video_id}/video/{iteam["id"]}.mp4')
+                print(duration)
                 duration_milliseconds = duration * 1000
                 end_time = start_time + timedelta(milliseconds=duration_milliseconds)
                 start_time_delay =  start_time + timedelta(milliseconds=100)  # Adjust start time
@@ -1286,76 +1288,77 @@ def format_time(seconds):
     return f"{hours:02}:{minutes:02}:{secs:06.3f}"
 
 async def cut_and_scale_video_random_async(input_video, path_video, path_audio, scale_width, scale_height):
-    max_retries = 10
+    max_retries = 5
     attempt = 1
+
     while attempt <= max_retries:
-        print(f"Thử lần {attempt}/{max_retries}: Đang cắt video {input_video} và thay đổi tốc độ.")
+        print(f"🌀 Thử lần {attempt}/{max_retries}: Xử lý video {input_video}...")
+
         video_length = get_video_duration(input_video)
-        duration = get_audio_duration(path_audio)
-        start_time = random.uniform(0, video_length - duration)
-        start_time_str = format_time(start_time)
-        print(f"Thời gian bắt đầu: {start_time_str}")
-        print(f"Thời lượng video: {duration}")
-        print(f"Độ dài video: {video_length}")
-        
-        # Kiểm tra xem video có ngắn hơn audio không và tính tỷ lệ tốc độ video cần thay đổi
-        if video_length < duration:
-            scale_factor = duration / video_length
+        audio_duration = get_audio_duration(path_audio)
+
+        if video_length <= audio_duration:
+            start_time = 0
+            scale_factor = audio_duration / video_length
         else:
-            scale_factor = 1  # Giữ nguyên tốc độ video nếu video dài hơn hoặc bằng audio
+            start_time = random.uniform(0, video_length - audio_duration)
+            scale_factor = 1
+
+        start_time_str = format_time(start_time)
+
         ffmpeg_command = [
             "ffmpeg",
-            "-ss", start_time_str,  # Thời gian bắt đầu cắt
-            "-i", input_video,  # Video đầu vào
-            "-i", path_audio,  # Audio đầu vào
-            "-vf", f"scale={scale_width}:{scale_height},setpts={scale_factor}*PTS,format=yuv420p",  # Bộ lọc video
+            "-ss", start_time_str,
+            "-i", input_video,
+            "-i", path_audio,
+            "-vf", f"scale={scale_width}:{scale_height},setpts={scale_factor}*PTS,format=yuv420p",
             "-map", "0:v",
             "-map", "1:a",
-            "-t", str(duration),
-            '-r', '24',
+            "-t", str(audio_duration),
+            "-r", "24",
             "-c:v", "libx265",
-            "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
-            "-b:a", "192k",  # Bitrate âm thanh hợp lý
-            "-preset", "veryfast",
-            "-pix_fmt", "yuv420p",  # Ghi đè file đầu ra nếu đã tồn tại
-            "-y",
-            path_video  # File đầu ra
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-preset", "ultrafast",
+            "-pix_fmt", "yuv420p",
+            "-y", path_video
         ]
 
-        for attempt in range(max_retries):
-            path_cmd = " ".join(ffmpeg_command)
-            print(f"Command: {path_cmd}")
-            print("xxxxxxxxxxxxxxxxxxxxx")
-            print(f"Attempt {attempt + 1}/{max_retries}: Creating video {path_video}")
-            try:
-                # Sử dụng asyncio.create_subprocess_shell để chạy FFmpeg bất đồng bộ
-                process = await asyncio.create_subprocess_exec(
-                    *ffmpeg_command,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
-                )
-                
-                stdout, stderr = await process.communicate()
-                
-                if process.returncode == 0:
-                    print(f"Video created successfully: {path_video}")
-                    return True  # Thành công, thoát hàm
-                else:
-                    print(f"FFmpeg error: {stderr.decode()}")
-                    raise Exception(f"FFmpeg process failed with return code {process.returncode}")
-                    
-            except Exception as e:
-                print(f"Attempt {attempt + 1}/{max_retries} failed. Error: {e}")
-                if attempt + 1 == max_retries:
-                    print(f"Failed to create video after {max_retries} attempts: {path_video}")
-                    return False
-                else:
-                    print("Retrying...")
-                    asyncio.sleep(2) 
-        
-    # Nếu hết max_attempts lần thử mà vẫn lỗi
-    print(f"Lỗi: Không thể tạo video {path_video} sau {max_retries} lần thử.")
-    raise Exception(f"Không thể tạo video sau {max_retries} lần thử.")
+        try:
+            print(f"📦 Chạy FFmpeg: {' '.join(ffmpeg_command)}")
+            process = await asyncio.create_subprocess_exec(
+                *ffmpeg_command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            stdout, stderr = await process.communicate()
+
+            # ✅ Kiểm tra file output
+            if os.path.exists(path_video):
+                try:
+                    out_duration = get_video_duration(path_video)
+                    if out_duration > 0:
+                        print(f"✅ Video tạo thành công ({out_duration:.2f} giây): {path_video}")
+                        return True
+                    else:
+                        print(f"⚠️ File tồn tại nhưng không có âm thanh. Xoá và thử lại.")
+                        os.remove(path_video)
+                except Exception as dur_err:
+                    print(f"⚠️ Không đọc được thời lượng video output: {dur_err}")
+                    os.remove(path_video)
+            else:
+                print("❌ Không tạo được file video output.")
+
+        except Exception as e:
+            print(f"❌ Lỗi khi chạy ffmpeg: {e}")
+            if os.path.exists(path_video):
+                os.remove(path_video)
+
+        attempt += 1
+        await asyncio.sleep(2)
+
+    print(f"⛔ Không thể tạo video hợp lệ sau {max_retries} lần thử: {path_video}")
+    return False
 
 def overlay_rgba_onto_rgb(background, overlay_rgba, x=0, y=0):
     """
@@ -1875,7 +1878,7 @@ async def process_video_segment_async(data, text_entry, i, video_id, task_id, wo
                 "-t", str(duration),
                 "-r", "24",
                 "-c:v", "libx265",
-                "-preset", "veryfast",
+                "-preset", "ultrafast",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
                 "-b:a", "192k",
