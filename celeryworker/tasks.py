@@ -1308,7 +1308,7 @@ async def cut_and_scale_video_random_async(input_video, path_video, path_audio, 
             "-ss", start_time_str,  # Thời gian bắt đầu cắt
             "-i", input_video,  # Video đầu vào
             "-i", path_audio,  # Audio đầu vào
-            "-vf", f"scale={scale_width}:{scale_height},fps=24,setpts={scale_factor}*PTS,format=yuv420p",  # Bộ lọc video
+            "-vf", f"scale={scale_width}:{scale_height},setpts={scale_factor}*PTS,format=yuv420p",  # Bộ lọc video
             "-map", "0:v",
             "-map", "1:a",
             "-t", str(duration),
@@ -1316,7 +1316,7 @@ async def cut_and_scale_video_random_async(input_video, path_video, path_audio, 
             "-c:v", "libx265",
             "-c:a", "aac",  # Đảm bảo codec âm thanh là AAC
             "-b:a", "192k",  # Bitrate âm thanh hợp lý
-            "-preset", "ultrafast",
+            "-preset", "veryfast",
             "-pix_fmt", "yuv420p",  # Ghi đè file đầu ra nếu đã tồn tại
             "-y",
             path_video  # File đầu ra
@@ -1870,8 +1870,15 @@ async def process_video_segment_async(data, text_entry, i, video_id, task_id, wo
                 "-y",
                 "-i", temp_video,
                 "-i", path_audio,
-                "-c:v", "copy",
+                "-map", "0:v",
+                "-map", "1:a",
+                "-t", str(duration),
+                "-r", "24",
+                "-c:v", "libx265",
+                "-preset", "veryfast",
+                "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
+                "-b:a", "192k",
                 "-shortest",
                 out_file
             ]
